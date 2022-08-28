@@ -9,9 +9,14 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   View,
+  ImageBackground,
 } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+
+const bgImgURL = {
+  uri: 'https://cdn.vox-cdn.com/thumbor/Al48-pEnyIn2rlgKX7MIHNmlE68=/0x0:5563x3709/1200x800/filters:focal(2302x1311:3192x2201)/cdn.vox-cdn.com/uploads/chorus_image/image/65752607/1048232144.jpg.0.jpg',
+};
 
 export default function App() {
   const [name, setName] = useState('');
@@ -50,22 +55,24 @@ export default function App() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container} onLayout={onLayoutRootView}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <TextInput
-            value={name}
-            onChangeText={nameHandler}
-            placeholder="Username"
-            style={styles.input}
-          />
-          <TextInput
-            value={password}
-            onChangeText={passwordHandler}
-            placeholder="Password"
-            secureTextEntry={true}
-            style={styles.input}
-          />
-          <Button title={'Login'} style={styles.input} onPress={onLogin} />
-        </KeyboardAvoidingView>
+        <ImageBackground source={bgImgURL} resizeMode="cover" style={styles.image}>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+            <TextInput
+              value={name}
+              onChangeText={nameHandler}
+              placeholder="Username"
+              style={styles.input}
+            />
+            <TextInput
+              value={password}
+              onChangeText={passwordHandler}
+              placeholder="Password"
+              secureTextEntry={true}
+              style={styles.input}
+            />
+            <Button title={'Login'} style={styles.input} onPress={onLogin} />
+          </KeyboardAvoidingView>
+        </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -74,7 +81,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
     fontFamily: 'Roboto-Regular',
     ...Platform.select({
@@ -94,5 +100,10 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     marginBottom: 10,
     fontFamily: 'DynaPuff-Regular',
+  },
+  image: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
