@@ -8,62 +8,136 @@ import {
   TouchableOpacity,
   Linking,
   Keyboard,
-  Image,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
-import { Formik } from 'formik';
+import { ErrorMessage, Formik } from 'formik';
+import * as yup from 'yup';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+
+const registerSchema = yup.object({
+  login: yup
+    .string()
+    .required('Это поле не может быть пустым')
+    .min(2, 'Слишком короткий логин')
+    .max(32, 'Слишком длинный логин'),
+  email: yup
+    .string()
+    .required('Это поле не может быть пустым')
+    .email('Невалидный электронный адрес'),
+  password: yup
+    .string()
+    .required('Это поле не может быть пустым')
+    .min(8, 'Слишком короткий пароль')
+    .max(32, 'Пароль не может содержать больше 32 символов'),
+});
 
 export default function RegistrationScreen() {
+  const [focusedItem, setFocusedItem] = useState('');
+  const [isHiddenPassword, setIsHiddenPassword] = useState(true);
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <ImageBackground source={require('../assets/bg-image.jpg')} style={styles.image}>
           <View style={styles.avatarContainer}>
-            <View>
-              <TouchableOpacity style={styles.buttonIcon} onPress={() => {}}>
-                <Image source={require('../assets/icons/add.png')} style={styles.image} />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
+              <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
+            </TouchableOpacity>
           </View>
           <Formik
             initialValues={{ login: '', email: '', password: '' }}
+            validationSchema={registerSchema}
             onSubmit={(values, { resetForm }) => {
               console.log(values);
               resetForm();
+              setFocusedItem('');
+              Keyboard.dismiss();
             }}
           >
             {props => (
               <View style={styles.regFormContainer}>
                 <Text style={styles.formTitle}>Регистрация</Text>
-                <TextInput
-                  value={props.values.login}
-                  onChangeText={props.handleChange('login')}
-                  placeholder="Логин"
-                  placeholderTextColor="#BDBDBD"
-                  style={styles.input}
-                  underlineColorAndroid={'transparent'}
-                />
-                <TextInput
-                  value={props.values.email}
-                  onChangeText={props.handleChange('email')}
-                  placeholder="Адрес электронной почты"
-                  placeholderTextColor="#BDBDBD"
-                  style={styles.input}
-                  autoComplete={'email'}
-                  keyboardType={'email-address'}
-                />
-                <TextInput
-                  value={props.values.password}
-                  onChangeText={props.handleChange('password')}
-                  placeholder="Пароль"
-                  placeholderTextColor="#BDBDBD"
-                  secureTextEntry={true}
-                  style={styles.input}
-                />
-                <View style={styles.buttonContainer}>
-                  <TouchableOpacity onPress={props.handleSubmit}>
-                    <Text style={styles.buttonText}>Зарегистрироваться</Text>
-                  </TouchableOpacity>
-                </View>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
+                  <TextInput
+                    value={props.values.login}
+                    onChangeText={props.handleChange('login')}
+                    onFocus={() => setFocusedItem('login')}
+                    onBlur={() => props.handleBlur('login')}
+                    placeholder="Логин"
+                    placeholderTextColor="#BDBDBD"
+                    style={[
+                      focusedItem === 'login'
+                        ? { ...styles.input, ...styles.inputOnFocus }
+                        : styles.input,
+                    ]}
+                    underlineColorAndroid={'transparent'}
+                  />
+                  {props.errors.login && props.touched.login && (
+                    <Text style={styles.errorText}>{props.errors.login}</Text>
+                  )}
+
+                  <TextInput
+                    value={props.values.email}
+                    onChangeText={props.handleChange('email')}
+                    onFocus={() => setFocusedItem('email')}
+                    onBlur={() => props.handleBlur('email')}
+                    placeholder="Адрес электронной почты"
+                    placeholderTextColor="#BDBDBD"
+                    autoComplete={'email'}
+                    keyboardType={'email-address'}
+                    style={[
+                      focusedItem === 'email'
+                        ? { ...styles.input, ...styles.inputOnFocus }
+                        : styles.input,
+                    ]}
+                  />
+                  {props.errors.email && props.touched.email && (
+                    <Text style={styles.errorText}>{props.errors.email}</Text>
+                  )}
+
+                  <View>
+                    <TextInput
+                      value={props.values.password}
+                      onChangeText={props.handleChange('password')}
+                      onFocus={() => setFocusedItem('password')}
+                      onBlur={() => props.handleBlur('password')}
+                      placeholder="Пароль"
+                      placeholderTextColor="#BDBDBD"
+                      secureTextEntry={isHiddenPassword}
+                      style={[
+                        focusedItem === 'password'
+                          ? { ...styles.input, ...styles.inputOnFocus }
+                          : styles.input,
+                      ]}
+                    />
+                    <TouchableOpacity
+                      style={styles.passwordIcon}
+                      activeOpacity={0.8}
+                      onPress={() => setIsHiddenPassword(!isHiddenPassword)}
+                    >
+                      <Ionicons
+                        name={isHiddenPassword ? 'ios-eye' : 'ios-eye-off'}
+                        size={28}
+                        color="#808080"
+                      />
+                    </TouchableOpacity>
+
+                    {props.errors.password && props.touched.password && (
+                      <Text style={styles.errorText}>{props.errors.password}</Text>
+                    )}
+                  </View>
+                </KeyboardAvoidingView>
+
+                <TouchableOpacity
+                  style={styles.buttonContainer}
+                  activeOpacity={0.8}
+                  onPress={props.handleSubmit}
+                >
+                  <Text style={styles.buttonText}>Зарегистрироваться</Text>
+                </TouchableOpacity>
+
                 <Text
                   style={styles.text}
                   accessibilityRole="link"
@@ -83,8 +157,6 @@ export default function RegistrationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'flex-end',
-    // fontFamily: 'Roboto-Regular',
   },
   avatarContainer: {
     marginBottom: -60,
@@ -105,6 +177,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  errorText: {
+    color: '#AF0606',
+    fontSize: 12,
+    textAlign: 'center',
   },
   regFormContainer: {
     alignSelf: 'stretch',
@@ -127,6 +204,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginTop: 16,
     padding: 16,
+    paddingRight: 40,
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderStyle: 'solid',
@@ -136,6 +214,15 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
+  },
+  inputOnFocus: {
+    backgroundColor: '#fff',
+    borderColor: '#FF6C00',
+  },
+  passwordIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 25,
   },
   buttonContainer: {
     marginTop: 44,
