@@ -6,12 +6,11 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  Linking,
   Keyboard,
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { ErrorMessage, Formik } from 'formik';
+import { Formik } from 'formik';
 import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
@@ -46,108 +45,115 @@ export default function RegistrationScreen() {
               <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
             </TouchableOpacity>
           </View>
-          <Formik
-            initialValues={{ login: '', email: '', password: '' }}
-            validationSchema={registerSchema}
-            onSubmit={(values, { resetForm }) => {
-              console.log(values);
-              resetForm();
-              setFocusedItem('');
-              Keyboard.dismiss();
-            }}
-          >
-            {props => (
-              <View style={styles.regFormContainer}>
-                <Text style={styles.formTitle}>Регистрация</Text>
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
-                  <TextInput
-                    value={props.values.login}
-                    onChangeText={props.handleChange('login')}
-                    onFocus={() => setFocusedItem('login')}
-                    onBlur={() => props.handleBlur('login')}
-                    placeholder="Логин"
-                    placeholderTextColor="#BDBDBD"
-                    style={[
-                      focusedItem === 'login'
-                        ? { ...styles.input, ...styles.inputOnFocus }
-                        : styles.input,
-                    ]}
-                    underlineColorAndroid={'transparent'}
-                  />
-                  {props.errors.login && props.touched.login && (
-                    <Text style={styles.errorText}>{props.errors.login}</Text>
-                  )}
-
-                  <TextInput
-                    value={props.values.email}
-                    onChangeText={props.handleChange('email')}
-                    onFocus={() => setFocusedItem('email')}
-                    onBlur={() => props.handleBlur('email')}
-                    placeholder="Адрес электронной почты"
-                    placeholderTextColor="#BDBDBD"
-                    autoComplete={'email'}
-                    keyboardType={'email-address'}
-                    style={[
-                      focusedItem === 'email'
-                        ? { ...styles.input, ...styles.inputOnFocus }
-                        : styles.input,
-                    ]}
-                  />
-                  {props.errors.email && props.touched.email && (
-                    <Text style={styles.errorText}>{props.errors.email}</Text>
-                  )}
-
-                  <View>
+          <View style={styles.regFormContainer}>
+            <Formik
+              initialValues={{ login: '', email: '', password: '' }}
+              validationSchema={registerSchema}
+              onSubmit={(values, { resetForm }) => {
+                Keyboard.dismiss();
+                resetForm();
+                console.log(values);
+              }}
+            >
+              {props => (
+                <View>
+                  <Text style={styles.formTitle}>Регистрация</Text>
+                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
                     <TextInput
-                      value={props.values.password}
-                      onChangeText={props.handleChange('password')}
-                      onFocus={() => setFocusedItem('password')}
-                      onBlur={() => props.handleBlur('password')}
-                      placeholder="Пароль"
+                      value={props.values.login}
+                      onChangeText={props.handleChange('login')}
+                      onFocus={() => setFocusedItem('login')}
+                      onBlur={() => {
+                        props.setFieldTouched('login');
+                        setFocusedItem('');
+                      }}
+                      placeholder="Логин"
                       placeholderTextColor="#BDBDBD"
-                      secureTextEntry={isHiddenPassword}
                       style={[
-                        focusedItem === 'password'
+                        focusedItem === 'login'
                           ? { ...styles.input, ...styles.inputOnFocus }
                           : styles.input,
                       ]}
+                      underlineColorAndroid={'transparent'}
                     />
-                    <TouchableOpacity
-                      style={styles.passwordIcon}
-                      activeOpacity={0.8}
-                      onPress={() => setIsHiddenPassword(!isHiddenPassword)}
-                    >
-                      <Ionicons
-                        name={isHiddenPassword ? 'ios-eye' : 'ios-eye-off'}
-                        size={28}
-                        color="#808080"
-                      />
-                    </TouchableOpacity>
-
-                    {props.errors.password && props.touched.password && (
-                      <Text style={styles.errorText}>{props.errors.password}</Text>
+                    {props.errors.login && props.touched.login && (
+                      <Text style={styles.errorText}>{props.errors.login}</Text>
                     )}
-                  </View>
-                </KeyboardAvoidingView>
 
-                <TouchableOpacity
-                  style={styles.buttonContainer}
-                  activeOpacity={0.8}
-                  onPress={props.handleSubmit}
-                >
-                  <Text style={styles.buttonText}>Зарегистрироваться</Text>
-                </TouchableOpacity>
+                    <TextInput
+                      value={props.values.email}
+                      onChangeText={props.handleChange('email')}
+                      onFocus={() => setFocusedItem('email')}
+                      onBlur={() => {
+                        props.setFieldTouched('email');
+                        setFocusedItem('');
+                      }}
+                      placeholder="Адрес электронной почты"
+                      placeholderTextColor="#BDBDBD"
+                      autoComplete={'email'}
+                      keyboardType={'email-address'}
+                      style={[
+                        focusedItem === 'email'
+                          ? { ...styles.input, ...styles.inputOnFocus }
+                          : styles.input,
+                      ]}
+                      underlineColorAndroid={'transparent'}
+                    />
+                    {props.errors.email && props.touched.email && (
+                      <Text style={styles.errorText}>{props.errors.email}</Text>
+                    )}
 
-                <Text
-                  style={styles.text}
-                  accessibilityRole="link"
-                  onPress={() => Linking.openURL('https://www.google.com/')}
-                >
-                  Уже есть аккаунт? Войти
-                </Text>
-              </View>
-            )}
-          </Formik>
+                    <View>
+                      <TextInput
+                        value={props.values.password}
+                        onChangeText={props.handleChange('password')}
+                        onFocus={() => setFocusedItem('password')}
+                        onBlur={() => {
+                          props.setFieldTouched('password');
+                          setFocusedItem('');
+                        }}
+                        placeholder="Пароль"
+                        placeholderTextColor="#BDBDBD"
+                        secureTextEntry={isHiddenPassword}
+                        style={[
+                          focusedItem === 'password'
+                            ? { ...styles.input, ...styles.inputOnFocus }
+                            : styles.input,
+                        ]}
+                        underlineColorAndroid={'transparent'}
+                      />
+                      <TouchableOpacity
+                        style={styles.passwordIcon}
+                        activeOpacity={0.8}
+                        onPress={() => setIsHiddenPassword(!isHiddenPassword)}
+                      >
+                        <Ionicons
+                          name={isHiddenPassword ? 'ios-eye' : 'ios-eye-off'}
+                          size={28}
+                          color="#808080"
+                        />
+                      </TouchableOpacity>
+
+                      {props.errors.password && props.touched.password && (
+                        <Text style={styles.errorText}>{props.errors.password}</Text>
+                      )}
+                    </View>
+                  </KeyboardAvoidingView>
+
+                  <TouchableOpacity
+                    style={styles.buttonContainer}
+                    activeOpacity={0.8}
+                    onPress={props.handleSubmit}
+                  >
+                    <Text style={styles.buttonText}>Зарегистрироваться</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Formik>
+            <TouchableOpacity onPress={() => {}} activeOpacity={0.8}>
+              <Text style={styles.text}>Уже есть аккаунт? Войти</Text>
+            </TouchableOpacity>
+          </View>
         </ImageBackground>
       </View>
     </TouchableWithoutFeedback>
@@ -170,8 +176,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -13,
     top: 81,
-    height: 25,
-    width: 25,
+    height: 26,
+    width: 26,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
   },
   image: {
     flex: 1,
