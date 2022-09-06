@@ -32,11 +32,6 @@ export default function LoginScreen() {
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
-  const keyboardHide = () => {
-    setIsKeyboardVisible(false);
-    Keyboard.dismiss();
-  };
-
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       setIsKeyboardVisible(true);
@@ -52,7 +47,7 @@ export default function LoginScreen() {
   }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <ImageBackground source={require('../assets/bg-image.jpg')} style={styles.image}>
           <View style={styles.regFormContainer}>
@@ -61,7 +56,6 @@ export default function LoginScreen() {
               validationSchema={loginSchema}
               onSubmit={(values, { resetForm }) => {
                 console.log(values);
-                keyboardHide();
                 resetForm();
               }}
             >
@@ -227,6 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingHorizontal: 32,
     paddingVertical: 16,
+    opacity: 1,
   },
   buttonText: {
     fontFamily: 'Roboto-Regular',
@@ -243,5 +238,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     color: '#1B4371',
+    opacity: 1,
   },
 });

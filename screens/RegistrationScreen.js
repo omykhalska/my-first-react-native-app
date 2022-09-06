@@ -13,7 +13,7 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const registerSchema = yup.object({
   login: yup
@@ -35,6 +35,21 @@ const registerSchema = yup.object({
 export default function RegistrationScreen() {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -50,13 +65,12 @@ export default function RegistrationScreen() {
               initialValues={{ login: '', email: '', password: '' }}
               validationSchema={registerSchema}
               onSubmit={(values, { resetForm }) => {
-                Keyboard.dismiss();
-                resetForm();
                 console.log(values);
+                resetForm();
               }}
             >
               {props => (
-                <View>
+                <View style={{ marginBottom: isKeyboardVisible ? 32 : 0 }}>
                   <Text style={styles.formTitle}>Регистрация</Text>
                   <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
                     <TextInput
@@ -141,7 +155,10 @@ export default function RegistrationScreen() {
                   </KeyboardAvoidingView>
 
                   <TouchableOpacity
-                    style={styles.buttonContainer}
+                    style={{
+                      ...styles.buttonContainer,
+                      display: isKeyboardVisible ? 'none' : 'flex',
+                    }}
                     activeOpacity={0.8}
                     onPress={props.handleSubmit}
                   >
@@ -151,7 +168,14 @@ export default function RegistrationScreen() {
               )}
             </Formik>
             <TouchableOpacity onPress={() => {}} activeOpacity={0.8}>
-              <Text style={styles.text}>Уже есть аккаунт? Войти</Text>
+              <Text
+                style={{
+                  ...styles.text,
+                  display: isKeyboardVisible ? 'none' : 'flex',
+                }}
+              >
+                Уже есть аккаунт? Войти
+              </Text>
             </TouchableOpacity>
           </View>
         </ImageBackground>
