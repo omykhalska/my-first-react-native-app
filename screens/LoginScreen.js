@@ -13,7 +13,7 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const loginSchema = yup.object({
   email: yup
@@ -30,12 +30,26 @@ const loginSchema = yup.object({
 export default function LoginScreen() {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [isShowKeyboard, setIsShowKeyboard] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const keyboardHide = () => {
-    setIsShowKeyboard(false);
+    setIsKeyboardVisible(false);
     Keyboard.dismiss();
   };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+      setIsKeyboardVisible(true);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setIsKeyboardVisible(false);
+    });
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={keyboardHide}>
@@ -44,12 +58,10 @@ export default function LoginScreen() {
           <View style={styles.regFormContainer}>
             <Formik
               initialValues={{ email: '', password: '' }}
-              // initialErrors={{ email: false, password: false }}
-              // initialTouched={{ email: false, password: false }}
               validationSchema={loginSchema}
               onSubmit={(values, { resetForm }) => {
-                keyboardHide();
                 console.log(values);
+                keyboardHide();
                 resetForm();
               }}
             >
@@ -62,7 +74,6 @@ export default function LoginScreen() {
                       onChangeText={props.handleChange('email')}
                       onFocus={() => {
                         setFocusedItem('email');
-                        setIsShowKeyboard(true);
                       }}
                       onBlur={() => {
                         props.setFieldTouched('email');
@@ -83,13 +94,12 @@ export default function LoginScreen() {
                       <Text style={styles.errorText}>{props.errors.email}</Text>
                     )}
 
-                    <View>
+                    <View style={{ marginBottom: isKeyboardVisible ? 32 : 0 }}>
                       <TextInput
                         value={props.values.password}
                         onChangeText={props.handleChange('password')}
                         onFocus={() => {
                           setFocusedItem('password');
-                          setIsShowKeyboard(true);
                         }}
                         onBlur={() => {
                           props.setFieldTouched('password');
@@ -124,9 +134,12 @@ export default function LoginScreen() {
                   </KeyboardAvoidingView>
 
                   <TouchableOpacity
-                    style={styles.buttonContainer}
-                    activeOpacity={0.8}
                     onPress={props.handleSubmit}
+                    activeOpacity={0.8}
+                    style={{
+                      ...styles.buttonContainer,
+                      display: isKeyboardVisible ? 'none' : 'flex',
+                    }}
                   >
                     <Text style={styles.buttonText}>Войти</Text>
                   </TouchableOpacity>
@@ -134,7 +147,13 @@ export default function LoginScreen() {
               )}
             </Formik>
             <TouchableOpacity onPress={() => {}} activeOpacity={0.8}>
-              <Text style={{ ...styles.text, marginBottom: isShowKeyboard ? 20 : 110 }}>
+              <Text
+                style={{
+                  ...styles.text,
+                  marginBottom: isKeyboardVisible ? 20 : 110,
+                  display: isKeyboardVisible ? 'none' : 'flex',
+                }}
+              >
                 Нет аккаунта? Зарегистрироваться
               </Text>
             </TouchableOpacity>
@@ -218,7 +237,6 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 16,
-    // marginBottom: 110,
     textAlign: 'center',
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
