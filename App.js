@@ -1,9 +1,18 @@
 import { useCallback, useEffect } from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import RegistrationScreen from './screens/RegistrationScreen';
-import LoginScreen from './screens/LoginScreen';
+
+import Home from './screens/Home';
+import RegistrationScreen from './screens/auth/RegistrationScreen';
+import LoginScreen from './screens/auth/LoginScreen';
+
+const AuthStack = createNativeStackNavigator();
+// const MainStack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -31,10 +40,15 @@ export default function App() {
   }
 
   return (
-    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
-      {/*<RegistrationScreen />*/}
-      <LoginScreen />
-    </SafeAreaView>
+    <NavigationContainer>
+      <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+        <AuthStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+          <AuthStack.Screen name="Login" component={LoginScreen} />
+          <AuthStack.Screen name="Sign up" component={RegistrationScreen} />
+          <AuthStack.Screen name="Home" component={Home} />
+        </AuthStack.Navigator>
+      </SafeAreaView>
+    </NavigationContainer>
   );
 }
 

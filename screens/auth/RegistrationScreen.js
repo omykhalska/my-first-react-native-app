@@ -32,7 +32,7 @@ const registerSchema = yup.object({
     .max(32, 'Пароль не может содержать больше 32 символов'),
 });
 
-export default function RegistrationScreen() {
+export default function RegistrationScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -54,7 +54,7 @@ export default function RegistrationScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <ImageBackground source={require('../assets/bg-image.jpg')} style={styles.image}>
+        <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
           <View style={styles.avatarContainer}>
             <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
               <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
@@ -67,6 +67,7 @@ export default function RegistrationScreen() {
               onSubmit={(values, { resetForm }) => {
                 console.log(values);
                 resetForm();
+                navigation.navigate('Home');
               }}
             >
               {props => (
@@ -167,7 +168,12 @@ export default function RegistrationScreen() {
                 </View>
               )}
             </Formik>
-            <TouchableOpacity onPress={() => {}} activeOpacity={0.8}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Login');
+              }}
+              activeOpacity={0.8}
+            >
               <Text
                 style={{
                   ...styles.text,

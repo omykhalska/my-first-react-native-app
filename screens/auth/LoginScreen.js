@@ -27,7 +27,7 @@ const loginSchema = yup.object({
     .max(32, 'Пароль не может содержать больше 32 символов'),
 });
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
@@ -49,7 +49,7 @@ export default function LoginScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <ImageBackground source={require('../assets/bg-image.jpg')} style={styles.image}>
+        <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
           <View style={styles.regFormContainer}>
             <Formik
               initialValues={{ email: '', password: '' }}
@@ -57,6 +57,7 @@ export default function LoginScreen() {
               onSubmit={(values, { resetForm }) => {
                 console.log(values);
                 resetForm();
+                navigation.navigate('Home');
               }}
             >
               {props => (
@@ -140,7 +141,7 @@ export default function LoginScreen() {
                 </View>
               )}
             </Formik>
-            <TouchableOpacity onPress={() => {}} activeOpacity={0.8}>
+            <TouchableOpacity onPress={() => navigation.navigate('Sign up')} activeOpacity={0.8}>
               <Text
                 style={{
                   ...styles.text,
