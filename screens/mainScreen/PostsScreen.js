@@ -1,13 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  FlatList,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 
 const user = {
   name: 'Natali Romanova',
@@ -55,7 +47,7 @@ export default function PostsScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.user}>
         <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
         <View style={styles.userDataBox}>
@@ -72,7 +64,7 @@ export default function PostsScreen() {
           style={{ marginBottom: 32 }}
         />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 

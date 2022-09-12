@@ -5,10 +5,10 @@ import { StyleSheet, SafeAreaView } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-import useRoute from './router';
+import useRoute from './navigation/router';
 
 export default function App() {
-  const routing = useRoute({});
+  const routing = useRoute(true);
 
   const [fontsLoaded] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
