@@ -1,30 +1,13 @@
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
-
-const user = {
-  name: 'Natali Romanova',
-  email: 'email@example.com',
-  avatar: 'https://i.pinimg.com/736x/6a/92/aa/6a92aa73d9838e2d26421b2e2546088b.jpg',
-};
-
-const posts = [
-  {
-    url: 'https://res.cloudinary.com/rebelwalls/image/upload/b_black,c_fit,f_auto,fl_progressive,q_auto,w_1333/v1428564288/article/R10141_image1',
-    title: 'Лес',
-    comments: [],
-    location: 'Kiev',
-    id: 1,
-  },
-  {
-    url: 'https://img.freepik.com/free-photo/vertical-shot-body-water-with-pink-sky-during-sunset-perfect-wallpaper_181624-5246.jpg?w=2000',
-    title: 'Sunset',
-    comments: ['cool', 'not bad', '😍😍'],
-    location: 'Casa-Blanca',
-    id: 2,
-  },
-];
+import { useState } from 'react';
+import USER from '../../data/user';
+import POSTS from '../../data/posts';
 
 export default function PostsScreen() {
+  const [posts, setPosts] = useState(POSTS);
+  const [user, setUser] = useState(USER);
+
   const renderItem = ({ item }) => (
     <View style={styles.publication}>
       <Image source={{ uri: item.url }} style={styles.picture} />
@@ -57,12 +40,7 @@ export default function PostsScreen() {
       </View>
 
       <View style={styles.publications}>
-        <FlatList
-          data={posts}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          style={{ marginBottom: 32 }}
-        />
+        <FlatList data={posts} renderItem={renderItem} keyExtractor={item => item.id} />
       </View>
     </View>
   );

@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import mainScreen from '../screens/mainScreen';
+import { CommonActions } from '@react-navigation/native';
 
 const MainTab = createBottomTabNavigator();
 
@@ -11,15 +12,15 @@ const tabNavOptions = {
   tabBarInactiveTintColor: '#212121',
   tabBarInactiveBackgroundColor: '#fff',
   tabBarItemStyle: {
-    marginVertical: 8,
-    borderRadius: 20,
+    marginTop: 8,
     height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    maxWidth: 70,
+    marginHorizontal: 10,
+    borderRadius: 20,
   },
   tabBarStyle: {
-    height: 70,
-    paddingHorizontal: 80,
+    height: 62,
+    alignItems: 'center',
   },
   tabBarShowLabel: false,
   headerTitleAlign: 'center',
@@ -47,12 +48,12 @@ export default function TabNavigation() {
       <MainTab.Screen
         name="Posts"
         component={mainScreen.PostsScreen}
-        options={{
+        options={() => ({
           ...tabScreenOptions,
-          tabBarActiveTintColor: '#212121',
+          tabBarActiveTintColor: '#FF6C00',
           tabBarActiveBackgroundColor: '#fff',
           tabBarIcon: ({ color }) => <Feather name="grid" size={24} color={color} />,
-          headerTitle: 'Публикации',
+          title: 'Публикации',
           headerRightContainerStyle: {
             paddingRight: 10,
           },
@@ -65,22 +66,43 @@ export default function TabNavigation() {
               <Feather name="log-out" size={24} color="#BDBDBD" />
             </TouchableOpacity>
           ),
-        }}
+        })}
       />
       <MainTab.Screen
         name="Create"
         component={mainScreen.CreatePostsScreen}
-        options={{
+        options={({ navigation }) => ({
           ...tabScreenOptions,
-          tabBarIcon: ({ color }) => <AntDesign name="plus" size={24} color={color} />,
-          headerTitle: 'Создать публикацию',
-        }}
+          tabBarStyle: {
+            display: 'none',
+          },
+          tabBarItemStyle: {
+            marginTop: 8,
+            height: 40,
+            maxWidth: 70,
+            marginHorizontal: 10,
+            borderRadius: 20,
+            backgroundColor: '#FF6C00',
+          },
+          tabBarIcon: () => <AntDesign name="plus" size={24} color="#fff" />,
+          title: 'Создать публикацию',
+          headerLeftContainerStyle: {
+            paddingLeft: 10,
+          },
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.dispatch(CommonActions.goBack())}>
+              <Feather name="arrow-left" size={24} color="#212121" />
+            </TouchableOpacity>
+          ),
+        })}
       />
       <MainTab.Screen
         name="Profile"
         component={mainScreen.ProfileScreen}
         options={{
           tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
+          tabBarActiveTintColor: '#FF6C00',
+          tabBarActiveBackgroundColor: '#fff',
           headerShown: false,
         }}
       />
