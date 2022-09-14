@@ -127,6 +127,14 @@ export default function CreatePostsScreen() {
             )}
           </Formik>
         </View>
+
+        {/*Trash Button START*/}
+        <View>
+          <TouchableOpacity onPress={() => {}} opacity={0.8} style={styles.trashBtnBox}>
+            <Feather name="trash-2" size={24} color="#BDBDBD" />
+          </TouchableOpacity>
+        </View>
+        {/*Trash Button END*/}
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
   );
@@ -135,6 +143,7 @@ export default function CreatePostsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 32,
     fontFamily: 'Roboto-Regular',
@@ -195,7 +204,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   submitBtn: {
-    marginTop: 32,
+    marginVertical: 32,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 16,
@@ -208,5 +217,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     color: '#BDBDBD',
+  },
+  trashBtnBox: {
+    width: 70,
+    height: 40,
+    backgroundColor: '#F6F6F6',
+    borderRadius: 20,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
 });
