@@ -1,13 +1,15 @@
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { useState } from 'react';
 import {
-  FlatList,
+  StatusBar,
   Image,
   ImageBackground,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 
 import POSTS from '../../data/posts';
@@ -17,8 +19,8 @@ export default function ProfileScreen() {
   const [posts, setPosts] = useState(POSTS);
   const [user, setUser] = useState(USER);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.publication}>
+  const renderItem = item => (
+    <View style={styles.publication} key={item.id}>
       <Image source={{ uri: item.url }} style={styles.picture} />
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.extraData}>
@@ -46,34 +48,35 @@ export default function ProfileScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
-        <View style={styles.contentBox}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Image source={{ uri: user.avatar }} style={styles.image} />
+    <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <View style={styles.contentBox}>
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatar}>
+                <Image source={{ uri: user.avatar }} style={styles.image} />
+              </View>
+              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
+                <AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
-              <AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />
-            </TouchableOpacity>
-          </View>
 
-          <View>
-            <Text style={styles.userName}>{user.name}</Text>
-          </View>
+            <View>
+              <Text style={styles.userName}>{user.name}</Text>
+            </View>
 
-          <View style={styles.publications}>
-            <FlatList data={posts} renderItem={renderItem} keyExtractor={item => item.id} />
+            <View style={styles.publications}>{posts.map(renderItem)}</View>
           </View>
-        </View>
-      </ImageBackground>
-    </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: StatusBar.currentHeight,
   },
   image: {
     flex: 1,
@@ -82,8 +85,9 @@ const styles = StyleSheet.create({
   },
   contentBox: {
     flex: 1,
+    minWidth: '100%',
     alignSelf: 'stretch',
-    marginTop: 147,
+    marginTop: 148 - StatusBar.currentHeight,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
     borderTopLeftRadius: 25,
