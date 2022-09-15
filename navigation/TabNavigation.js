@@ -46,8 +46,8 @@ export default function TabNavigation() {
   return (
     <MainTab.Navigator screenOptions={tabNavOptions}>
       <MainTab.Screen
-        name="Posts"
-        component={mainScreen.PostsScreen}
+        name="Home"
+        component={mainScreen.HomeScreen}
         options={() => ({
           ...tabScreenOptions,
           tabBarActiveTintColor: '#FF6C00',
