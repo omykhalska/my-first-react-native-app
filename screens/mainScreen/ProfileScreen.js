@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Dimensions,
 } from 'react-native';
 
 import POSTS from '../../data/posts';
@@ -85,8 +86,9 @@ const styles = StyleSheet.create({
   },
   contentBox: {
     flex: 1,
-    minWidth: '100%',
-    alignSelf: 'stretch',
+    // minWidth: '100%',
+    // alignSelf: 'stretch',
+    width: Dimensions.get('window').width,
     marginTop: 148 - StatusBar.currentHeight,
     paddingHorizontal: 16,
     backgroundColor: '#fff',
