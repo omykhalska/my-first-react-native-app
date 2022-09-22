@@ -69,8 +69,7 @@ export default function RegistrationScreen({ navigation }) {
               initialValues={{ login: '', email: '', password: '' }}
               validationSchema={registerSchema}
               onSubmit={(values, { resetForm }) => {
-                const { email, password } = values;
-                dispatch(authRegisterUser(email, password));
+                dispatch(authRegisterUser(values));
                 resetForm();
               }}
             >
