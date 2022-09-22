@@ -14,6 +14,8 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { authRegisterUser } from '../../redux/auth/authOperations';
 
 const registerSchema = yup.object({
   login: yup
@@ -36,6 +38,8 @@ export default function RegistrationScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
@@ -65,9 +69,9 @@ export default function RegistrationScreen({ navigation }) {
               initialValues={{ login: '', email: '', password: '' }}
               validationSchema={registerSchema}
               onSubmit={(values, { resetForm }) => {
-                console.log(values);
+                const { email, password } = values;
+                dispatch(authRegisterUser(email, password));
                 resetForm();
-                navigation.navigate('Home');
               }}
             >
               {props => (

@@ -1,4 +1,5 @@
 import {
+  Button,
   Image,
   Keyboard,
   StyleSheet,
@@ -9,9 +10,12 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Camera, CameraType } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import { useEffect, useState } from 'react';
 
 const publicationSchema = yup.object({
   image: yup.string(),
@@ -23,6 +27,42 @@ const publicationSchema = yup.object({
 });
 
 export default function CreatePostsScreen() {
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [cameraRef, setCameraRef] = useState(null);
+
+  useEffect(() => {
+    if (!permission) {
+      (async () => {
+        // const cameraPermission = await Camera.getCameraPermissionsAsync();
+        await MediaLibrary.requestPermissionsAsync();
+
+        await requestPermission();
+      })();
+    }
+  }, []);
+
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View />;
+  }
+
+  if (permission.granted !== true) {
+    // Camera permissions are not granted yet
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center' }}>Требуется разрешение на использование камеры</Text>
+        <Button
+          onPress={requestPermission}
+          title="разрешить"
+          style={{
+            backgroundColor: '#FF6C00',
+            borderRadius: 100,
+          }}
+        />
+      </View>
+    );
+  }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
@@ -52,14 +92,16 @@ export default function CreatePostsScreen() {
             }) => (
               <View>
                 <View style={styles.pictureBox}>
-                  <Image source={null} style={styles.picture} />
-                  <TouchableOpacity
-                    style={styles.cameraBtnBox}
-                    activeOpacity={0.8}
-                    onPress={() => {}}
-                  >
-                    <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-                  </TouchableOpacity>
+                  <Camera ref={ref => setCameraRef(ref)}>
+                    <Image source={null} style={styles.picture} />
+                    <TouchableOpacity
+                      style={styles.cameraBtnBox}
+                      activeOpacity={0.8}
+                      onPress={() => {}}
+                    >
+                      <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
+                    </TouchableOpacity>
+                  </Camera>
                 </View>
                 <Text style={styles.text}>Загрузите фото</Text>
 

@@ -3,6 +3,8 @@ import { AntDesign, Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native';
 import mainScreen from '../screens/mainScreen';
 import { CommonActions } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { authLogOutUser } from '../redux/auth/authOperations';
 
 const MainTab = createBottomTabNavigator();
 
@@ -43,6 +45,8 @@ const tabScreenOptions = {
 };
 
 export default function TabNavigation() {
+  const dispatch = useDispatch();
+
   return (
     <MainTab.Navigator screenOptions={tabNavOptions}>
       <MainTab.Screen
@@ -60,7 +64,7 @@ export default function TabNavigation() {
           headerRight: () => (
             <TouchableOpacity
               onPress={() => {
-                // TODO ->> log out
+                dispatch(authLogOutUser());
               }}
             >
               <Feather name="log-out" size={24} color="#BDBDBD" />

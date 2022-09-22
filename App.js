@@ -1,14 +1,30 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StyleSheet, SafeAreaView } from 'react-native';
 
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase/config';
+
 import useRoute from './navigation/router';
 
 export default function App() {
-  const routing = useRoute({});
+  const [user, setUser] = useState(null);
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      setUser(user);
+    } else {
+      setUser(null);
+    }
+  });
+
+  const routing = useRoute(user);
 
   const [fontsLoaded] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
@@ -35,11 +51,13 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
-        {routing}
-      </SafeAreaView>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+          {routing}
+        </SafeAreaView>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
