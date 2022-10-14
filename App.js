@@ -1,6 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { StyleSheet, SafeAreaView } from 'react-native';
+import { useCallback, useEffect } from 'react';
 
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,24 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
 
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase/config';
-
-import useRoute from './navigation/router';
+import { Main } from './components/Main';
 
 export default function App() {
-  const [user, setUser] = useState(null);
-
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      setUser(user);
-    } else {
-      setUser(null);
-    }
-  });
-
-  const routing = useRoute(user);
-
   const [fontsLoaded] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
     'Roboto-Bold': require('./assets/fonts/Roboto-Bold.ttf'),
@@ -52,19 +35,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
-          {routing}
-        </SafeAreaView>
-      </NavigationContainer>
+      <Main onLayoutRootView={onLayoutRootView} />
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    fontFamily: 'Roboto-Regular',
-  },
-});

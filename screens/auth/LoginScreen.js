@@ -22,11 +22,7 @@ const loginSchema = yup.object({
     .string()
     .required('Это поле не может быть пустым')
     .email('Невалидный электронный адрес'),
-  password: yup
-    .string()
-    .required('Это поле не может быть пустым')
-    .min(8, 'Слишком короткий пароль')
-    .max(32, 'Пароль не может содержать больше 32 символов'),
+  password: yup.string().required('Это поле не может быть пустым'),
 });
 
 export default function LoginScreen({ navigation }) {

@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   userId: null,
   userName: null,
+  stateChange: false,
 };
 
 export const authSlice = createSlice({
@@ -14,11 +15,10 @@ export const authSlice = createSlice({
       userId: payload.userId,
       userName: payload.userName,
     }),
+    authStateChange: (state, { payload }) => ({
+      ...state,
+      stateChange: payload.stateChange,
+    }),
+    signOutUser: () => initialState,
   },
 });
-
-// Action creators are generated for each case reducer function
-//
-// export const {} = authSlice.actions;
-//
-// export default authSlice.reducer;
