@@ -1,18 +1,31 @@
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 
 import USER from '../../data/user';
-import POSTS from '../../data/posts';
 
-export default function PostsScreen() {
+export default function PostsScreen({ route }) {
+  console.log('Posts params -> ', route.params);
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
 
-  const [posts, setPosts] = useState(POSTS);
+  const [posts, setPosts] = useState([
+    {
+      url: 'https://img.freepik.com/free-photo/vertical-shot-body-water-with-pink-sky-during-sunset-perfect-wallpaper_181624-5246.jpg?w=2000',
+      title: 'Sunset',
+      comments: ['cool', 'not bad', '😍😍'],
+      location: 'Casa-Blanca',
+      likes: 0,
+      id: 2,
+    },
+  ]);
   const [user, setUser] = useState(USER);
+
+  useEffect(() => {
+    if (route.params) setPosts(prevState => [...prevState, route.params]);
+  }, [route.params]);
 
   const renderItem = ({ item }) => (
     <View style={styles.publication}>
@@ -25,12 +38,14 @@ export default function PostsScreen() {
           </TouchableOpacity>
           <Text style={styles.commentsCount}>{item.comments.length}</Text>
         </View>
-        <View style={styles.comments}>
-          <TouchableOpacity>
-            <Feather name="map-pin" size={24} color="#BDBDBD" />
-          </TouchableOpacity>
-          <Text style={styles.location}>{item.location}</Text>
-        </View>
+        {item.location && (
+          <View style={styles.comments}>
+            <TouchableOpacity>
+              <Feather name="map-pin" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+            <Text style={styles.location}>{item.location}</Text>
+          </View>
+        )}
       </View>
     </View>
   );

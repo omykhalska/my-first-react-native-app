@@ -16,14 +16,14 @@ import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useState } from 'react';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
   location: yup.string().min(2, 'Слишком короткое описание'),
 });
 
-export default function CreatePostsScreen() {
+export default function CreatePostsScreen({ navigation }) {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraRef, setCameraRef] = useState(null);
   const [photoUrl, setPhotoUrl] = useState('');
@@ -62,8 +62,22 @@ export default function CreatePostsScreen() {
 
   const takePhoto = async () => {
     console.log('Camera in use');
-    const photo = await cameraRef.takePictureAsync();
-    setPhotoUrl(photo.uri);
+    try {
+      const photo = await cameraRef.takePictureAsync();
+      setPhotoUrl(photo.uri);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
+  const sendPhoto = values => {
+    navigation.navigate('Posts', {
+      ...values,
+      url: photoUrl,
+      comments: [],
+      likes: 0,
+      id: photoUrl,
+    });
   };
 
   return (
@@ -102,8 +116,9 @@ export default function CreatePostsScreen() {
             initialValues={{ title: '', location: '' }}
             validationSchema={publicationSchema}
             onSubmit={(values, { resetForm }) => {
-              console.log(values);
+              sendPhoto(values);
               resetForm();
+              setPhotoUrl('');
             }}
           >
             {({
