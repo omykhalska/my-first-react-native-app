@@ -1,5 +1,6 @@
 import {
   Button,
+  Dimensions,
   Image,
   Keyboard,
   StyleSheet,
@@ -10,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Camera, CameraType } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
@@ -18,22 +19,19 @@ import * as yup from 'yup';
 import { useEffect, useState } from 'react';
 
 const publicationSchema = yup.object({
-  image: yup.string(),
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
-  location: yup
-    .string()
-    .required('Это поле не может быть пустым')
-    .min(2, 'Слишком короткое описание'),
+  location: yup.string().min(2, 'Слишком короткое описание'),
 });
 
 export default function CreatePostsScreen() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraRef, setCameraRef] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState('');
 
   useEffect(() => {
     if (!permission) {
       (async () => {
-        // const cameraPermission = await Camera.getCameraPermissionsAsync();
+        await Camera.getCameraPermissionsAsync();
         await MediaLibrary.requestPermissionsAsync();
 
         await requestPermission();
@@ -42,8 +40,7 @@ export default function CreatePostsScreen() {
   }, []);
 
   if (!permission) {
-    // Camera permissions are still loading
-    return <View />;
+    return <Text>Получение разрешений...</Text>;
   }
 
   if (permission.granted !== true) {
@@ -63,6 +60,12 @@ export default function CreatePostsScreen() {
     );
   }
 
+  const takePhoto = async () => {
+    console.log('Camera in use');
+    const photo = await cameraRef.takePictureAsync();
+    setPhotoUrl(photo.uri);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
@@ -71,9 +74,32 @@ export default function CreatePostsScreen() {
         contentContainerStyle={styles.container}
         scrollEnabled={false}
       >
-        <View style={styles.form}>
+        <View>
+          <View
+            style={{
+              ...styles.pictureBox,
+              height: photoUrl ? 240 : ((Dimensions.get('window').width - 32) * 4) / 3,
+            }}
+          >
+            <Camera ref={setCameraRef} style={styles.camera}>
+              {photoUrl && (
+                <View style={styles.picture}>
+                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={{ ...styles.cameraBtnBox, display: photoUrl === '' ? 'flex' : 'none' }}
+                activeOpacity={0.8}
+                onPress={takePhoto}
+              >
+                <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
+              </TouchableOpacity>
+            </Camera>
+          </View>
+          <Text style={styles.text}>Загрузите фото</Text>
           <Formik
-            initialValues={{ title: '', location: '', image: '' }}
+            initialValues={{ title: '', location: '' }}
             validationSchema={publicationSchema}
             onSubmit={(values, { resetForm }) => {
               console.log(values);
@@ -91,20 +117,6 @@ export default function CreatePostsScreen() {
               dirty,
             }) => (
               <View>
-                <View style={styles.pictureBox}>
-                  <Camera ref={ref => setCameraRef(ref)}>
-                    <Image source={null} style={styles.picture} />
-                    <TouchableOpacity
-                      style={styles.cameraBtnBox}
-                      activeOpacity={0.8}
-                      onPress={() => {}}
-                    >
-                      <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-                    </TouchableOpacity>
-                  </Camera>
-                </View>
-                <Text style={styles.text}>Загрузите фото</Text>
-
                 <TextInput
                   value={values.title}
                   onChangeText={handleChange('title')}
@@ -172,7 +184,14 @@ export default function CreatePostsScreen() {
 
         {/*Trash Button START*/}
         <View>
-          <TouchableOpacity onPress={() => {}} opacity={0.8} style={styles.trashBtnBox}>
+          <TouchableOpacity
+            onPress={() => {
+              setPhotoUrl('');
+              setCameraRef(null);
+            }}
+            opacity={0.8}
+            style={styles.trashBtnBox}
+          >
             <Feather name="trash-2" size={24} color="#BDBDBD" />
           </TouchableOpacity>
         </View>
@@ -197,18 +216,23 @@ const styles = StyleSheet.create({
     borderColor: '#E8E8E8',
     borderStyle: 'solid',
     borderRadius: 8,
-    overflow: 'hidden',
+  },
+  camera: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   picture: {
     width: '100%',
     height: 240,
-    resizeMode: 'cover',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 100000000,
   },
   cameraBtnBox: {
     width: 60,
     height: 60,
-    position: 'absolute',
-    top: 90, // 240/2 - 60/2
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',

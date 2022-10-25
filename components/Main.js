@@ -4,9 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import useRoute from '../navigation/router';
 import { useDispatch, useSelector } from 'react-redux';
 import { authStateChangeUser } from '../redux/auth/authOperations';
+import { getStateChange } from '../redux/auth/authSelectors';
 
 export const Main = ({ onLayoutRootView }) => {
-  const { stateChange } = useSelector(state => state.auth);
+  const stateChange = useSelector(getStateChange);
 
   const dispatch = useDispatch();
 

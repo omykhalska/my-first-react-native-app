@@ -16,7 +16,12 @@ import {
 import POSTS from '../../data/posts';
 import USER from '../../data/user';
 
+import { useSelector } from 'react-redux';
+import { getUserName } from '../../redux/auth/authSelectors';
+
 export default function ProfileScreen() {
+  const userName = useSelector(getUserName);
+
   const [posts, setPosts] = useState(POSTS);
   const [user, setUser] = useState(USER);
 
@@ -63,7 +68,7 @@ export default function ProfileScreen() {
             </View>
 
             <View>
-              <Text style={styles.userName}>{user.name}</Text>
+              <Text style={styles.userName}>{userName}</Text>
             </View>
 
             <View style={styles.publications}>{posts.map(renderItem)}</View>

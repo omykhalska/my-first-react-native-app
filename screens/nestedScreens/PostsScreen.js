@@ -1,10 +1,16 @@
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
+
 import USER from '../../data/user';
 import POSTS from '../../data/posts';
 
 export default function PostsScreen() {
+  const userName = useSelector(getUserName);
+  const userEmail = useSelector(getUserEmail);
+
   const [posts, setPosts] = useState(POSTS);
   const [user, setUser] = useState(USER);
 
@@ -34,8 +40,8 @@ export default function PostsScreen() {
       <View style={styles.user}>
         <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
         <View style={styles.userDataBox}>
-          <Text style={styles.userName}>{user.name}</Text>
-          <Text style={styles.userEmail}>{user.email}</Text>
+          <Text style={styles.userName}>{userName}</Text>
+          <Text style={styles.userEmail}>{userEmail}</Text>
         </View>
       </View>
 
