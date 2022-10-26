@@ -11,16 +11,7 @@ export default function PostsScreen({ route }) {
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
 
-  const [posts, setPosts] = useState([
-    {
-      url: 'https://img.freepik.com/free-photo/vertical-shot-body-water-with-pink-sky-during-sunset-perfect-wallpaper_181624-5246.jpg?w=2000',
-      title: 'Sunset',
-      comments: ['cool', 'not bad', '😍😍'],
-      location: 'Casa-Blanca',
-      likes: 0,
-      id: 2,
-    },
-  ]);
+  const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(USER);
 
   useEffect(() => {
@@ -60,9 +51,17 @@ export default function PostsScreen({ route }) {
         </View>
       </View>
 
-      <View style={styles.publications}>
-        <FlatList data={posts} renderItem={renderItem} keyExtractor={item => item.id} />
-      </View>
+      {posts.length > 0 ? (
+        <View style={styles.publications}>
+          <FlatList data={posts} renderItem={renderItem} keyExtractor={item => item.id} />
+        </View>
+      ) : (
+        <View style={styles.publications}>
+          <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
+            Здесь еще нет публикаций...
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -111,6 +110,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 240,
     resizeMode: 'cover',
+    backgroundColor: '#e8e8e8',
+    borderRadius: 8,
   },
   title: {
     marginTop: 8,
@@ -146,5 +147,11 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: '#212121',
     textDecorationLine: 'underline',
+  },
+  skeleton: {
+    marginTop: 8,
+    height: 36,
+    backgroundColor: '#e8e8e8',
+    borderRadius: 8,
   },
 });

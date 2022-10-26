@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     height: 240,
     resizeMode: 'cover',
     borderRadius: 8,
+    backgroundColor: '#BDBDBD',
   },
   title: {
     marginTop: 8,
