@@ -6,7 +6,7 @@ import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 
 import USER from '../../data/user';
 
-export default function PostsScreen({ route }) {
+export default function PostsScreen({ navigation, route }) {
   console.log('Posts params -> ', route.params);
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
@@ -31,7 +31,11 @@ export default function PostsScreen({ route }) {
         </View>
         {item.location && (
           <View style={styles.comments}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Map', location);
+              }}
+            >
               <Feather name="map-pin" size={24} color="#BDBDBD" />
             </TouchableOpacity>
             <Text style={styles.location}>{item.location}</Text>

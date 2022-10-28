@@ -16,7 +16,8 @@ import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as yup from 'yup';
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import * as Location from 'expo-location';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
@@ -27,6 +28,8 @@ export default function CreatePostsScreen({ navigation }) {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraRef, setCameraRef] = useState(null);
   const [photoUrl, setPhotoUrl] = useState('');
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   useEffect(() => {
     if (!permission) {
@@ -39,8 +42,21 @@ export default function CreatePostsScreen({ navigation }) {
     }
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+      }
+    })();
+  }, []);
+
   if (!permission) {
     return <Text>Получение разрешений...</Text>;
+  }
+
+  if (errorMsg) {
+    return <Text>{errorMsg}</Text>;
   }
 
   if (permission.granted !== true) {
@@ -65,6 +81,21 @@ export default function CreatePostsScreen({ navigation }) {
     try {
       const photo = await cameraRef.takePictureAsync();
       setPhotoUrl(photo.uri);
+
+      const { coords } = await Location.getCurrentPositionAsync({});
+      if (coords) {
+        const { latitude, longitude } = coords;
+        let response = await Location.reverseGeocodeAsync({
+          latitude,
+          longitude,
+        });
+
+        for (let item of response) {
+          let address = `${item.city}, ${item.country}`;
+          setLocation(address);
+        }
+      }
+      console.log(location);
     } catch (e) {
       console.log(e.message);
     }
@@ -77,6 +108,7 @@ export default function CreatePostsScreen({ navigation }) {
       comments: [],
       likes: 0,
       id: photoUrl,
+      location,
     });
   };
 
@@ -127,6 +159,7 @@ export default function CreatePostsScreen({ navigation }) {
               touched,
               handleChange,
               setFieldTouched,
+              setFieldValue,
               handleSubmit,
               isValid,
               dirty,
@@ -150,6 +183,9 @@ export default function CreatePostsScreen({ navigation }) {
                 <View>
                   <TextInput
                     value={values.location}
+                    onFocus={() => {
+                      setFieldValue('location', location);
+                    }}
                     onChangeText={handleChange('location')}
                     onBlur={() => {
                       setFieldTouched('location');
