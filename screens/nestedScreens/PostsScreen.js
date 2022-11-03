@@ -7,7 +7,6 @@ import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import USER from '../../data/user';
 
 export default function PostsScreen({ navigation, route }) {
-  console.log('Posts params -> ', route.params);
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
 

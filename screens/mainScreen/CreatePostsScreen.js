@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Alert,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Camera } from 'expo-camera';
@@ -18,6 +19,12 @@ import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
+import uuid from 'react-native-uuid';
+import { storage, db } from '../../firebase/config';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { collection, addDoc } from 'firebase/firestore';
+import { useSelector } from 'react-redux';
+import { getUserId, getUserName } from '../../redux/auth/authSelectors';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
@@ -30,6 +37,9 @@ export default function CreatePostsScreen({ navigation }) {
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  const userName = useSelector(getUserName);
+  const userId = useSelector(getUserId);
 
   useEffect(() => {
     if (!permission) {
@@ -77,7 +87,6 @@ export default function CreatePostsScreen({ navigation }) {
   }
 
   const takePhoto = async () => {
-    console.log('Camera in use');
     try {
       const photo = await cameraRef.takePictureAsync();
       setPhotoUrl(photo.uri);
@@ -95,13 +104,41 @@ export default function CreatePostsScreen({ navigation }) {
           setLocation(address);
         }
       }
-      console.log(location);
     } catch (e) {
+      Alert.alert('Error', e.message);
       console.log(e.message);
     }
   };
 
+  const uploadPhotoToServer = async () => {
+    try {
+      const id = uuid.v4();
+      const response = await fetch(photoUrl);
+      const file = await response.blob();
+      const storageRef = ref(storage, `postsImg/${id}`);
+
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    } catch (e) {
+      Alert.alert('Error', e.message);
+      console.log(e.message);
+    }
+  };
+
+  const uploadPostToServer = async values => {
+    const snapshot = await uploadPhotoToServer();
+
+    const createPost = await addDoc(collection(db, 'posts'), {
+      photo: snapshot,
+      title: values.title,
+      location,
+      userId,
+      userName,
+    });
+  };
+
   const sendPhoto = values => {
+    uploadPostToServer(values);
     navigation.navigate('Posts', {
       ...values,
       url: photoUrl,
