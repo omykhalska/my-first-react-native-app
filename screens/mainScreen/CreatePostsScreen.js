@@ -91,19 +91,23 @@ export default function CreatePostsScreen({ navigation }) {
       const photo = await cameraRef.takePictureAsync();
       setPhotoUrl(photo.uri);
 
-      const { coords } = await Location.getCurrentPositionAsync({});
-      if (coords) {
-        const { latitude, longitude } = coords;
-        let response = await Location.reverseGeocodeAsync({
-          latitude,
-          longitude,
-        });
+      const { coords } = await Location.getCurrentPositionAsync();
+      setLocation(coords);
 
-        for (let item of response) {
-          let address = `${item.city}, ${item.country}`;
-          setLocation(address);
-        }
-      }
+      // ----------- ПОЛУЧЕНИЕ НАЗВАНИЯ МЕСТНОСТИ ИЗ КООРДИНАТ - START----------
+      // if (coords) {
+      //   const { latitude, longitude } = coords;
+      //   let response = await Location.reverseGeocodeAsync({
+      //     latitude,
+      //     longitude,
+      //   });
+      //
+      //   for (let item of response) {
+      //     let address = `${item.city}, ${item.country}`;
+      //     setLocation(address);
+      //   }
+      // }
+      // ----------- ПОЛУЧЕНИЕ НАЗВАНИЯ МЕСТНОСТИ ИЗ КООРДИНАТ - END ----------
     } catch (e) {
       Alert.alert('Error', e.message);
       console.log(e.message);
@@ -128,7 +132,7 @@ export default function CreatePostsScreen({ navigation }) {
   const uploadPostToServer = async values => {
     const snapshot = await uploadPhotoToServer();
 
-    const createPost = await addDoc(collection(db, 'posts'), {
+    await addDoc(collection(db, 'posts'), {
       photo: snapshot,
       title: values.title,
       location,
@@ -139,14 +143,7 @@ export default function CreatePostsScreen({ navigation }) {
 
   const sendPhoto = values => {
     uploadPostToServer(values);
-    navigation.navigate('Posts', {
-      ...values,
-      url: photoUrl,
-      comments: [],
-      likes: 0,
-      id: photoUrl,
-      location,
-    });
+    navigation.navigate('Posts');
   };
 
   return (
@@ -196,7 +193,6 @@ export default function CreatePostsScreen({ navigation }) {
               touched,
               handleChange,
               setFieldTouched,
-              setFieldValue,
               handleSubmit,
               isValid,
               dirty,
@@ -220,9 +216,6 @@ export default function CreatePostsScreen({ navigation }) {
                 <View>
                   <TextInput
                     value={values.location}
-                    onFocus={() => {
-                      setFieldValue('location', location);
-                    }}
                     onChangeText={handleChange('location')}
                     onBlur={() => {
                       setFieldTouched('location');

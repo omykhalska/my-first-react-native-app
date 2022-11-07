@@ -3,41 +3,52 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
+import { db } from '../../firebase/config';
+import { collection, getDocs } from 'firebase/firestore';
 
 import USER from '../../data/user';
 
-export default function PostsScreen({ navigation, route }) {
+export default function PostsScreen({ navigation }) {
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
 
   const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(USER);
+  const [user, setUser] = useState(USER); // используется пока для аватарки
+
+  const getAllPosts = async () => {
+    const querySnapshot = await getDocs(collection(db, 'posts'));
+    const queryPosts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    setPosts(queryPosts);
+  };
 
   useEffect(() => {
-    if (route.params) setPosts(prevState => [...prevState, route.params]);
-  }, [route.params]);
+    console.log(`UseEffect is running at ${new Date(Date.now()).toLocaleString()}`);
+
+    getAllPosts().catch(console.error);
+  }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.publication}>
-      <Image source={{ uri: item.url }} style={styles.picture} />
+      <Image source={{ uri: item.photo }} style={styles.picture} />
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.extraData}>
-        <View style={styles.comments}>
-          <TouchableOpacity style={{ width: 24 }}>
+        <View>
+          <TouchableOpacity style={{ ...styles.comments, width: 24 }} onPress={() => {}}>
             <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
+            <Text style={styles.commentsCount}>{item?.comments?.length || 0}</Text>
           </TouchableOpacity>
-          <Text style={styles.commentsCount}>{item.comments.length}</Text>
         </View>
         {item.location && (
-          <View style={styles.comments}>
+          <View>
             <TouchableOpacity
+              style={styles.comments}
               onPress={() => {
-                navigation.navigate('Map', location);
+                navigation.navigate('Map', { location: item.location });
               }}
             >
               <Feather name="map-pin" size={24} color="#BDBDBD" />
+              <Text style={styles.location}>{item.location.latitude}</Text>
             </TouchableOpacity>
-            <Text style={styles.location}>{item.location}</Text>
           </View>
         )}
       </View>
