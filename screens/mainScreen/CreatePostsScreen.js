@@ -36,6 +36,7 @@ export default function CreatePostsScreen({ navigation }) {
   const [cameraRef, setCameraRef] = useState(null);
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
+  const [address, setAddress] = useState('');
   const [errorMsg, setErrorMsg] = useState(null);
 
   const userName = useSelector(getUserName);
@@ -86,6 +87,22 @@ export default function CreatePostsScreen({ navigation }) {
     );
   }
 
+  const getAddress = async coords => {
+    if (coords) {
+      const { latitude, longitude } = coords;
+      let response = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      for (let item of response) {
+        let address = `${item.city}, ${item.country}`;
+        setAddress(address);
+        console.log('address', address);
+      }
+    }
+  };
+
   const takePhoto = async () => {
     try {
       const photo = await cameraRef.takePictureAsync();
@@ -93,21 +110,7 @@ export default function CreatePostsScreen({ navigation }) {
 
       const { coords } = await Location.getCurrentPositionAsync();
       setLocation(coords);
-
-      // ----------- ПОЛУЧЕНИЕ НАЗВАНИЯ МЕСТНОСТИ ИЗ КООРДИНАТ - START----------
-      // if (coords) {
-      //   const { latitude, longitude } = coords;
-      //   let response = await Location.reverseGeocodeAsync({
-      //     latitude,
-      //     longitude,
-      //   });
-      //
-      //   for (let item of response) {
-      //     let address = `${item.city}, ${item.country}`;
-      //     setLocation(address);
-      //   }
-      // }
-      // ----------- ПОЛУЧЕНИЕ НАЗВАНИЯ МЕСТНОСТИ ИЗ КООРДИНАТ - END ----------
+      await getAddress(coords);
     } catch (e) {
       Alert.alert('Error', e.message);
       console.log(e.message);
@@ -136,6 +139,7 @@ export default function CreatePostsScreen({ navigation }) {
       photo: snapshot,
       title: values.title,
       location,
+      address,
       userId,
       userName,
     });

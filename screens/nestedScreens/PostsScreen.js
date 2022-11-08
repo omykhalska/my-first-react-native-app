@@ -15,15 +15,14 @@ export default function PostsScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(USER); // используется пока для аватарки
 
-  const getAllPosts = async () => {
-    const querySnapshot = await getDocs(collection(db, 'posts'));
-    const queryPosts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-    setPosts(queryPosts);
-  };
-
   useEffect(() => {
     console.log(`UseEffect is running at ${new Date(Date.now()).toLocaleString()}`);
 
+    const getAllPosts = async () => {
+      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const queryPosts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      setPosts(queryPosts);
+    };
     getAllPosts().catch(console.error);
   }, []);
 
@@ -33,7 +32,12 @@ export default function PostsScreen({ navigation }) {
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.extraData}>
         <View>
-          <TouchableOpacity style={{ ...styles.comments, width: 24 }} onPress={() => {}}>
+          <TouchableOpacity
+            style={{ ...styles.comments, width: 24 }}
+            onPress={() => {
+              navigation.navigate('Comments', { postId: item.id });
+            }}
+          >
             <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
             <Text style={styles.commentsCount}>{item?.comments?.length || 0}</Text>
           </TouchableOpacity>
@@ -47,7 +51,7 @@ export default function PostsScreen({ navigation }) {
               }}
             >
               <Feather name="map-pin" size={24} color="#BDBDBD" />
-              <Text style={styles.location}>{item.location.latitude}</Text>
+              <Text style={styles.location}>{item.address}</Text>
             </TouchableOpacity>
           </View>
         )}
