@@ -25,6 +25,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
@@ -38,6 +39,9 @@ const handleError = e => {
 
 export default function CreatePostsScreen({ navigation }) {
   const [permission, requestPermission] = Camera.useCameraPermissions();
+
+  const isFocused = useIsFocused();
+
   const [cameraRef, setCameraRef] = useState(null);
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
@@ -171,21 +175,23 @@ export default function CreatePostsScreen({ navigation }) {
               height: photoUrl ? 240 : ((Dimensions.get('window').width - 32) * 4) / 3,
             }}
           >
-            <Camera ref={setCameraRef} style={styles.camera}>
-              {photoUrl && (
-                <View style={styles.picture}>
-                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
-                </View>
-              )}
+            {isFocused && (
+              <Camera ref={setCameraRef} style={styles.camera}>
+                {photoUrl && (
+                  <View style={styles.picture}>
+                    <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
+                  </View>
+                )}
 
-              <TouchableOpacity
-                style={{ ...styles.cameraBtnBox, display: photoUrl === '' ? 'flex' : 'none' }}
-                activeOpacity={0.8}
-                onPress={takePhoto}
-              >
-                <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-              </TouchableOpacity>
-            </Camera>
+                <TouchableOpacity
+                  style={{ ...styles.cameraBtnBox, display: photoUrl === '' ? 'flex' : 'none' }}
+                  activeOpacity={0.8}
+                  onPress={takePhoto}
+                >
+                  <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
+                </TouchableOpacity>
+              </Camera>
+            )}
           </View>
           <Text style={styles.text}>Загрузите фото</Text>
           <Formik
