@@ -1,10 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot, query } from 'firebase/firestore';
 
 import USER from '../../data/user';
 
@@ -19,11 +19,16 @@ export default function PostsScreen({ navigation }) {
     console.log(`UseEffect is running at ${new Date(Date.now()).toLocaleString()}`);
 
     const getAllPosts = async () => {
-      const querySnapshot = await getDocs(collection(db, 'posts'));
-      const queryPosts = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      setPosts(queryPosts);
+      try {
+        const q = await query(collection(db, 'posts'));
+        await onSnapshot(q, data => {
+          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
     };
-    getAllPosts().catch(console.error);
+    getAllPosts();
   }, []);
 
   const renderItem = ({ item }) => (
@@ -59,6 +64,8 @@ export default function PostsScreen({ navigation }) {
     </View>
   );
 
+  const memoizedRenderItem = useMemo(() => renderItem, [posts]);
+
   return (
     <View style={styles.container}>
       <View style={styles.user}>
@@ -71,7 +78,7 @@ export default function PostsScreen({ navigation }) {
 
       {posts.length > 0 ? (
         <View style={styles.publications}>
-          <FlatList data={posts} renderItem={renderItem} keyExtractor={item => item.id} />
+          <FlatList data={posts} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
         </View>
       ) : (
         <View style={styles.publications}>
