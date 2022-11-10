@@ -31,6 +31,11 @@ const publicationSchema = yup.object({
   location: yup.string().min(2, 'Слишком короткое описание'),
 });
 
+const handleError = e => {
+  Alert.alert('Error', e.message);
+  console.log(e.message);
+};
+
 export default function CreatePostsScreen({ navigation }) {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraRef, setCameraRef] = useState(null);
@@ -98,7 +103,6 @@ export default function CreatePostsScreen({ navigation }) {
       for (let item of response) {
         let address = `${item.city}, ${item.country}`;
         setAddress(address);
-        console.log('address', address);
       }
     }
   };
@@ -112,8 +116,7 @@ export default function CreatePostsScreen({ navigation }) {
       setLocation(coords);
       await getAddress(coords);
     } catch (e) {
-      Alert.alert('Error', e.message);
-      console.log(e.message);
+      handleError(e);
     }
   };
 
@@ -127,22 +130,25 @@ export default function CreatePostsScreen({ navigation }) {
       await uploadBytes(storageRef, file);
       return await getDownloadURL(storageRef);
     } catch (e) {
-      Alert.alert('Error', e.message);
-      console.log(e.message);
+      handleError(e);
     }
   };
 
   const uploadPostToServer = async values => {
-    const snapshot = await uploadPhotoToServer();
+    try {
+      const snapshot = await uploadPhotoToServer();
 
-    await addDoc(collection(db, 'posts'), {
-      photo: snapshot,
-      title: values.title,
-      location,
-      address,
-      userId,
-      userName,
-    });
+      await addDoc(collection(db, 'posts'), {
+        photo: snapshot,
+        title: values.title,
+        location,
+        address,
+        userId,
+        userName,
+      });
+    } catch (e) {
+      handleError(e);
+    }
   };
 
   const sendPhoto = values => {

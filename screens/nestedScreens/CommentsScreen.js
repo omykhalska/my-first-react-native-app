@@ -1,16 +1,21 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getUserName } from '../../redux/auth/authSelectors';
-import { useState } from 'react';
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 export default function CommentsScreen({ navigation, route }) {
   const { postId } = route.params;
   const commentOwner = useSelector(getUserName);
   const [commentText, setCommentText] = useState('');
+  const [comments, setComments] = useState([]);
 
-  const createPost = async () => {
+  useEffect(() => {
+    getAllComments().then(() => console.log(comments));
+  }, []);
+
+  const createComment = async () => {
     try {
       const docRef = doc(db, 'posts', postId);
       const colRef = collection(docRef, 'comments');
@@ -23,19 +28,42 @@ export default function CommentsScreen({ navigation, route }) {
     }
   };
 
+  const getAllComments = async () => {
+    try {
+      const docRef = doc(db, 'posts', postId);
+      const colRef = collection(docRef, 'comments');
+      await onSnapshot(colRef, data => {
+        setComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
+      <View>
+        <FlatList
+          data={comments}
+          renderItem={({ item }) => (
+            <View>
+              <Text>{item.commentText}</Text>
+            </View>
+          )}
+          keyExtractor={item => item.id}
+        />
+      </View>
       <TextInput
         multiline={true}
         style={styles.textArea}
-        placeholder="useless placeholder"
+        placeholder="Оставьте свой комментарий..."
         onChangeText={setCommentText}
         value={commentText}
       />
       <TouchableOpacity
         onPress={() => {
           setCommentText('');
-          createPost();
+          createComment();
           navigation.navigate('Posts');
         }}
         activeOpacity={0.8}
