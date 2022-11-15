@@ -1,5 +1,5 @@
 import { AntDesign, Feather } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   StatusBar,
   Image,
@@ -11,23 +11,40 @@ import {
   View,
   SafeAreaView,
   Dimensions,
+  FlatList,
 } from 'react-native';
 
-import POSTS from '../../data/posts';
-import USER from '../../data/user';
+import USER from '../../data/user'; // для аватарки пока нужен
 
 import { useSelector } from 'react-redux';
-import { getUserName } from '../../redux/auth/authSelectors';
+import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 
 export default function ProfileScreen() {
   const userName = useSelector(getUserName);
+  const userId = useSelector(getUserId);
 
-  const [posts, setPosts] = useState(POSTS);
-  const [user, setUser] = useState(USER);
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const getUserPosts = async () => {
+      try {
+        const q = await query(collection(db, 'posts'), where('userId', '==', userId));
+        await onSnapshot(q, data => {
+          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
+    };
+
+    getUserPosts();
+  }, []);
 
   const renderItem = item => (
     <View style={styles.publication} key={item.id}>
-      <Image source={{ uri: item.url }} style={styles.picture} />
+      <Image source={{ uri: item.photo }} style={styles.picture} />
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.extraData}>
         <View style={{ flexDirection: 'row' }}>
@@ -36,17 +53,17 @@ export default function ProfileScreen() {
               source={require('../../assets/icons/message-circle.png')}
               style={{ width: 24, height: 24 }}
             />
-            <Text style={styles.extraDataText}>{item.comments.length}</Text>
+            <Text style={styles.extraDataText}>{item?.comments?.length || 0}</Text>
           </View>
           <View style={{ ...styles.extraDataInnerBox, marginLeft: 24 }}>
             <Feather name="thumbs-up" size={24} color="#FF6C00" />
-            <Text style={styles.extraDataText}>{item.likes}</Text>
+            <Text style={styles.extraDataText}>{item?.likes || 0}</Text>
           </View>
         </View>
         <View style={styles.extraDataInnerBox}>
           <Feather name="map-pin" size={24} color="#BDBDBD" />
           <Text style={{ ...styles.extraDataText, textDecorationLine: 'underline' }}>
-            {item.location}
+            {item.address}
           </Text>
         </View>
       </View>
@@ -56,11 +73,11 @@ export default function ProfileScreen() {
   return (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
-        <ScrollView>
+        <ScrollView contentContainerStyle={{ flex: 1 }}>
           <View style={styles.contentBox}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>
-                <Image source={{ uri: user.avatar }} style={styles.image} />
+                <Image source={{ uri: USER.avatar || null }} style={styles.image} />
               </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
                 <AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />
@@ -71,7 +88,15 @@ export default function ProfileScreen() {
               <Text style={styles.userName}>{userName}</Text>
             </View>
 
-            <View style={styles.publications}>{posts.map(renderItem)}</View>
+            {posts.length > 0 ? (
+              <View style={styles.publications}>{posts.map(renderItem)}</View>
+            ) : (
+              <View style={styles.publications}>
+                <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
+                  У Вас еще нет публикаций...
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -91,6 +116,8 @@ const styles = StyleSheet.create({
   },
   contentBox: {
     flex: 1,
+    flexGrow: 1,
+    alignSelf: 'stretch',
     width: Dimensions.get('window').width,
     marginTop: 148 - StatusBar.currentHeight,
     paddingHorizontal: 16,
@@ -113,6 +140,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     zIndex: 10,
     overflow: 'hidden',
+    backgroundColor: '#e8e8e8',
   },
   buttonIcon: {
     position: 'absolute',

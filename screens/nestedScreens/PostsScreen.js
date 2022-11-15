@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
-import { collection, getDocs, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 
 import USER from '../../data/user';
 
@@ -16,8 +16,6 @@ export default function PostsScreen({ navigation }) {
   const [user, setUser] = useState(USER); // используется пока для аватарки
 
   useEffect(() => {
-    console.log(`UseEffect is running at ${new Date(Date.now()).toLocaleString()}`);
-
     const getAllPosts = async () => {
       try {
         const q = await query(collection(db, 'posts'));
