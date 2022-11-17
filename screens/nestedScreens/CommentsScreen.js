@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'r
 import { useSelector } from 'react-redux';
 import { getUserName } from '../../redux/auth/authSelectors';
 import { useEffect, useState } from 'react';
-import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 export default function CommentsScreen({ navigation, route }) {
@@ -12,7 +12,7 @@ export default function CommentsScreen({ navigation, route }) {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    getAllComments().then(() => console.log(comments));
+    getAllComments();
   }, []);
 
   const createComment = async () => {
@@ -23,6 +23,7 @@ export default function CommentsScreen({ navigation, route }) {
         commentText,
         commentOwner,
       });
+      await updateDoc(docRef, { comments: comments.length + 1 });
     } catch (e) {
       console.log(e.message);
     }
@@ -62,8 +63,7 @@ export default function CommentsScreen({ navigation, route }) {
       />
       <TouchableOpacity
         onPress={() => {
-          setCommentText('');
-          createComment();
+          createComment().then(() => setCommentText(''));
           navigation.navigate('Posts');
         }}
         activeOpacity={0.8}

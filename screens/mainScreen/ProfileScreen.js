@@ -18,7 +18,7 @@ import USER from '../../data/user'; // для аватарки пока нуже
 
 import { useSelector } from 'react-redux';
 import { getUserId, getUserName } from '../../redux/auth/authSelectors';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 export default function ProfileScreen() {
@@ -30,7 +30,12 @@ export default function ProfileScreen() {
   useEffect(() => {
     const getUserPosts = async () => {
       try {
-        const q = await query(collection(db, 'posts'), where('userId', '==', userId));
+        const q = await query(
+          collection(db, 'posts'),
+          orderBy('createdAt', 'desc'),
+          where('userId', '==', userId),
+        );
+
         await onSnapshot(q, data => {
           setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
         });
@@ -73,7 +78,7 @@ export default function ProfileScreen() {
   return (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentBox}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>

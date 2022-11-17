@@ -22,7 +22,7 @@ import * as Location from 'expo-location';
 import uuid from 'react-native-uuid';
 import { storage, db } from '../../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
@@ -149,6 +149,9 @@ export default function CreatePostsScreen({ navigation }) {
         address,
         userId,
         userName,
+        createdAt: serverTimestamp(),
+        comments: 0,
+        likes: 0,
       });
     } catch (e) {
       handleError(e);

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 import USER from '../../data/user';
 
@@ -18,10 +18,17 @@ export default function PostsScreen({ navigation }) {
   useEffect(() => {
     const getAllPosts = async () => {
       try {
-        const q = await query(collection(db, 'posts'));
-        await onSnapshot(q, data => {
-          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-        });
+        const q = await query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+        await onSnapshot(
+          q,
+          data => {
+            setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+          },
+          error => {
+            // if index is missing, error message should provide a link to generate required index.
+            console.log(error);
+          },
+        );
       } catch (e) {
         console.log(e.message);
       }
@@ -42,7 +49,7 @@ export default function PostsScreen({ navigation }) {
             }}
           >
             <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
-            <Text style={styles.commentsCount}>{item?.comments?.length || 0}</Text>
+            <Text style={styles.commentsCount}>{item.comments}</Text>
           </TouchableOpacity>
         </View>
         {item.location && (
