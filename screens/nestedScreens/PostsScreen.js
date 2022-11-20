@@ -19,16 +19,9 @@ export default function PostsScreen({ navigation }) {
     const getAllPosts = async () => {
       try {
         const q = await query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
-        await onSnapshot(
-          q,
-          data => {
-            setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-          },
-          error => {
-            // if index is missing, error message should provide a link to generate required index.
-            console.log(error);
-          },
-        );
+        await onSnapshot(q, data => {
+          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+        });
       } catch (e) {
         console.log(e.message);
       }
@@ -45,7 +38,7 @@ export default function PostsScreen({ navigation }) {
           <TouchableOpacity
             style={{ ...styles.comments, width: 24 }}
             onPress={() => {
-              navigation.navigate('Comments', { postId: item.id });
+              navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
             }}
           >
             <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
