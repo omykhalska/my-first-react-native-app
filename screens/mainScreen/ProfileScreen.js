@@ -11,7 +11,6 @@ import {
   View,
   SafeAreaView,
   Dimensions,
-  FlatList,
 } from 'react-native';
 
 import USER from '../../data/user'; // для аватарки пока нужен
@@ -58,11 +57,11 @@ export default function ProfileScreen() {
               source={require('../../assets/icons/message-circle.png')}
               style={{ width: 24, height: 24 }}
             />
-            <Text style={styles.extraDataText}>{item?.comments?.length || 0}</Text>
+            <Text style={styles.extraDataText}>{item.comments}</Text>
           </View>
           <View style={{ ...styles.extraDataInnerBox, marginLeft: 24 }}>
             <Feather name="thumbs-up" size={24} color="#FF6C00" />
-            <Text style={styles.extraDataText}>{item?.likes || 0}</Text>
+            <Text style={styles.extraDataText}>{item.likes}</Text>
           </View>
         </View>
         <View style={styles.extraDataInnerBox}>

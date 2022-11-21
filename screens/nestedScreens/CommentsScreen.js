@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import {
@@ -12,12 +12,14 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import { getUserName } from '../../redux/auth/authSelectors';
-import { AntDesign, Ionicons } from '@expo/vector-icons';
+import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { AntDesign } from '@expo/vector-icons';
+import USER from '../../data/user';
 
-export default function CommentsScreen({ navigation, route }) {
+export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
-  const commentOwner = useSelector(getUserName);
+  const commentOwnerName = useSelector(getUserName);
+  const commentOwnerId = useSelector(getUserId);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
 
@@ -31,7 +33,8 @@ export default function CommentsScreen({ navigation, route }) {
       const colRef = collection(docRef, 'comments');
       await addDoc(colRef, {
         commentText,
-        commentOwner,
+        commentOwner: commentOwnerName,
+        commentOwnerId,
         createdAt: serverTimestamp(),
       });
       await updateDoc(docRef, { comments: comments.length + 1 });
@@ -43,7 +46,7 @@ export default function CommentsScreen({ navigation, route }) {
   const getAllComments = async () => {
     try {
       const docRef = doc(db, 'posts', postId);
-      const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt', 'desc'));
+      const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt'));
       await onSnapshot(colRef, data => {
         setComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
       });
@@ -52,22 +55,45 @@ export default function CommentsScreen({ navigation, route }) {
     }
   };
 
+  const getDate = item => item?.createdAt?.toDate()?.toLocaleDateString() || 'Сегодня';
+
+  const getTime = item => item?.createdAt?.toDate()?.toLocaleTimeString() || 'Только что';
+
+  const renderItem = ({ item }) => (
+    <View
+      style={{
+        ...styles.commentBox,
+        flexDirection: item.commentOwnerId === commentOwnerId ? 'row-reverse' : 'row',
+      }}
+    >
+      <View
+        style={{
+          marginLeft: item.commentOwnerId === commentOwnerId ? 16 : 0,
+          marginRight: item.commentOwnerId === commentOwnerId ? 0 : 16,
+        }}
+      >
+        <Image source={{ uri: USER.avatar }} style={styles.avatar} />
+      </View>
+      <View style={styles.comment}>
+        <Text>{item.commentText}</Text>
+        <Text
+          style={{
+            alignSelf: item.commentOwnerId === commentOwnerId ? 'flex-start' : 'flex-end',
+            ...styles.commentDate,
+          }}
+        >{`${getDate(item)} | ${getTime(item)}`}</Text>
+      </View>
+    </View>
+  );
+  const memoizedRenderItem = useMemo(() => renderItem, [comments]);
+
   return (
     <View style={styles.container}>
       <View>
         <Image source={{ uri: postImage }} style={styles.picture} />
       </View>
       <View style={styles.commentsArea}>
-        <FlatList
-          data={comments}
-          renderItem={({ item }) => (
-            <View style={styles.commentBox}>
-              <Text>{item.commentText}</Text>
-              <Text>{item.createdAt.toDate().toLocaleString('ru-Ru')}</Text>
-            </View>
-          )}
-          keyExtractor={item => item.id}
-        />
+        <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
       </View>
       <View>
         <TextInput
@@ -82,7 +108,6 @@ export default function CommentsScreen({ navigation, route }) {
             activeOpacity={0.8}
             onPress={() => {
               createComment().then(() => setCommentText(''));
-              navigation.navigate('Posts');
             }}
           >
             <AntDesign name="arrowup" size={24} color="#FFFFFF" />
@@ -113,11 +138,26 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   commentBox: {
+    justifyContent: 'space-between',
     marginBottom: 24,
-    borderWidth: 1,
-    borderColor: 'blue',
   },
-
+  comment: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    padding: 16,
+    borderRadius: 6,
+  },
+  commentText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#212121',
+  },
+  commentDate: {
+    marginTop: 8,
+    fontSize: 10,
+    lineHeight: 12,
+    color: '#BDBDBD',
+  },
   textArea: {
     marginTop: 30,
     marginBottom: 16,
@@ -150,5 +190,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 6,
+  },
+  avatar: {
+    width: 28,
+    height: 28,
+    backgroundColor: '#e8e8e8',
+    borderRadius: 14,
   },
 });
