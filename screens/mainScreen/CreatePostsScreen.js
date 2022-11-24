@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Alert,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Camera } from 'expo-camera';
@@ -26,16 +25,12 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
+import { handleError } from '../../helpers/handleError';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
   location: yup.string().min(2, 'Слишком короткое описание'),
 });
-
-const handleError = e => {
-  Alert.alert('Error', e.message);
-  console.log(e.message);
-};
 
 export default function CreatePostsScreen({ navigation }) {
   const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -97,17 +92,15 @@ export default function CreatePostsScreen({ navigation }) {
   }
 
   const getAddress = async coords => {
-    if (coords) {
-      const { latitude, longitude } = coords;
-      let response = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
+    const { latitude, longitude } = coords;
+    let response = await Location.reverseGeocodeAsync({
+      latitude,
+      longitude,
+    });
 
-      for (let item of response) {
-        let address = `${item.city}, ${item.country}`;
-        setAddress(address);
-      }
+    for (let item of response) {
+      let address = `${item.city}, ${item.country}`;
+      setAddress(address);
     }
   };
 

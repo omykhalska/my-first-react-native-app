@@ -74,7 +74,13 @@ export default function CommentsScreen({ route }) {
       >
         <Image source={{ uri: USER.avatar }} style={styles.avatar} />
       </View>
-      <View style={styles.comment}>
+      <View
+        style={{
+          ...styles.comment,
+          borderTopRightRadius: item.commentOwnerId === commentOwnerId ? 0 : 6,
+          borderTopLeftRadius: item.commentOwnerId === commentOwnerId ? 6 : 0,
+        }}
+      >
         <Text>{item.commentText}</Text>
         <Text
           style={{
@@ -99,6 +105,7 @@ export default function CommentsScreen({ route }) {
         <TextInput
           style={{ ...styles.textArea, ...styles.shadow }}
           placeholder="Комментировать..."
+          placeholderTextColor={'#BDBDBD'}
           onChangeText={setCommentText}
           value={commentText}
         />
@@ -170,7 +177,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#BDBDBD',
+    color: '#212121',
   },
   submitBtn: {
     position: 'absolute',

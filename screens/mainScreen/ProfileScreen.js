@@ -1,5 +1,5 @@
 import { AntDesign, Feather } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   StatusBar,
   Image,
@@ -74,6 +74,8 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const memoizedRenderItem = useMemo(() => renderItem, [posts]);
+
   return (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
@@ -93,7 +95,7 @@ export default function ProfileScreen() {
             </View>
 
             {posts.length > 0 ? (
-              <View style={styles.publications}>{posts.map(renderItem)}</View>
+              <View style={styles.publications}>{posts.map(memoizedRenderItem)}</View>
             ) : (
               <View style={styles.publications}>
                 <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
