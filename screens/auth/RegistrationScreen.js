@@ -9,13 +9,20 @@ import {
   Keyboard,
   Platform,
   KeyboardAvoidingView,
+  Alert,
+  Image,
 } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import * as ImagePicker from 'expo-image-picker';
 import { authRegisterUser } from '../../redux/auth/authOperations';
+import uuid from 'react-native-uuid';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { storage } from '../../firebase/config';
+import { handleError } from '../../helpers/handleError';
 
 const registerSchema = yup.object({
   login: yup
@@ -38,6 +45,7 @@ export default function RegistrationScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [imageUri, setImageUri] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -55,23 +63,78 @@ export default function RegistrationScreen({ navigation }) {
     };
   }, []);
 
+  useEffect(() => {
+    permissionFunction();
+  }, []);
+
+  const pickAvatar = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      quality: 1,
+      allowsEditing: true,
+    });
+
+    if (!result.cancelled) {
+      setImageUri(result.uri);
+    }
+  };
+
+  const uploadAvatarToServer = async () => {
+    try {
+      const id = uuid.v4();
+      const response = await fetch(imageUri);
+      const file = await response.blob();
+      const storageRef = ref(storage, `avatars/${id}`);
+
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
+  const handleRegisterClick = async values => {
+    const avatarUrl = await uploadAvatarToServer();
+    const data = { ...values, avatar: avatarUrl };
+    dispatch(authRegisterUser(data));
+  };
+
+  const removeAvatar = () => {
+    setImageUri(null);
+  };
+
+  const permissionFunction = async () => {
+    const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+    if (imagePermission.status !== 'granted') {
+      Alert.alert('Permission for media access needed.');
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
           <View style={styles.avatarContainer}>
-            <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
-              <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
-            </TouchableOpacity>
+            <Image source={{ uri: imageUri }} style={styles.image} />
+            {!imageUri ? (
+              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={pickAvatar}>
+                <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.buttonIcon}
+                onPress={removeAvatar}
+              >
+                <AntDesign name="delete" size={25} color="#FF6C00" />
+              </TouchableOpacity>
+            )}
           </View>
           <View style={styles.regFormContainer}>
             <Formik
               initialValues={{ login: '', email: '', password: '' }}
               validationSchema={registerSchema}
-              onSubmit={(values, { resetForm }) => {
-                dispatch(authRegisterUser(values));
-                resetForm();
-              }}
+              onSubmit={handleRegisterClick}
             >
               {props => (
                 <View style={{ marginBottom: isKeyboardVisible ? 32 : 0 }}>

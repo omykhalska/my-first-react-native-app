@@ -2,18 +2,16 @@ import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getUserEmail, getUserName } from '../../redux/auth/authSelectors';
+import { getUserAvatar, getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-
-import USER from '../../data/user';
 
 export default function PostsScreen({ navigation }) {
   const userName = useSelector(getUserName);
   const userEmail = useSelector(getUserEmail);
+  const userAvatar = useSelector(getUserAvatar);
 
   const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(USER); // используется пока для аватарки
 
   useEffect(() => {
     const getAllPosts = async () => {
@@ -67,7 +65,7 @@ export default function PostsScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.user}>
-        <Image source={{ uri: user.avatar }} style={styles.userAvatar} />
+        <Image source={{ uri: userAvatar }} style={styles.userAvatar} />
         <View style={styles.userDataBox}>
           <Text style={styles.userName}>{userName}</Text>
           <Text style={styles.userEmail}>{userEmail}</Text>

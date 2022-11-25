@@ -12,14 +12,14 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { AntDesign } from '@expo/vector-icons';
-import USER from '../../data/user';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
   const commentOwnerName = useSelector(getUserName);
   const commentOwnerId = useSelector(getUserId);
+  const commentOwnerAvatar = useSelector(getUserAvatar);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
 
@@ -35,6 +35,7 @@ export default function CommentsScreen({ route }) {
         commentText,
         commentOwner: commentOwnerName,
         commentOwnerId,
+        commentOwnerAvatar,
         createdAt: serverTimestamp(),
       });
       await updateDoc(docRef, { comments: comments.length + 1 });
@@ -72,7 +73,7 @@ export default function CommentsScreen({ route }) {
           marginRight: item.commentOwnerId === commentOwnerId ? 0 : 16,
         }}
       >
-        <Image source={{ uri: USER.avatar }} style={styles.avatar} />
+        <Image source={{ uri: item.commentOwnerAvatar }} style={styles.avatar} />
       </View>
       <View
         style={{

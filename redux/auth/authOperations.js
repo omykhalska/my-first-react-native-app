@@ -9,22 +9,24 @@ import { updateProfile } from 'firebase/auth';
 import { handleAuthErrors } from '../../helpers/handleAuthErrors';
 import { authSlice } from './authReducer';
 
-export const authRegisterUser = ({ login, email, password }) => {
+export const authRegisterUser = ({ login, email, password, avatar }) => {
   return async (dispatch, _) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
 
       await updateProfile(auth.currentUser, {
         displayName: login,
+        photoURL: avatar,
       });
 
-      const { uid, displayName } = auth.currentUser;
+      const { uid, displayName, photoURL } = auth.currentUser;
 
       dispatch(
         authSlice.actions.updateUserProfile({
           userId: uid,
           userName: displayName,
           userEmail: email,
+          userAvatar: photoURL,
         }),
       );
     } catch (error) {
@@ -57,6 +59,7 @@ export const authStateChangeUser = () => async dispatch => {
         userId: user.uid,
         userName: user.displayName,
         userEmail: user.email,
+        userAvatar: user.photoURL,
       };
 
       dispatch(authSlice.actions.updateUserProfile(update));

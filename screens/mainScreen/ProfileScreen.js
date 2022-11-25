@@ -13,16 +13,15 @@ import {
   Dimensions,
 } from 'react-native';
 
-import USER from '../../data/user'; // для аватарки пока нужен
-
 import { useSelector } from 'react-redux';
-import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 export default function ProfileScreen() {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
+  const userAvatar = useSelector(getUserAvatar);
 
   const [posts, setPosts] = useState([]);
 
@@ -83,7 +82,7 @@ export default function ProfileScreen() {
           <View style={styles.contentBox}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>
-                <Image source={{ uri: USER.avatar || null }} style={styles.image} />
+                <Image source={{ uri: userAvatar }} style={styles.image} />
               </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
                 <AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />
