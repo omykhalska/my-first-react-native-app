@@ -1,5 +1,5 @@
 import CreatePostsScreen from './CreatePostsScreen';
-import HomeScreen from './HomeScreen';
+import PostsScreen from './PostsScreen';
 import ProfileScreen from './ProfileScreen';
 
-export default { CreatePostsScreen, HomeScreen, ProfileScreen };
+export default { CreatePostsScreen, PostsScreen, ProfileScreen };

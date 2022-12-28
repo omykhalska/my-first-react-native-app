@@ -1,11 +1,11 @@
 import AuthNavigation from './AuthNavigation';
-import TabNavigation from './TabNavigation';
+import MainNavigation from './MainNavigation';
 
 const useRoute = isAuth => {
   if (!isAuth) {
     return <AuthNavigation />;
   } else {
-    return <TabNavigation />;
+    return <MainNavigation />;
   }
 };
 

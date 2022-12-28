@@ -1,6 +1,5 @@
 import {
   Button,
-  Dimensions,
   Image,
   Keyboard,
   StyleSheet,
@@ -160,15 +159,14 @@ export default function CreatePostsScreen({ navigation }) {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
         enableOnAndroid={true}
-        extraScrollHeight={200}
         contentContainerStyle={styles.container}
-        scrollEnabled={false}
+        scrollEnabled={true}
       >
-        <View>
+        <View style={{ flex: 1 }}>
           <View
             style={{
               ...styles.pictureBox,
-              height: photoUrl ? 240 : ((Dimensions.get('window').width - 32) * 4) / 3,
+              height: photoUrl ? 240 : '80%',
             }}
           >
             {isFocused && !photoUrl ? (
@@ -212,8 +210,8 @@ export default function CreatePostsScreen({ navigation }) {
                 dirty,
                 resetForm,
               }) => (
-                <View style={{ borderWidth: 2, borderColor: 'blue' }}>
-                  <View style={{ borderWidth: 1, borderColor: 'red' }}>
+                <View style={{ flex: 1 }}>
+                  <View style={{ flex: 1, minHeight: 300 }}>
                     <TextInput
                       value={values.title}
                       onChangeText={handleChange('title')}
@@ -257,7 +255,13 @@ export default function CreatePostsScreen({ navigation }) {
                     </TouchableOpacity>
                   </View>
 
-                  <View style={{ borderWidth: 2, borderColor: 'green' }}>
+                  <View
+                    style={{
+                      alignContent: 'center',
+
+                      borderColor: 'blue',
+                    }}
+                  >
                     <TouchableOpacity
                       onPress={() => {
                         setPhotoUrl('');

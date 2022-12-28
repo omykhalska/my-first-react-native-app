@@ -1,10 +1,12 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import mainScreen from '../mainScreen';
 import { AntDesign, Feather } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native';
-import mainScreen from '../screens/mainScreen';
 import { CommonActions } from '@react-navigation/native';
+import { TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { authLogOutUser } from '../../redux/auth/authOperations';
 
-const MainTab = createBottomTabNavigator();
+const HomeTabs = createBottomTabNavigator();
 
 const tabNavOptions = {
   tabBarActiveTintColor: '#fff',
@@ -42,21 +44,36 @@ const tabScreenOptions = {
   },
 };
 
-export default function TabNavigation() {
+export default function HomeScreen() {
+  const dispatch = useDispatch();
+
   return (
-    <MainTab.Navigator screenOptions={tabNavOptions}>
-      <MainTab.Screen
+    <HomeTabs.Navigator screenOptions={tabNavOptions}>
+      <HomeTabs.Screen
         name="Home"
-        component={mainScreen.HomeScreen}
+        component={mainScreen.PostsScreen}
         options={() => ({
           ...tabScreenOptions,
           tabBarActiveTintColor: '#FF6C00',
           tabBarActiveBackgroundColor: '#fff',
           tabBarIcon: ({ color }) => <Feather name="grid" size={24} color={color} />,
-          headerShown: false,
+
+          title: 'Публикации',
+          headerRightContainerStyle: {
+            paddingRight: 10,
+          },
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                dispatch(authLogOutUser());
+              }}
+            >
+              <Feather name="log-out" size={24} color="#BDBDBD" />
+            </TouchableOpacity>
+          ),
         })}
       />
-      <MainTab.Screen
+      <HomeTabs.Screen
         name="Create"
         component={mainScreen.CreatePostsScreen}
         options={({ navigation }) => ({
@@ -84,7 +101,7 @@ export default function TabNavigation() {
           ),
         })}
       />
-      <MainTab.Screen
+      <HomeTabs.Screen
         name="Profile"
         component={mainScreen.ProfileScreen}
         options={{
@@ -94,6 +111,6 @@ export default function TabNavigation() {
           headerShown: false,
         }}
       />
-    </MainTab.Navigator>
+    </HomeTabs.Navigator>
   );
 }
