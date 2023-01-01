@@ -1,5 +1,7 @@
 import {
+  Alert,
   Button,
+  Dimensions,
   Image,
   Keyboard,
   StyleSheet,
@@ -25,10 +27,10 @@ import { useSelector } from 'react-redux';
 import { getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
 import { handleError } from '../../helpers/handleError';
+import * as ImagePicker from 'expo-image-picker';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
-  location: yup.string().min(2, 'Слишком короткое описание'),
 });
 
 export default function CreatePostsScreen({ navigation }) {
@@ -63,6 +65,18 @@ export default function CreatePostsScreen({ navigation }) {
         setErrorMsg('Permission to access location was denied');
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    const permissionFunction = async () => {
+      const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+
+      if (imagePermission.status !== 'granted') {
+        Alert.alert('Permission for media access needed.');
+      }
+    };
+
+    permissionFunction();
   }, []);
 
   if (!permission) {
@@ -116,6 +130,24 @@ export default function CreatePostsScreen({ navigation }) {
     }
   };
 
+  const pickImage = async () => {
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        quality: 1,
+        allowsEditing: true,
+        aspect: [Dimensions.get('window').width, 240],
+      });
+
+      if (!result.cancelled) {
+        setPhotoUrl(result.uri);
+        setAddress('');
+        setLocation(null);
+      }
+    } catch (e) {
+      handleError(e);
+    }
+  };
+
   const uploadPhotoToServer = async () => {
     try {
       const id = uuid.v4();
@@ -152,7 +184,7 @@ export default function CreatePostsScreen({ navigation }) {
 
   const sendPhoto = values => {
     uploadPostToServer(values);
-    navigation.navigate('Posts');
+    navigation.navigate('Home');
   };
 
   return (
@@ -166,7 +198,7 @@ export default function CreatePostsScreen({ navigation }) {
           <View
             style={{
               ...styles.pictureBox,
-              height: photoUrl ? 240 : '80%',
+              height: photoUrl ? 240 : ((Dimensions.get('window').width - 32) * 4) / 3,
             }}
           >
             {isFocused && !photoUrl ? (
@@ -188,7 +220,13 @@ export default function CreatePostsScreen({ navigation }) {
             )}
           </View>
           {!photoUrl ? (
-            <Text style={styles.text}>Загрузите фото</Text>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={pickImage}
+              style={{ ...styles.submitBtn, ...styles.uploadImgBtn }}
+            >
+              <Text style={styles.text}>Загрузить фото с галереи</Text>
+            </TouchableOpacity>
           ) : (
             <Formik
               initialValues={{ title: '', location: '' }}
@@ -258,7 +296,6 @@ export default function CreatePostsScreen({ navigation }) {
                   <View
                     style={{
                       alignContent: 'center',
-
                       borderColor: 'blue',
                     }}
                   >
@@ -315,18 +352,20 @@ const styles = StyleSheet.create({
   cameraBtnBox: {
     width: 60,
     height: 60,
-    alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 30,
   },
+  uploadImgBtn: {
+    marginTop: 16,
+    backgroundColor: '#FF6C00',
+  },
   text: {
-    marginTop: 8,
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#BDBDBD',
+    color: '#fff',
   },
   input: {
     height: 50,
