@@ -13,7 +13,7 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { authLogInUser } from '../../redux/auth/authOperations';
 
@@ -29,12 +29,16 @@ export default function LoginScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const passwordRef = useRef(null);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', e => {
       setIsKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height);
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setIsKeyboardVisible(false);
@@ -74,6 +78,10 @@ export default function LoginScreen({ navigation }) {
                         props.setFieldTouched('email');
                         setFocusedItem('');
                       }}
+                      onSubmitEditing={() => passwordRef.current?.focus()}
+                      blurOnSubmit={false}
+                      returnKeyType="next"
+                      returnKeyLabel="next"
                       placeholder="Адрес электронной почты"
                       placeholderTextColor="#BDBDBD"
                       autoComplete={'email'}
@@ -89,7 +97,7 @@ export default function LoginScreen({ navigation }) {
                       <Text style={styles.errorText}>{props.errors.email}</Text>
                     )}
 
-                    <View style={{ marginBottom: isKeyboardVisible ? 32 : 0 }}>
+                    <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
                       <TextInput
                         value={props.values.password}
                         onChangeText={props.handleChange('password')}
@@ -100,6 +108,9 @@ export default function LoginScreen({ navigation }) {
                           props.setFieldTouched('password');
                           setFocusedItem('');
                         }}
+                        ref={passwordRef}
+                        returnKeyType="go"
+                        returnKeyLabel="go"
                         placeholder="Пароль"
                         placeholderTextColor="#BDBDBD"
                         secureTextEntry={isHiddenPassword}

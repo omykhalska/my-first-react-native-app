@@ -15,7 +15,7 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
 import { authRegisterUser } from '../../redux/auth/authOperations';
@@ -45,13 +45,18 @@ export default function RegistrationScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [imageUri, setImageUri] = useState(null);
+
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', e => {
       setIsKeyboardVisible(true);
+      setKeyboardHeight(e.endCoordinates.height);
     });
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
       setIsKeyboardVisible(false);
@@ -71,6 +76,7 @@ export default function RegistrationScreen({ navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       quality: 1,
       allowsEditing: true,
+      aspect: [1, 1],
     });
 
     if (!result.cancelled) {
@@ -137,52 +143,66 @@ export default function RegistrationScreen({ navigation }) {
               onSubmit={handleRegisterClick}
             >
               {props => (
-                <View style={{ marginBottom: isKeyboardVisible ? 32 : 0 }}>
+                <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
                   <Text style={styles.formTitle}>Регистрация</Text>
-                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
-                    <TextInput
-                      value={props.values.login}
-                      onChangeText={props.handleChange('login')}
-                      onFocus={() => setFocusedItem('login')}
-                      onBlur={() => {
-                        props.setFieldTouched('login');
-                        setFocusedItem('');
-                      }}
-                      placeholder="Логин"
-                      placeholderTextColor="#BDBDBD"
-                      style={[
-                        focusedItem === 'login'
-                          ? { ...styles.input, ...styles.inputOnFocus }
-                          : styles.input,
-                      ]}
-                      underlineColorAndroid={'transparent'}
-                    />
-                    {props.errors.login && props.touched.login && (
-                      <Text style={styles.errorText}>{props.errors.login}</Text>
-                    )}
 
-                    <TextInput
-                      value={props.values.email}
-                      onChangeText={props.handleChange('email')}
-                      onFocus={() => setFocusedItem('email')}
-                      onBlur={() => {
-                        props.setFieldTouched('email');
-                        setFocusedItem('');
-                      }}
-                      placeholder="Адрес электронной почты"
-                      placeholderTextColor="#BDBDBD"
-                      autoComplete={'email'}
-                      keyboardType={'email-address'}
-                      style={[
-                        focusedItem === 'email'
-                          ? { ...styles.input, ...styles.inputOnFocus }
-                          : styles.input,
-                      ]}
-                      underlineColorAndroid={'transparent'}
-                    />
-                    {props.errors.email && props.touched.email && (
-                      <Text style={styles.errorText}>{props.errors.email}</Text>
-                    )}
+                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                    <View>
+                      <TextInput
+                        value={props.values.login}
+                        onChangeText={props.handleChange('login')}
+                        onFocus={() => setFocusedItem('login')}
+                        onBlur={() => {
+                          props.setFieldTouched('login');
+                          setFocusedItem('');
+                        }}
+                        onSubmitEditing={() => emailRef.current?.focus()}
+                        blurOnSubmit={false}
+                        returnKeyType="next"
+                        returnKeyLabel="next"
+                        placeholder="Логин"
+                        placeholderTextColor="#BDBDBD"
+                        style={[
+                          focusedItem === 'login'
+                            ? { ...styles.input, ...styles.inputOnFocus }
+                            : styles.input,
+                        ]}
+                        underlineColorAndroid={'transparent'}
+                      />
+                      {props.errors.login && props.touched.login && (
+                        <Text style={styles.errorText}>{props.errors.login}</Text>
+                      )}
+                    </View>
+
+                    <View>
+                      <TextInput
+                        value={props.values.email}
+                        onChangeText={props.handleChange('email')}
+                        onFocus={() => setFocusedItem('email')}
+                        onBlur={() => {
+                          props.setFieldTouched('email');
+                          setFocusedItem('');
+                        }}
+                        ref={emailRef}
+                        onSubmitEditing={() => passwordRef.current?.focus()}
+                        blurOnSubmit={false}
+                        returnKeyType="next"
+                        returnKeyLabel="next"
+                        placeholder="Адрес электронной почты"
+                        placeholderTextColor="#BDBDBD"
+                        autoComplete="email"
+                        keyboardType="email-address"
+                        style={[
+                          focusedItem === 'email'
+                            ? { ...styles.input, ...styles.inputOnFocus }
+                            : styles.input,
+                        ]}
+                        underlineColorAndroid={'transparent'}
+                      />
+                      {props.errors.email && props.touched.email && (
+                        <Text style={styles.errorText}>{props.errors.email}</Text>
+                      )}
+                    </View>
 
                     <View>
                       <TextInput
@@ -193,6 +213,9 @@ export default function RegistrationScreen({ navigation }) {
                           props.setFieldTouched('password');
                           setFocusedItem('');
                         }}
+                        ref={passwordRef}
+                        returnKeyType="go"
+                        returnKeyLabel="go"
                         placeholder="Пароль"
                         placeholderTextColor="#BDBDBD"
                         secureTextEntry={isHiddenPassword}
