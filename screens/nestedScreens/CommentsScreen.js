@@ -73,7 +73,14 @@ export default function CommentsScreen({ route }) {
           marginRight: item.commentOwnerId === commentOwnerId ? 0 : 16,
         }}
       >
-        <Image source={{ uri: item.commentOwnerAvatar }} style={styles.avatar} />
+        <Image
+          source={
+            item.commentOwnerAvatar
+              ? { uri: item.commentOwnerAvatar }
+              : require('../../assets/blank-profile-picture.png')
+          }
+          style={styles.avatar}
+        />
       </View>
       <View
         style={{
@@ -92,6 +99,7 @@ export default function CommentsScreen({ route }) {
       </View>
     </View>
   );
+
   const memoizedRenderItem = useMemo(() => renderItem, [comments]);
 
   return (
@@ -154,9 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.03)',
     padding: 16,
     borderRadius: 6,
-  },
-  commentText: {
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: 18,
     color: '#212121',
   },

@@ -1,16 +1,10 @@
 import { Feather } from '@expo/vector-icons';
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getUserAvatar, getUserEmail, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 export default function PostsScreen({ navigation }) {
-  const userName = useSelector(getUserName);
-  const userEmail = useSelector(getUserEmail);
-  const userAvatar = useSelector(getUserAvatar);
-
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -29,6 +23,17 @@ export default function PostsScreen({ navigation }) {
 
   const renderItem = ({ item }) => (
     <View style={styles.publication}>
+      <View style={styles.userDataBox}>
+        <Image
+          source={
+            item.userPhotoURL
+              ? { uri: item.userPhotoURL }
+              : require('../../assets/blank-profile-picture.png')
+          }
+          style={styles.userAvatar}
+        />
+        <Text style={styles.userName}>{item.userName}</Text>
+      </View>
       <Image source={{ uri: item.photo }} style={styles.picture} />
       <Text style={styles.title}>{item.title}</Text>
       <View style={styles.extraData}>
@@ -64,14 +69,6 @@ export default function PostsScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.user}>
-        <Image source={{ uri: userAvatar }} style={styles.userAvatar} />
-        <View style={styles.userDataBox}>
-          <Text style={styles.userName}>{userName}</Text>
-          <Text style={styles.userEmail}>{userEmail}</Text>
-        </View>
-      </View>
-
       {posts.length > 0 ? (
         <View style={styles.publications}>
           <FlatList data={posts} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
@@ -91,41 +88,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 32,
     fontFamily: 'Roboto-Regular',
     backgroundColor: '#fff',
   },
-  user: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  userAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
+  publication: {
+    marginBottom: 32,
   },
   userDataBox: {
-    marginLeft: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  userAvatar: {
+    width: 28,
+    height: 28,
+    backgroundColor: '#e8e8e8',
+    borderRadius: 14,
   },
   userName: {
+    marginLeft: 6,
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 15,
-    color: '#212121',
-  },
-  userEmail: {
-    fontWeight: '400',
-    fontSize: 11,
-    lineHeight: 13,
     color: '#212121',
   },
   publications: {
     flex: 1,
     flexGrow: 1,
-    paddingTop: 32,
-  },
-  publication: {
-    marginBottom: 32,
+    paddingTop: 16,
   },
   picture: {
     width: '100%',
@@ -168,11 +158,5 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: '#212121',
     textDecorationLine: 'underline',
-  },
-  skeleton: {
-    marginTop: 8,
-    height: 36,
-    backgroundColor: '#e8e8e8',
-    borderRadius: 8,
   },
 });

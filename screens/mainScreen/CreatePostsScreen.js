@@ -24,7 +24,7 @@ import { storage, db } from '../../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
-import { getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { getUserId, getUserName, getUserAvatar } from '../../redux/auth/authSelectors';
 import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
 import { handleError } from '../../helpers/handleError';
 import * as ImagePicker from 'expo-image-picker';
@@ -46,6 +46,7 @@ export default function CreatePostsScreen({ navigation }) {
 
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
+  const userPhotoURL = useSelector(getUserAvatar);
 
   useEffect(() => {
     if (!permission) {
@@ -173,6 +174,7 @@ export default function CreatePostsScreen({ navigation }) {
         address,
         userId,
         userName,
+        userPhotoURL,
         createdAt: serverTimestamp(),
         comments: 0,
         likes: 0,
@@ -379,11 +381,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-  },
-  locationIcon: {
-    position: 'absolute',
-    left: 0,
-    top: 25,
   },
   errorText: {
     color: '#AF0606',
