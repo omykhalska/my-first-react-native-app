@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Camera } from 'expo-camera';
@@ -43,6 +44,7 @@ export default function CreatePostsScreen({ navigation }) {
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
   const [errorMsg, setErrorMsg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
@@ -77,7 +79,7 @@ export default function CreatePostsScreen({ navigation }) {
       }
     };
 
-    permissionFunction();
+    permissionFunction().catch(handleError);
   }, []);
 
   if (!permission) {
@@ -106,15 +108,19 @@ export default function CreatePostsScreen({ navigation }) {
   }
 
   const getAddress = async coords => {
-    const { latitude, longitude } = coords;
-    let response = await Location.reverseGeocodeAsync({
-      latitude,
-      longitude,
-    });
+    try {
+      const { latitude, longitude } = coords;
+      let response = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
 
-    for (let item of response) {
-      let address = `${item.city}, ${item.country}`;
-      setAddress(address);
+      for (let item of response) {
+        let address = `${item.city}, ${item.country}`;
+        setAddress(address);
+      }
+    } catch (e) {
+      handleError(e);
     }
   };
 
@@ -165,6 +171,7 @@ export default function CreatePostsScreen({ navigation }) {
 
   const uploadPostToServer = async values => {
     try {
+      setIsLoading(true);
       const snapshot = await uploadPhotoToServer();
 
       await addDoc(collection(db, 'posts'), {
@@ -181,11 +188,13 @@ export default function CreatePostsScreen({ navigation }) {
       });
     } catch (e) {
       handleError(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const sendPhoto = values => {
-    uploadPostToServer(values);
+  const sendPhoto = async values => {
+    await uploadPostToServer(values);
     navigation.navigate('Home');
   };
 
@@ -197,6 +206,9 @@ export default function CreatePostsScreen({ navigation }) {
         scrollEnabled={true}
       >
         <View style={{ flex: 1 }}>
+          {isLoading && (
+            <ActivityIndicator size="large" color="#FF6C00" style={styles.loadingIndicator} />
+          )}
           <View
             style={{
               ...styles.pictureBox,
@@ -234,7 +246,7 @@ export default function CreatePostsScreen({ navigation }) {
               initialValues={{ title: '', location: '' }}
               validationSchema={publicationSchema}
               onSubmit={(values, { resetForm }) => {
-                sendPhoto(values);
+                sendPhoto(values).catch(handleError);
                 resetForm();
                 setPhotoUrl('');
               }}
@@ -411,5 +423,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  loadingIndicator: {
+    zIndex: 5,
+    width: '100%',
+    height: '100%',
   },
 });
