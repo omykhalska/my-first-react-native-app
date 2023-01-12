@@ -94,7 +94,9 @@ export default function ProfileScreen() {
             </View>
 
             {posts.length > 0 ? (
-              <View style={styles.publications}>{posts.map(memoizedRenderItem)}</View>
+              <>
+                <View style={styles.publications}>{posts.map(memoizedRenderItem)}</View>
+              </>
             ) : (
               <View style={styles.publications}>
                 <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>

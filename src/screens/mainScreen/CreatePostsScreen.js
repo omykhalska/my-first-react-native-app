@@ -146,9 +146,9 @@ export default function CreatePostsScreen({ navigation }) {
       });
 
       if (!result.cancelled) {
-        setPhotoUrl(result.uri);
         setAddress('');
         setLocation(null);
+        setPhotoUrl(result.uri);
       }
     } catch (e) {
       handleError(e);
@@ -219,7 +219,7 @@ export default function CreatePostsScreen({ navigation }) {
               <Camera ref={setCameraRef} style={styles.camera}>
                 <TouchableOpacity
                   style={styles.cameraBtnBox}
-                  activeOpacity={0.8}
+                  activeOpacity={0.2}
                   onPress={takePhoto}
                 >
                   <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
@@ -347,13 +347,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     borderWidth: 1,
     borderColor: '#E8E8E8',
-    borderStyle: 'solid',
     borderRadius: 8,
   },
   camera: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   picture: {
     width: '100%',
@@ -361,18 +359,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    zIndex: 100000000,
+    zIndex: 10,
   },
   cameraBtnBox: {
+    position: 'absolute',
+    bottom: -30,
     width: 60,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
     borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   uploadImgBtn: {
-    marginTop: 16,
+    marginTop: 46,
     backgroundColor: '#FF6C00',
   },
   text: {
