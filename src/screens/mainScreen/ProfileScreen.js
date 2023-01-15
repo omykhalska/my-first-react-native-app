@@ -1,4 +1,4 @@
-import { AntDesign, Feather } from '@expo/vector-icons';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState, useMemo } from 'react';
 import {
   StatusBar,
@@ -17,6 +17,8 @@ import { useSelector } from 'react-redux';
 import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { PhotoEditPopup } from '../../components/PhotoEditPopup';
+import { handleError } from '../../helpers/handleError';
 
 export default function ProfileScreen() {
   const userName = useSelector(getUserName);
@@ -24,6 +26,7 @@ export default function ProfileScreen() {
   const userAvatar = useSelector(getUserAvatar);
 
   const [posts, setPosts] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const getUserPosts = async () => {
@@ -38,12 +41,14 @@ export default function ProfileScreen() {
           setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
         });
       } catch (e) {
-        console.log(e.message);
+        handleError(e);
       }
     };
 
     getUserPosts();
   }, []);
+
+  const togglePopup = () => setIsVisible(!isVisible);
 
   const renderItem = item => (
     <View style={styles.publication} key={item.id}>
@@ -78,14 +83,16 @@ export default function ProfileScreen() {
   return (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
+        <PhotoEditPopup visible={isVisible} onPress={togglePopup} />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentBox}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>
                 <Image source={{ uri: userAvatar }} style={styles.image} />
               </View>
-              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={() => {}}>
-                <AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />
+              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={togglePopup}>
+                <MaterialIcons name="mode-edit" size={24} color="#E8E8E8" style={styles.icon} />
+                {/*<AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />*/}
               </TouchableOpacity>
             </View>
 
