@@ -15,7 +15,7 @@ import { storage } from '../firebase/config';
 import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
-import { pickImage } from '../helpers/handleImagePicker';
+import { pickImage, takePhoto } from '../helpers/handleImagePicker';
 
 export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   const userAvatar = useSelector(getUserAvatar);
@@ -39,21 +39,22 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
     ]);
   };
 
-  const onTakePhoto = () => {
-    onPress();
-    Alert.alert('Capture a new photo');
+  const onTakePhoto = async () => {
+    try {
+      onPress();
+      const photo = await takePhoto();
+      await changePhoto(photo);
+    } catch (e) {
+      setIsLoadingPhoto(false);
+      handleError(e);
+    }
   };
 
   const onPickPhoto = async () => {
     try {
       onPress();
       const photo = await pickImage();
-      if (photo) {
-        setIsLoadingPhoto(true);
-        const avatarUrl = await uploadAvatarToServer(photo);
-        userAvatar && (await removePhoto());
-        dispatch(authUpdateUserPhoto(avatarUrl));
-      }
+      await changePhoto(photo);
     } catch (e) {
       setIsLoadingPhoto(false);
       handleError(e);
@@ -79,6 +80,15 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
       await deleteObject(avatarRef);
     } catch (e) {
       handleError(e);
+    }
+  };
+
+  const changePhoto = async photo => {
+    if (photo) {
+      setIsLoadingPhoto(true);
+      const avatarUrl = await uploadAvatarToServer(photo);
+      userAvatar && (await removePhoto());
+      dispatch(authUpdateUserPhoto(avatarUrl));
     }
   };
 

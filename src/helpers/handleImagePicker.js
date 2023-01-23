@@ -25,3 +25,19 @@ export const pickImage = async () => {
     handleError(e);
   }
 };
+
+export const takePhoto = async () => {
+  try {
+    let result = await ImagePicker.launchCameraAsync({
+      quality: 1,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+
+    if (!result.cancelled) {
+      return result.uri;
+    }
+  } catch (e) {
+    handleError(e);
+  }
+};
