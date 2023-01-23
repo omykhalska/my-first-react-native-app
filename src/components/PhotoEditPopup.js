@@ -40,21 +40,23 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   };
 
   const onTakePhoto = async () => {
-    try {
-      onPress();
-      const photo = await takePhoto();
-      await changePhoto(photo);
-    } catch (e) {
-      setIsLoadingPhoto(false);
-      handleError(e);
-    }
+    await changePhoto(takePhoto);
   };
 
   const onPickPhoto = async () => {
+    await changePhoto(pickImage);
+  };
+
+  const changePhoto = async imagePickerFn => {
     try {
       onPress();
-      const photo = await pickImage();
-      await changePhoto(photo);
+      const photo = await imagePickerFn();
+      if (photo) {
+        setIsLoadingPhoto(true);
+        const avatarUrl = await uploadAvatarToServer(photo);
+        userAvatar && (await removePhoto());
+        dispatch(authUpdateUserPhoto(avatarUrl));
+      }
     } catch (e) {
       setIsLoadingPhoto(false);
       handleError(e);
@@ -80,15 +82,6 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
       await deleteObject(avatarRef);
     } catch (e) {
       handleError(e);
-    }
-  };
-
-  const changePhoto = async photo => {
-    if (photo) {
-      setIsLoadingPhoto(true);
-      const avatarUrl = await uploadAvatarToServer(photo);
-      userAvatar && (await removePhoto());
-      dispatch(authUpdateUserPhoto(avatarUrl));
     }
   };
 
