@@ -8,17 +8,16 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { pickImage } from '../helpers/handleImagePicker';
-import { getUserAvatar } from '../redux/auth/authSelectors';
-import { storage } from '../firebase/config';
 import { ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { handleError } from '../helpers/handleError';
-import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import uuid from 'react-native-uuid';
+import { storage } from '../firebase/config';
+import { getUserAvatar } from '../redux/auth/authSelectors';
+import { authUpdateUserPhoto } from '../redux/auth/authOperations';
+import { handleError } from '../helpers/handleError';
+import { pickImage } from '../helpers/handleImagePicker';
 
-export const PhotoEditPopup = ({ visible, onPress }) => {
+export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
 
@@ -30,7 +29,13 @@ export const PhotoEditPopup = ({ visible, onPress }) => {
         onPress: () => {},
         style: 'cancel',
       },
-      { text: 'Удалить', onPress: removePhoto },
+      {
+        text: 'Удалить',
+        onPress: async () => {
+          await removePhoto();
+          dispatch(authUpdateUserPhoto(''));
+        },
+      },
     ]);
   };
 
@@ -43,11 +48,14 @@ export const PhotoEditPopup = ({ visible, onPress }) => {
     try {
       onPress();
       const photo = await pickImage();
-      const avatarUrl = await uploadAvatarToServer(photo);
-      userAvatar && (await removePhoto());
-      dispatch(authUpdateUserPhoto(avatarUrl));
+      if (photo) {
+        setIsLoadingPhoto(true);
+        const avatarUrl = await uploadAvatarToServer(photo);
+        userAvatar && (await removePhoto());
+        dispatch(authUpdateUserPhoto(avatarUrl));
+      }
     } catch (e) {
-      console.log('onPickPhoto error');
+      setIsLoadingPhoto(false);
       handleError(e);
     }
   };
@@ -61,21 +69,15 @@ export const PhotoEditPopup = ({ visible, onPress }) => {
       await uploadBytes(storageRef, file);
       return await getDownloadURL(storageRef);
     } catch (e) {
-      console.log('error while uploading');
       handleError(e);
     }
   };
 
   const removePhoto = async () => {
     const avatarRef = ref(storage, userAvatar);
-
-    console.log('userAvatar in removePhoto fn =>', userAvatar);
-    console.log('avatarRef in removePhoto fn =>', avatarRef);
     try {
       await deleteObject(avatarRef);
-      dispatch(authUpdateUserPhoto(''));
     } catch (e) {
-      console.log('error while deleting');
       handleError(e);
     }
   };

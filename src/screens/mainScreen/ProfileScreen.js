@@ -14,20 +14,24 @@ import {
 } from 'react-native';
 
 import { useSelector } from 'react-redux';
-import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
-import { PhotoEditPopup } from '../../components/PhotoEditPopup';
+import { Loader, PhotoEditPopup } from '../../components';
 import { handleError } from '../../helpers/handleError';
 
 export default function ProfileScreen() {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
   const userAvatar = useSelector(getUserAvatar);
-  console.log('userAvatar on ProfileScreen', userAvatar);
 
   const [posts, setPosts] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
+
+  useEffect(() => {
+    setIsLoadingPhoto(false);
+  }, [userAvatar]);
 
   useEffect(() => {
     const getUserPosts = async () => {
@@ -84,12 +88,20 @@ export default function ProfileScreen() {
   return (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
-        <PhotoEditPopup visible={isVisible} onPress={togglePopup} />
+        <PhotoEditPopup
+          visible={isVisible}
+          onPress={togglePopup}
+          setIsLoadingPhoto={setIsLoadingPhoto}
+        />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentBox}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatar}>
-                <Image source={{ uri: userAvatar }} style={styles.image} />
+                {isLoadingPhoto ? (
+                  <Loader />
+                ) : (
+                  <Image source={{ uri: userAvatar }} style={styles.image} />
+                )}
               </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={togglePopup}>
                 <MaterialIcons name="mode-edit" size={24} color="#FF6C00" style={styles.icon} />

@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  ActivityIndicator,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Camera } from 'expo-camera';
@@ -29,6 +28,7 @@ import { getUserId, getUserName, getUserAvatar } from '../../redux/auth/authSele
 import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
 import { handleError } from '../../helpers/handleError';
 import * as ImagePicker from 'expo-image-picker';
+import { Loader } from '../../components';
 
 const publicationSchema = yup.object({
   title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
@@ -206,9 +206,7 @@ export default function CreatePostsScreen({ navigation }) {
         scrollEnabled={true}
       >
         <View style={{ flex: 1 }}>
-          {isLoading && (
-            <ActivityIndicator size="large" color="#FF6C00" style={styles.loadingIndicator} />
-          )}
+          {isLoading && <Loader />}
           <View
             style={{
               ...styles.pictureBox,
@@ -431,10 +429,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
-  },
-  loadingIndicator: {
-    zIndex: 5,
-    width: '100%',
-    height: '100%',
   },
 });
