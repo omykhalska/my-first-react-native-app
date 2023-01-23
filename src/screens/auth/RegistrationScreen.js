@@ -9,7 +9,6 @@ import {
   Keyboard,
   Platform,
   KeyboardAvoidingView,
-  Alert,
   Image,
 } from 'react-native';
 import { Formik } from 'formik';
@@ -17,12 +16,12 @@ import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import * as ImagePicker from 'expo-image-picker';
 import { authRegisterUser } from '../../redux/auth/authOperations';
 import uuid from 'react-native-uuid';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/config';
 import { handleError } from '../../helpers/handleError';
+import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 
 const registerSchema = yup.object({
   login: yup
@@ -73,15 +72,8 @@ export default function RegistrationScreen({ navigation }) {
   }, []);
 
   const pickAvatar = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      quality: 1,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
-
-    if (!result.cancelled) {
-      setImageUri(result.uri);
-    }
+    const photo = await pickImage();
+    setImageUri(photo);
   };
 
   const uploadAvatarToServer = async () => {
@@ -106,14 +98,6 @@ export default function RegistrationScreen({ navigation }) {
 
   const removeAvatar = () => {
     setImageUri(null);
-  };
-
-  const permissionFunction = async () => {
-    const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
-
-    if (imagePermission.status !== 'granted') {
-      Alert.alert('Permission for media access needed.');
-    }
   };
 
   return (

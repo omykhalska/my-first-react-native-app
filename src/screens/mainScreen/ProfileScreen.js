@@ -24,6 +24,7 @@ export default function ProfileScreen() {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
   const userAvatar = useSelector(getUserAvatar);
+  console.log('userAvatar on ProfileScreen', userAvatar);
 
   const [posts, setPosts] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
@@ -91,8 +92,7 @@ export default function ProfileScreen() {
                 <Image source={{ uri: userAvatar }} style={styles.image} />
               </View>
               <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={togglePopup}>
-                <MaterialIcons name="mode-edit" size={24} color="#E8E8E8" style={styles.icon} />
-                {/*<AntDesign name="closecircleo" size={24} color="#E8E8E8" style={styles.icon} />*/}
+                <MaterialIcons name="mode-edit" size={24} color="#FF6C00" style={styles.icon} />
               </TouchableOpacity>
             </View>
 
@@ -160,13 +160,24 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -12,
     top: 81,
-    borderRadius: 12,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     zIndex: 11,
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   icon: {
-    flex: 1,
-    alignSelf: 'center',
-    backgroundColor: '#fff',
     overflow: 'hidden',
     borderRadius: 12,
   },

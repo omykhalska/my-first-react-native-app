@@ -4,8 +4,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
-import { updateProfile } from 'firebase/auth';
 import { handleAuthErrors } from '../../helpers/handleAuthErrors';
 import { authSlice } from './authReducer';
 
@@ -66,4 +66,27 @@ export const authStateChangeUser = () => async dispatch => {
       dispatch(authSlice.actions.authStateChange({ stateChange: true }));
     }
   });
+};
+
+export const authUpdateUserPhoto = avatar => {
+  return async (dispatch, _) => {
+    try {
+      await updateProfile(auth.currentUser, {
+        photoURL: avatar,
+      });
+
+      const { uid, displayName, photoURL, email } = auth.currentUser;
+
+      dispatch(
+        authSlice.actions.updateUserProfile({
+          userId: uid,
+          userName: displayName,
+          userEmail: email,
+          userAvatar: photoURL,
+        }),
+      );
+    } catch (error) {
+      handleAuthErrors(error);
+    }
+  };
 };
