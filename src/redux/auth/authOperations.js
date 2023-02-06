@@ -1,4 +1,4 @@
-import { auth } from '../../firebase/config';
+import { auth, db } from '../../firebase/config';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,6 +8,8 @@ import {
 } from 'firebase/auth';
 import { handleAuthErrors } from '../../helpers/handleAuthErrors';
 import { authSlice } from './authReducer';
+import { addDoc, collection } from 'firebase/firestore';
+import { updateUserData } from '../../helpers/handleFirebase';
 
 export const authRegisterUser = ({ login, email, password, avatar }) => {
   return async (dispatch, _) => {
@@ -21,14 +23,16 @@ export const authRegisterUser = ({ login, email, password, avatar }) => {
 
       const { uid, displayName, photoURL } = auth.currentUser;
 
-      dispatch(
-        authSlice.actions.updateUserProfile({
-          userId: uid,
-          userName: displayName,
-          userEmail: email,
-          userAvatar: photoURL,
-        }),
-      );
+      const update = {
+        userId: uid,
+        userName: displayName,
+        userEmail: email,
+        userAvatar: photoURL,
+      };
+
+      await addDoc(collection(db, 'users'), update);
+
+      dispatch(authSlice.actions.updateUserProfile(update));
     } catch (error) {
       handleAuthErrors(error);
     }
@@ -76,6 +80,8 @@ export const authUpdateUserPhoto = avatar => {
       });
 
       const { uid, displayName, photoURL, email } = auth.currentUser;
+
+      await updateUserData(uid, { userAvatar: photoURL });
 
       dispatch(
         authSlice.actions.updateUserProfile({
