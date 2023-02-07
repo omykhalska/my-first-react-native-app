@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react
 import { useEffect, useMemo, useState } from 'react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { getUserData } from '../../helpers/handleFirebase';
 
 export default function PostsScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
@@ -11,8 +12,13 @@ export default function PostsScreen({ navigation }) {
     const getAllPosts = async () => {
       try {
         const q = await query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
-        await onSnapshot(q, data => {
-          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+        await onSnapshot(q, async data => {
+          const posts = [];
+          for (const doc of data.docs) {
+            const { userName, userAvatar } = await getUserData(doc.data().userId);
+            posts.push({ ...doc.data(), id: doc.id, userName, userAvatar });
+          }
+          setPosts(posts);
         });
       } catch (e) {
         console.log(e.message);
@@ -21,49 +27,51 @@ export default function PostsScreen({ navigation }) {
     getAllPosts();
   }, []);
 
-  const renderItem = ({ item }) => (
-    <View style={styles.publication}>
-      <View style={styles.userDataBox}>
-        <Image
-          source={
-            item.userPhotoURL
-              ? { uri: item.userPhotoURL }
-              : require('../../assets/blank-profile-picture.png')
-          }
-          style={styles.userAvatar}
-        />
-        <Text style={styles.userName}>{item.userName}</Text>
-      </View>
-      <Image source={{ uri: item.photo }} style={styles.picture} />
-      <Text style={styles.title}>{item.title}</Text>
-      <View style={styles.extraData}>
-        <View>
-          <TouchableOpacity
-            style={{ ...styles.comments, width: 24 }}
-            onPress={() => {
-              navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
-            }}
-          >
-            <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
-            <Text style={styles.commentsCount}>{item.comments}</Text>
-          </TouchableOpacity>
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.publication}>
+        <View style={styles.userDataBox}>
+          <Image
+            source={
+              item.userAvatar
+                ? { uri: item.userAvatar }
+                : require('../../assets/blank-profile-picture.png')
+            }
+            style={styles.userAvatar}
+          />
+          <Text style={styles.userName}>{item.userName}</Text>
         </View>
-        {item.location && (
+        <Image source={{ uri: item.photo }} style={styles.picture} />
+        <Text style={styles.title}>{item.title}</Text>
+        <View style={styles.extraData}>
           <View>
             <TouchableOpacity
-              style={styles.comments}
+              style={{ ...styles.comments, width: 24 }}
               onPress={() => {
-                navigation.navigate('Map', { location: item.location });
+                navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
               }}
             >
-              <Feather name="map-pin" size={24} color="#BDBDBD" />
-              <Text style={styles.location}>{item.address}</Text>
+              <Feather name="message-circle" size={24} color="#BDBDBD" style={styles.messageIcon} />
+              <Text style={styles.commentsCount}>{item.comments}</Text>
             </TouchableOpacity>
           </View>
-        )}
+          {item.location && (
+            <View>
+              <TouchableOpacity
+                style={styles.comments}
+                onPress={() => {
+                  navigation.navigate('Map', { location: item.location });
+                }}
+              >
+                <Feather name="map-pin" size={24} color="#BDBDBD" />
+                <Text style={styles.location}>{item.address}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
