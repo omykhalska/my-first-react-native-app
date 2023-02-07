@@ -3,13 +3,17 @@ import { db } from '../firebase/config';
 import { handleError } from './handleError';
 
 export const updateUserData = async (uid, updateData) => {
-  const q = await query(collection(db, 'users'), where('userId', '==', uid));
-  const querySnapshot = await getDocs(q);
-  querySnapshot.forEach(document => {
-    const docId = document.id;
-    const docRef = doc(db, 'users', docId);
-    updateDoc(docRef, updateData);
-  });
+  try {
+    const q = await query(collection(db, 'users'), where('userId', '==', uid));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(document => {
+      const docId = document.id;
+      const docRef = doc(db, 'users', docId);
+      updateDoc(docRef, updateData);
+    });
+  } catch (e) {
+    handleError(e);
+  }
 };
 
 export const getUserData = async userId => {

@@ -4,9 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { db } from '../../firebase/config';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { getUserData } from '../../helpers/handleFirebase';
+import { handleError } from '../../helpers/handleError';
+import { getUserAvatar } from '../../redux/auth/authSelectors';
+import { useSelector } from 'react-redux';
 
 export default function PostsScreen({ navigation }) {
   const [posts, setPosts] = useState([]);
+  const userAvatar = useSelector(getUserAvatar);
 
   useEffect(() => {
     const getAllPosts = async () => {
@@ -21,11 +25,11 @@ export default function PostsScreen({ navigation }) {
           setPosts(posts);
         });
       } catch (e) {
-        console.log(e.message);
+        handleError(e);
       }
     };
     getAllPosts();
-  }, []);
+  }, [userAvatar]);
 
   const renderItem = ({ item }) => {
     return (

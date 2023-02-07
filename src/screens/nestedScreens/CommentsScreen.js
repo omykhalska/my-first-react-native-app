@@ -12,18 +12,34 @@ import {
   orderBy,
 } from 'firebase/firestore';
 import { db } from '../../firebase/config';
-import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
+import { getUserId } from '../../redux/auth/authSelectors';
 import { AntDesign } from '@expo/vector-icons';
+import { handleError } from '../../helpers/handleError';
+import { getUserData } from '../../helpers/handleFirebase';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
-  const commentOwnerName = useSelector(getUserName);
-  const commentOwnerId = useSelector(getUserId);
-  const commentOwnerAvatar = useSelector(getUserAvatar);
+  const userId = useSelector(getUserId);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
+    const getAllComments = async () => {
+      try {
+        const docRef = doc(db, 'posts', postId);
+        const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt', 'desc'));
+        await onSnapshot(colRef, async data => {
+          const comments = [];
+          for (const doc of data.docs) {
+            const { userAvatar } = await getUserData(doc.data().userId);
+            comments.push({ ...doc.data(), id: doc.id, userAvatar });
+          }
+          setComments(comments);
+        });
+      } catch (e) {
+        handleError(e);
+      }
+    };
     getAllComments();
   }, []);
 
@@ -33,26 +49,12 @@ export default function CommentsScreen({ route }) {
       const colRef = collection(docRef, 'comments');
       await addDoc(colRef, {
         commentText,
-        commentOwner: commentOwnerName,
-        commentOwnerId,
-        commentOwnerAvatar,
+        userId,
         createdAt: serverTimestamp(),
       });
       await updateDoc(docRef, { comments: comments.length + 1 });
     } catch (e) {
-      console.log(e.message);
-    }
-  };
-
-  const getAllComments = async () => {
-    try {
-      const docRef = doc(db, 'posts', postId);
-      const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt'));
-      await onSnapshot(colRef, data => {
-        setComments(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-      });
-    } catch (e) {
-      console.log(e.message);
+      handleError(e);
     }
   };
 
@@ -64,19 +66,19 @@ export default function CommentsScreen({ route }) {
     <View
       style={{
         ...styles.commentBox,
-        flexDirection: item.commentOwnerId === commentOwnerId ? 'row-reverse' : 'row',
+        flexDirection: item.userId === userId ? 'row-reverse' : 'row',
       }}
     >
       <View
         style={{
-          marginLeft: item.commentOwnerId === commentOwnerId ? 16 : 0,
-          marginRight: item.commentOwnerId === commentOwnerId ? 0 : 16,
+          marginLeft: item.userId === userId ? 16 : 0,
+          marginRight: item.userId === userId ? 0 : 16,
         }}
       >
         <Image
           source={
-            item.commentOwnerAvatar
-              ? { uri: item.commentOwnerAvatar }
+            item.userAvatar
+              ? { uri: item.userAvatar }
               : require('../../assets/blank-profile-picture.png')
           }
           style={styles.avatar}
@@ -85,14 +87,14 @@ export default function CommentsScreen({ route }) {
       <View
         style={{
           ...styles.comment,
-          borderTopRightRadius: item.commentOwnerId === commentOwnerId ? 0 : 6,
-          borderTopLeftRadius: item.commentOwnerId === commentOwnerId ? 6 : 0,
+          borderTopRightRadius: item.userId === userId ? 0 : 6,
+          borderTopLeftRadius: item.userId === userId ? 6 : 0,
         }}
       >
         <Text>{item.commentText}</Text>
         <Text
           style={{
-            alignSelf: item.commentOwnerId === commentOwnerId ? 'flex-start' : 'flex-end',
+            alignSelf: item.userId === userId ? 'flex-start' : 'flex-end',
             ...styles.commentDate,
           }}
         >{`${getDate(item)} | ${getTime(item)}`}</Text>
@@ -160,7 +162,8 @@ const styles = StyleSheet.create({
   comment: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.03)',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 6,
     fontSize: 12,
     lineHeight: 18,
