@@ -10,13 +10,9 @@ export const permissionFunction = async () => {
   }
 };
 
-export const pickImage = async () => {
+export const pickImage = async options => {
   try {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      quality: 1,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
+    let result = await ImagePicker.launchImageLibraryAsync(options);
 
     if (!result.cancelled) {
       return result.uri;
@@ -26,12 +22,9 @@ export const pickImage = async () => {
   }
 };
 
-export const takePhoto = async () => {
+export const takePhoto = async options => {
   try {
-    let result = await ImagePicker.launchCameraAsync({
-      quality: 1,
-      aspect: [1, 1],
-    });
+    let result = await ImagePicker.launchCameraAsync(options);
 
     if (!result.cancelled) {
       return result.uri;

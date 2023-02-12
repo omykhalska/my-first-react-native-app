@@ -17,6 +17,12 @@ import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
 import { pickImage, takePhoto } from '../helpers/handleImagePicker';
 
+const imgOptions = {
+  quality: 1,
+  aspect: [1, 1],
+  allowsEditing: true,
+};
+
 export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
@@ -50,7 +56,7 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   const changePhoto = async imagePickerFn => {
     try {
       onPress();
-      const photo = await imagePickerFn();
+      const photo = await imagePickerFn(imgOptions);
       if (photo) {
         setIsLoadingPhoto(true);
         const avatarUrl = await uploadAvatarToServer(photo);

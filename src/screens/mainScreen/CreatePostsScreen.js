@@ -1,6 +1,4 @@
 import {
-  Alert,
-  Button,
   Dimensions,
   Image,
   Keyboard,
@@ -12,8 +10,6 @@ import {
   View,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Camera } from 'expo-camera';
-import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -25,21 +21,21 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../../redux/auth/authSelectors';
-import { useIsFocused } from '@react-navigation/native'; // fixes a problem with a camera after changing screens
 import { handleError } from '../../helpers/handleError';
-import * as ImagePicker from 'expo-image-picker';
 import { Loader } from '../../components';
+import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
 
 const publicationSchema = yup.object({
-  title: yup.string().required('Это поле не может быть пустым').min(2, 'Слишком короткое описание'),
+  title: yup.string().required('Это поле не может быть пустым'),
 });
 
+const imgOptions = {
+  quality: 1,
+  allowsEditing: true,
+  aspect: [Dimensions.get('window').width, 240],
+};
+
 export default function CreatePostsScreen({ navigation }) {
-  const [permission, requestPermission] = Camera.useCameraPermissions();
-
-  const isFocused = useIsFocused();
-
-  const [cameraRef, setCameraRef] = useState(null);
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
@@ -47,17 +43,6 @@ export default function CreatePostsScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const userId = useSelector(getUserId);
-
-  useEffect(() => {
-    if (!permission) {
-      (async () => {
-        await Camera.getCameraPermissionsAsync();
-        await MediaLibrary.requestPermissionsAsync();
-
-        await requestPermission();
-      })();
-    }
-  }, []);
 
   useEffect(() => {
     (async () => {
@@ -69,40 +54,11 @@ export default function CreatePostsScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    const permissionFunction = async () => {
-      const imagePermission = await ImagePicker.getMediaLibraryPermissionsAsync();
-
-      if (imagePermission.status !== 'granted') {
-        Alert.alert('Permission for media access needed.');
-      }
-    };
-
     permissionFunction().catch(handleError);
   }, []);
 
-  if (!permission) {
-    return <Text>Получение разрешений...</Text>;
-  }
-
   if (errorMsg) {
     return <Text>{errorMsg}</Text>;
-  }
-
-  if (permission.granted !== true) {
-    // Camera permissions are not granted yet
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>Требуется разрешение на использование камеры</Text>
-        <Button
-          onPress={requestPermission}
-          title="разрешить"
-          style={{
-            backgroundColor: '#FF6C00',
-            borderRadius: 100,
-          }}
-        />
-      </View>
-    );
   }
 
   const getAddress = async coords => {
@@ -122,10 +78,10 @@ export default function CreatePostsScreen({ navigation }) {
     }
   };
 
-  const takePhoto = async () => {
+  const onTakePhoto = async () => {
     try {
-      const photo = await cameraRef.takePictureAsync();
-      setPhotoUrl(photo.uri);
+      const photo = await takePhoto(imgOptions);
+      setPhotoUrl(photo);
 
       const { coords } = await Location.getCurrentPositionAsync();
       setLocation(coords);
@@ -135,19 +91,12 @@ export default function CreatePostsScreen({ navigation }) {
     }
   };
 
-  const pickImage = async () => {
+  const onPickImage = async () => {
     try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        quality: 1,
-        allowsEditing: true,
-        aspect: [Dimensions.get('window').width, 240],
-      });
-
-      if (!result.cancelled) {
-        setAddress('');
-        setLocation(null);
-        setPhotoUrl(result.uri);
-      }
+      const image = await pickImage(imgOptions);
+      setAddress('');
+      setLocation(null);
+      setPhotoUrl(image);
     } catch (e) {
       handleError(e);
     }
@@ -178,8 +127,6 @@ export default function CreatePostsScreen({ navigation }) {
         location,
         address,
         userId,
-        // userName,
-        //userPhotoURL: ,
         createdAt: serverTimestamp(),
         comments: 0,
         likes: 0,
@@ -195,7 +142,6 @@ export default function CreatePostsScreen({ navigation }) {
     await uploadPostToServer(values);
     navigation.navigate('Home');
   };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView
@@ -205,125 +151,113 @@ export default function CreatePostsScreen({ navigation }) {
       >
         <View style={{ flex: 1 }}>
           {isLoading && <Loader />}
-          <View
-            style={{
-              ...styles.pictureBox,
-              height: photoUrl ? 240 : ((Dimensions.get('window').width - 32) * 4) / 3,
-            }}
-          >
-            {isFocused && !photoUrl ? (
-              <Camera ref={setCameraRef} style={styles.camera}>
-                <TouchableOpacity
-                  style={styles.cameraBtnBox}
-                  activeOpacity={0.2}
-                  onPress={takePhoto}
-                >
-                  <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-                </TouchableOpacity>
-              </Camera>
+          <View style={{ ...styles.pictureBox, ...styles.shadow }}>
+            {photoUrl ? (
+              <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
             ) : (
-              photoUrl && (
-                <View style={styles.picture}>
-                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
-                </View>
-              )
+              <View style={styles.buttonsBox}>
+                <TouchableOpacity
+                  style={{ ...styles.button, ...styles.shadow }}
+                  activeOpacity={0.8}
+                  onPress={onPickImage}
+                >
+                  <MaterialIcons name="image-search" size={24} color="#FF6C00" />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={{ ...styles.button, ...styles.shadow }}
+                  activeOpacity={0.8}
+                  onPress={onTakePhoto}
+                >
+                  <MaterialIcons name="photo-camera" size={24} color="#FF6C00" />
+                </TouchableOpacity>
+              </View>
             )}
           </View>
-          {!photoUrl ? (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={pickImage}
-              style={{ ...styles.submitBtn, ...styles.uploadImgBtn }}
-            >
-              <Text style={styles.text}>Загрузить фото с галереи</Text>
-            </TouchableOpacity>
-          ) : (
-            <Formik
-              initialValues={{ title: '', location: '' }}
-              validationSchema={publicationSchema}
-              onSubmit={(values, { resetForm }) => {
-                sendPhoto(values).catch(handleError);
-                resetForm();
-                setPhotoUrl('');
-              }}
-            >
-              {({
-                values,
-                errors,
-                touched,
-                handleChange,
-                setFieldTouched,
-                handleSubmit,
-                isValid,
-                dirty,
-                resetForm,
-              }) => (
-                <View style={{ flex: 1 }}>
-                  <View style={{ flex: 1, minHeight: 300 }}>
-                    <TextInput
-                      value={values.title}
-                      onChangeText={handleChange('title')}
-                      onBlur={() => {
-                        setFieldTouched('title');
-                      }}
-                      placeholder="Название..."
-                      placeholderTextColor="#BDBDBD"
-                      style={{ ...styles.input, fontWeight: '500' }}
-                      underlineColorAndroid={'transparent'}
-                    />
-                    {errors.title && touched.title && (
-                      <Text style={styles.errorText}>{errors.title}</Text>
-                    )}
-
-                    <TouchableOpacity
-                      onPress={handleSubmit}
-                      activeOpacity={0.8}
-                      disabled={!(isValid && dirty && photoUrl)}
+          <Formik
+            initialValues={{ title: '', location: '' }}
+            validationSchema={publicationSchema}
+            onSubmit={(values, { resetForm }) => {
+              sendPhoto(values).catch(handleError);
+              resetForm();
+              setPhotoUrl('');
+            }}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              setFieldTouched,
+              handleSubmit,
+              isValid,
+              dirty,
+              resetForm,
+            }) => (
+              <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, minHeight: 300 }}>
+                  <TextInput
+                    value={values.title}
+                    onChangeText={handleChange('title')}
+                    onBlur={() => {
+                      setFieldTouched('title');
+                    }}
+                    placeholder="Название..."
+                    placeholderTextColor="#BDBDBD"
+                    style={{ ...styles.input, fontWeight: '500' }}
+                    underlineColorAndroid={'transparent'}
+                  />
+                  {errors.title && touched.title && (
+                    <Text style={styles.errorText}>{errors.title}</Text>
+                  )}
+                  <TouchableOpacity
+                    onPress={handleSubmit}
+                    activeOpacity={0.8}
+                    disabled={!(isValid && dirty && photoUrl)}
+                    style={[
+                      !(isValid && dirty && photoUrl)
+                        ? styles.submitBtn
+                        : {
+                            ...styles.submitBtn,
+                            backgroundColor: '#FF6C00',
+                          },
+                    ]}
+                  >
+                    <Text
                       style={[
-                        !(isValid && dirty && photoUrl)
-                          ? styles.submitBtn
+                        !(isValid && dirty)
+                          ? styles.buttonText
                           : {
-                              ...styles.submitBtn,
-                              backgroundColor: '#FF6C00',
+                              ...styles.buttonText,
+                              color: '#FFF',
                             },
                       ]}
                     >
-                      <Text
-                        style={[
-                          !(isValid && dirty)
-                            ? styles.buttonText
-                            : {
-                                ...styles.buttonText,
-                                color: '#FFF',
-                              },
-                        ]}
-                      >
-                        Опубликовать
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View
-                    style={{
-                      alignContent: 'center',
-                      borderColor: 'blue',
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => {
-                        setPhotoUrl('');
-                        resetForm();
-                      }}
-                      opacity={0.8}
-                      style={styles.trashBtnBox}
-                    >
-                      <Feather name="trash-2" size={24} color="#BDBDBD" />
-                    </TouchableOpacity>
-                  </View>
+                      Опубликовать
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              )}
-            </Formik>
-          )}
+
+                <View
+                  style={{
+                    alignContent: 'center',
+                    borderColor: 'blue',
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={() => {
+                      setPhotoUrl('');
+                      resetForm();
+                    }}
+                    opacity={0.8}
+                    style={{ ...styles.trashBtnBox, ...styles.shadow }}
+                  >
+                    <Feather name="trash-2" size={24} color="#BDBDBD" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
         </View>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
@@ -340,40 +274,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   pictureBox: {
-    backgroundColor: '#E8E8E8',
-    borderWidth: 1,
-    borderColor: '#E8E8E8',
-    borderRadius: 8,
-  },
-  camera: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  picture: {
-    width: '100%',
     height: 240,
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 10,
+    backgroundColor: '#E8E8E8',
+    borderRadius: 8,
+    overflow: 'hidden',
+    justifyContent: 'center',
   },
-  cameraBtnBox: {
-    position: 'absolute',
-    bottom: -30,
-    width: 60,
-    height: 60,
+  buttonsBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
+  button: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: 60,
+    height: 60,
     backgroundColor: '#fff',
     borderRadius: 30,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   uploadImgBtn: {
     marginTop: 46,
@@ -427,5 +344,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
