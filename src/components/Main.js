@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authStateChangeUser } from '../redux/auth/authOperations';
 import { getStateChange } from '../redux/auth/authSelectors';
 
-export const Main = ({ onLayoutRootView }) => {
+const Main = ({ onLayoutRootView }) => {
   const stateChange = useSelector(getStateChange);
 
   const dispatch = useDispatch();
@@ -33,3 +33,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
   },
 });
+
+export default Main;

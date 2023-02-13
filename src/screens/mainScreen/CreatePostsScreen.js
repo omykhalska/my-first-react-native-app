@@ -22,7 +22,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
-import { Loader } from '../../components';
+import { Loader } from '../../components/Loader';
 import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
 
 const publicationSchema = yup.object({

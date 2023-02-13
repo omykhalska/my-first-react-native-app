@@ -6,9 +6,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/store';
 
-import { Main } from './src/components/Main';
+import Main from './src/components/Main';
 
-export default function App() {
+const App = () => {
   const [fontsLoaded] = useFonts({
     'Roboto-Regular': require('./src/assets/fonts/Roboto-Regular.ttf'),
     'Roboto-Bold': require('./src/assets/fonts/Roboto-Bold.ttf'),
@@ -39,4 +39,6 @@ export default function App() {
       <Main onLayoutRootView={onLayoutRootView} />
     </Provider>
   );
-}
+};
+
+export default App;

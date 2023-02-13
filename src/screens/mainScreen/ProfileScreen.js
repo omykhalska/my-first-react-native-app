@@ -17,7 +17,8 @@ import { useSelector } from 'react-redux';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { db } from '../../firebase/config';
-import { Loader, PhotoEditPopup } from '../../components';
+import { Loader } from '../../components/Loader';
+import { PhotoEditPopup } from '../../components/PhotoEditPopup';
 import { handleError } from '../../helpers/handleError';
 
 export default function ProfileScreen() {

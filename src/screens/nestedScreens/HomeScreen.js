@@ -48,7 +48,7 @@ export default function HomeScreen() {
   const dispatch = useDispatch();
 
   return (
-    <HomeTabs.Navigator screenOptions={tabNavOptions}>
+    <HomeTabs.Navigator screenOptions={tabNavOptions} initialRouteName="Home">
       <HomeTabs.Screen
         name="Home"
         component={mainScreen.PostsScreen}
