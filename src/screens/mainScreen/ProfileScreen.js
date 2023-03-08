@@ -20,8 +20,9 @@ import { db } from '../../firebase/config';
 import { Loader } from '../../components/Loader';
 import { PhotoEditPopup } from '../../components/PhotoEditPopup';
 import { handleError } from '../../helpers/handleError';
+import { Post } from '../../components/Post';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
   const userAvatar = useSelector(getUserAvatar);
@@ -56,34 +57,45 @@ export default function ProfileScreen() {
 
   const togglePopup = () => setIsVisible(!isVisible);
 
-  const renderItem = item => (
-    <View style={styles.publication} key={item.id}>
-      <Image source={{ uri: item.photo }} style={styles.picture} />
-      <Text style={styles.title}>{item.title}</Text>
-      <View style={styles.extraData}>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={styles.extraDataInnerBox}>
-            <Image
-              source={require('../../assets/icons/message-circle.png')}
-              style={{ width: 24, height: 24 }}
-            />
-            <Text style={styles.extraDataText}>{item.comments}</Text>
-          </View>
-          <View style={{ ...styles.extraDataInnerBox, marginLeft: 24 }}>
-            <Feather name="thumbs-up" size={24} color="#FF6C00" />
-            <Text style={styles.extraDataText}>{item.likes}</Text>
-          </View>
-        </View>
-        <View style={styles.extraDataInnerBox}>
-          <Feather name="map-pin" size={24} color="#BDBDBD" />
-          <Text style={{ ...styles.extraDataText, textDecorationLine: 'underline' }}>
-            {item.address}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
+  // const renderItem = item => (
+  //   <View style={styles.publication} key={item.id}>
+  //     <Image source={{ uri: item.photo }} style={styles.picture} />
+  //     <Text style={styles.title}>{item.title}</Text>
+  //     <View style={styles.extraData}>
+  //       <View style={{ flexDirection: 'row' }}>
+  //         <View style={styles.extraDataInnerBox}>
+  //           <Image
+  //             source={require('../../assets/icons/message-circle.png')}
+  //             style={{ width: 24, height: 24 }}
+  //           />
+  //           <Text style={styles.extraDataText}>{item.comments}</Text>
+  //         </View>
+  //         <View style={{ ...styles.extraDataInnerBox, marginLeft: 24 }}>
+  //           <Feather name="thumbs-up" size={24} color="#FF6C00" />
+  //           <Text style={styles.extraDataText}>{item.likes}</Text>
+  //         </View>
+  //       </View>
+  //
+  //       {item.location && (
+  //         <View>
+  //           <TouchableOpacity
+  //             style={styles.extraDataInnerBox}
+  //             onPress={() => {
+  //               navigation.navigate('Map', { location: item.location });
+  //             }}
+  //           >
+  //             <Feather name="map-pin" size={24} color="#BDBDBD" />
+  //             <Text style={{ ...styles.extraDataText, textDecorationLine: 'underline' }}>
+  //               {item.address}
+  //             </Text>
+  //           </TouchableOpacity>
+  //         </View>
+  //       )}
+  //     </View>
+  //   </View>
+  // );
 
+  const renderItem = item => <Post item={item} navigation={navigation} screen={ProfileScreen} />;
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
   return (
@@ -196,6 +208,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     marginTop: 92,
+    marginBottom: 32,
     alignSelf: 'center',
     fontWeight: '500',
     fontSize: 30,
