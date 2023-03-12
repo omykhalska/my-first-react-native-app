@@ -1,4 +1,13 @@
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+  arrayRemove,
+  arrayUnion,
+} from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { handleError } from './handleError';
 
@@ -25,6 +34,28 @@ export const getUserData = async userId => {
       user = { ...doc.data() };
     });
     return user;
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const setLike = async (postId, userId) => {
+  try {
+    const docRef = doc(db, 'posts', postId);
+    await updateDoc(docRef, {
+      likes: arrayUnion(userId),
+    });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const removeLike = async (postId, userId) => {
+  try {
+    const docRef = doc(db, 'posts', postId);
+    await updateDoc(docRef, {
+      likes: arrayRemove(userId),
+    });
   } catch (e) {
     handleError(e);
   }

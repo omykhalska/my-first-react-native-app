@@ -60,7 +60,8 @@ export default function CommentsScreen({ route }) {
 
   const getDate = item => item?.createdAt?.toDate()?.toLocaleDateString() || 'Сегодня';
 
-  const getTime = item => item?.createdAt?.toDate()?.toLocaleTimeString() || 'Только что';
+  const getTime = item =>
+    item?.createdAt?.toDate()?.toLocaleTimeString().slice(0, 5) || 'Только что';
 
   const renderItem = ({ item }) => (
     <View

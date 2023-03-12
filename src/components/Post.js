@@ -1,57 +1,79 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { setLike, removeLike } from '../helpers/handleFirebase';
+import { useSelector } from 'react-redux';
+import { getUserId } from '../redux/auth/authSelectors';
 
-export const Post = ({ item, navigation, screen = 'Post' }) => (
-  <View style={styles.publication} key={item.id}>
-    {screen === 'Post' ? (
-      <View style={styles.userDataBox}>
-        <Image
-          source={
-            item.userAvatar
-              ? { uri: item.userAvatar }
-              : require('../assets/blank-profile-picture.png')
-          }
-          style={styles.userAvatar}
-        />
-        <Text style={styles.userName}>{item.userName}</Text>
-      </View>
-    ) : null}
-    <Image source={{ uri: item.photo }} style={styles.picture} />
-    <Text style={styles.title}>{item.title}</Text>
-    <View style={styles.extraData}>
-      <View style={styles.centered}>
-        <TouchableOpacity style={styles.centered} onPress={() => {}}>
-          <Feather name="thumbs-up" size={24} color="#BDBDBD" />
-          <Text style={styles.commentsCount}>{item.likes}</Text>
-        </TouchableOpacity>
+export const Post = ({ item, navigation, screen = 'Post' }) => {
+  const [isLiked, setIsLiked] = useState(null);
 
-        <TouchableOpacity
-          style={{ ...styles.centered, marginLeft: 24 }}
-          onPress={() => {
-            navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
-          }}
-        >
-          <Feather name="message-circle" size={25} color="#BDBDBD" style={styles.messageIcon} />
-          <Text style={styles.commentsCount}>{item.comments}</Text>
-        </TouchableOpacity>
-      </View>
+  const userId = useSelector(getUserId);
 
-      {item.location && (
-        <View>
+  useEffect(() => {
+    setIsLiked(item.likes.includes(userId));
+  });
+
+  const toggleLike = async () => {
+    if (isLiked) {
+      await removeLike(item.id, userId);
+    } else {
+      await setLike(item.id, userId);
+    }
+  };
+
+  return (
+    <View style={styles.publication}>
+      {screen === 'Post' ? (
+        <View style={styles.userDataBox}>
+          <Image
+            source={
+              item.userAvatar
+                ? { uri: item.userAvatar }
+                : require('../assets/blank-profile-picture.png')
+            }
+            style={styles.userAvatar}
+          />
+          <Text style={styles.userName}>{item.userName}</Text>
+        </View>
+      ) : null}
+      <Image source={{ uri: item.photo }} style={styles.picture} />
+      <Text style={styles.title}>{item.title}</Text>
+      <View style={styles.extraData}>
+        <View style={styles.centered}>
+          <TouchableOpacity style={styles.centered} onPress={toggleLike}>
+            <AntDesign name={isLiked ? 'like1' : 'like2'} size={24} color="#FF6C00" />
+            <Text style={styles.commentsCount}>{item.likes?.length || 0}</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
-            style={styles.centered}
+            style={{ ...styles.centered, marginLeft: 24 }}
             onPress={() => {
-              navigation.navigate('Map', { location: item.location });
+              navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
             }}
           >
-            <Feather name="map-pin" size={24} color="#BDBDBD" />
-            <Text style={styles.location}>{item.address}</Text>
+            <AntDesign name="message1" size={24} color="#FF6C00" />
+            <Text style={styles.commentsCount}>{item.comments}</Text>
           </TouchableOpacity>
         </View>
-      )}
+
+        {item.location && (
+          <View>
+            <TouchableOpacity
+              style={styles.centered}
+              onPress={() => {
+                navigation.navigate('Map', { location: item.location });
+              }}
+            >
+              <AntDesign name="enviromento" size={24} color="#FF6C00" />
+              <Text style={styles.location}>{item.address}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   publication: {
@@ -108,7 +130,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#BDBDBD',
+    color: '#212121',
   },
   location: {
     marginLeft: 4,

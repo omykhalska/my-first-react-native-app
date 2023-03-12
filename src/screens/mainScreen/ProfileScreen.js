@@ -1,4 +1,4 @@
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useEffect, useState, useMemo } from 'react';
 import {
   StatusBar,
@@ -57,45 +57,9 @@ export default function ProfileScreen({ navigation }) {
 
   const togglePopup = () => setIsVisible(!isVisible);
 
-  // const renderItem = item => (
-  //   <View style={styles.publication} key={item.id}>
-  //     <Image source={{ uri: item.photo }} style={styles.picture} />
-  //     <Text style={styles.title}>{item.title}</Text>
-  //     <View style={styles.extraData}>
-  //       <View style={{ flexDirection: 'row' }}>
-  //         <View style={styles.extraDataInnerBox}>
-  //           <Image
-  //             source={require('../../assets/icons/message-circle.png')}
-  //             style={{ width: 24, height: 24 }}
-  //           />
-  //           <Text style={styles.extraDataText}>{item.comments}</Text>
-  //         </View>
-  //         <View style={{ ...styles.extraDataInnerBox, marginLeft: 24 }}>
-  //           <Feather name="thumbs-up" size={24} color="#FF6C00" />
-  //           <Text style={styles.extraDataText}>{item.likes}</Text>
-  //         </View>
-  //       </View>
-  //
-  //       {item.location && (
-  //         <View>
-  //           <TouchableOpacity
-  //             style={styles.extraDataInnerBox}
-  //             onPress={() => {
-  //               navigation.navigate('Map', { location: item.location });
-  //             }}
-  //           >
-  //             <Feather name="map-pin" size={24} color="#BDBDBD" />
-  //             <Text style={{ ...styles.extraDataText, textDecorationLine: 'underline' }}>
-  //               {item.address}
-  //             </Text>
-  //           </TouchableOpacity>
-  //         </View>
-  //       )}
-  //     </View>
-  //   </View>
-  // );
-
-  const renderItem = item => <Post item={item} navigation={navigation} screen={ProfileScreen} />;
+  const renderItem = item => (
+    <Post key={item.id} item={item} navigation={navigation} screen={ProfileScreen} />
+  );
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
   return (
@@ -220,36 +184,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingBottom: 12,
   },
-  publication: {
-    marginTop: 34,
-  },
-  picture: {
-    width: '100%',
-    height: 240,
-    resizeMode: 'cover',
-    borderRadius: 8,
-    backgroundColor: '#BDBDBD',
-  },
   title: {
     marginTop: 8,
     fontWeight: '500',
-    fontSize: 16,
-    lineHeight: 19,
-    color: '#212121',
-  },
-  extraData: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  extraDataInnerBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  extraDataText: {
-    marginLeft: 8,
-    fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
     color: '#212121',

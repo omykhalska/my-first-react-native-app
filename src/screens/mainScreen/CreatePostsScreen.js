@@ -129,7 +129,7 @@ export default function CreatePostsScreen({ navigation }) {
         userId,
         createdAt: serverTimestamp(),
         comments: 0,
-        likes: 0,
+        likes: [],
       });
     } catch (e) {
       handleError(e);
