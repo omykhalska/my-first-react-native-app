@@ -7,9 +7,25 @@ import {
   updateDoc,
   arrayRemove,
   arrayUnion,
+  orderBy,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { handleError } from './handleError';
+
+export const getUserData = async userId => {
+  try {
+    let user = {};
+    const q = await query(collection(db, 'users'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(doc => {
+      user = { ...doc.data() };
+    });
+    return user;
+  } catch (e) {
+    handleError(e);
+  }
+};
 
 export const updateUserData = async (uid, updateData) => {
   try {
@@ -25,15 +41,17 @@ export const updateUserData = async (uid, updateData) => {
   }
 };
 
-export const getUserData = async userId => {
+export const getAllPosts = async (cb = () => {}) => {
   try {
-    let user = {};
-    const q = await query(collection(db, 'users'), where('userId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      user = { ...doc.data() };
+    const q = await query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
+    await onSnapshot(q, async data => {
+      const posts = [];
+      for (const doc of data.docs) {
+        const { userName, userAvatar } = await getUserData(doc.data().userId);
+        posts.push({ ...doc.data(), id: doc.id, userName, userAvatar });
+      }
+      cb(posts);
     });
-    return user;
   } catch (e) {
     handleError(e);
   }
