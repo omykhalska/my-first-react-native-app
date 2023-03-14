@@ -10,7 +10,7 @@ export const Loader = ({ style = {} }) => (
 
 const styles = StyleSheet.create({
   loadingIndicator: {
-    zIndex: 5,
+    zIndex: 1000,
     width: '100%',
     height: '100%',
   },

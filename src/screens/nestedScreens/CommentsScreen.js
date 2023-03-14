@@ -1,24 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { AntDesign } from '@expo/vector-icons';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { getAllComments, createComment } from '../../helpers/handleFirebase';
 import { Comment } from '../../components/Comment';
+import { Loader } from '../../components/Loader';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
 
   const userId = useSelector(getUserId);
 
+  const [commentIsUploading, setCommentIsUploading] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState(null);
 
   useEffect(() => {
     getAllComments(postId, setComments);
   }, []);
-
-  // const renderItem = ({ item }) => <Comment data={item} />;
 
   const memoizedRenderItem = useMemo(
     () =>
@@ -27,33 +27,41 @@ export default function CommentsScreen({ route }) {
     [comments],
   );
 
+  const handleSubmit = async () => {
+    setCommentIsUploading(true);
+    await createComment({ postId, commentText, userId });
+    setCommentText('');
+    setCommentIsUploading(false);
+  };
+
   return (
     <View style={styles.container}>
       <View>
         <Image source={{ uri: postImage }} style={styles.picture} />
       </View>
       <View style={styles.commentsArea}>
+        {!comments && <Loader />}
         <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
       </View>
-      <View>
-        <TextInput
-          style={{ ...styles.textArea, ...styles.shadow }}
-          placeholder="Комментировать..."
-          placeholderTextColor={'#BDBDBD'}
-          onChangeText={setCommentText}
-          value={commentText}
-        />
-
-        <View style={{ ...styles.submitBtn, ...styles.shadow }}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => {
-              createComment({ postId, commentText, userId }).then(() => setCommentText(''));
-            }}
-          >
-            <AntDesign name="arrowup" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
+      <View style={{ height: 96 }}>
+        {commentIsUploading ? (
+          <Text style={styles.notification}>Sending your comment...</Text>
+        ) : (
+          <>
+            <TextInput
+              style={[styles.textArea, styles.shadow]}
+              placeholder="Комментировать..."
+              placeholderTextColor={'#BDBDBD'}
+              onChangeText={setCommentText}
+              value={commentText}
+            />
+            <View style={[styles.submitBtn, styles.shadow]}>
+              <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
+                <AntDesign name="arrowup" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
     </View>
   );
@@ -80,7 +88,6 @@ const styles = StyleSheet.create({
   },
   textArea: {
     marginTop: 30,
-    marginBottom: 16,
     height: 50,
     padding: 16,
     paddingRight: 40,
@@ -110,5 +117,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 6,
+  },
+  notification: {
+    marginTop: 30,
+    alignSelf: 'center',
   },
 });
