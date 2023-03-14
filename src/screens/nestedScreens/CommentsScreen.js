@@ -18,9 +18,14 @@ export default function CommentsScreen({ route }) {
     getAllComments(postId, setComments);
   }, []);
 
-  const renderItem = ({ item }) => <Comment data={item} />;
+  // const renderItem = ({ item }) => <Comment data={item} />;
 
-  const memoizedRenderItem = useMemo(() => renderItem, [comments]);
+  const memoizedRenderItem = useMemo(
+    () =>
+      ({ item }) =>
+        <Comment data={item} />,
+    [comments],
+  );
 
   return (
     <View style={styles.container}>
@@ -73,26 +78,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 30,
   },
-  commentBox: {
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  comment: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.03)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    fontSize: 12,
-    lineHeight: 18,
-    color: '#212121',
-  },
-  commentDate: {
-    marginTop: 8,
-    fontSize: 10,
-    lineHeight: 12,
-    color: '#BDBDBD',
-  },
   textArea: {
     marginTop: 30,
     marginBottom: 16,
@@ -125,11 +110,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 6,
-  },
-  avatar: {
-    width: 28,
-    height: 28,
-    backgroundColor: '#e8e8e8',
-    borderRadius: 14,
   },
 });

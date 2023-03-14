@@ -7,9 +7,9 @@ export const Comment = ({ data }) => {
 
   const currentUserId = useSelector(getUserId);
 
-  const getDate = () => createdAt.toDate().toLocaleDateString() || 'Сегодня';
+  const getDate = () => createdAt?.toDate().toLocaleDateString() || 'Сегодня';
 
-  const getTime = () => createdAt.toDate().toLocaleTimeString().slice(0, 5) || 'Только что';
+  const getTime = () => createdAt?.toDate().toLocaleTimeString().slice(0, 5) || 'Только что';
 
   return (
     <View
