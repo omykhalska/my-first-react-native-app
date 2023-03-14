@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import { getUserId } from '../../redux/auth/authSelectors';
 import { AntDesign } from '@expo/vector-icons';
+import { getUserId } from '../../redux/auth/authSelectors';
 import { getAllComments, createComment } from '../../helpers/handleFirebase';
+import { Comment } from '../../components/Comment';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
+
   const userId = useSelector(getUserId);
+
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState([]);
 
@@ -15,50 +18,7 @@ export default function CommentsScreen({ route }) {
     getAllComments(postId, setComments);
   }, []);
 
-  const getDate = item => item?.createdAt?.toDate()?.toLocaleDateString() || 'Сегодня';
-
-  const getTime = item =>
-    item?.createdAt?.toDate()?.toLocaleTimeString().slice(0, 5) || 'Только что';
-
-  const renderItem = ({ item }) => (
-    <View
-      style={{
-        ...styles.commentBox,
-        flexDirection: item.userId === userId ? 'row-reverse' : 'row',
-      }}
-    >
-      <View
-        style={{
-          marginLeft: item.userId === userId ? 16 : 0,
-          marginRight: item.userId === userId ? 0 : 16,
-        }}
-      >
-        <Image
-          source={
-            item.userAvatar
-              ? { uri: item.userAvatar }
-              : require('../../assets/blank-profile-picture.png')
-          }
-          style={styles.avatar}
-        />
-      </View>
-      <View
-        style={{
-          ...styles.comment,
-          borderTopRightRadius: item.userId === userId ? 0 : 6,
-          borderTopLeftRadius: item.userId === userId ? 6 : 0,
-        }}
-      >
-        <Text>{item.commentText}</Text>
-        <Text
-          style={{
-            alignSelf: item.userId === userId ? 'flex-start' : 'flex-end',
-            ...styles.commentDate,
-          }}
-        >{`${getDate(item)} | ${getTime(item)}`}</Text>
-      </View>
-    </View>
-  );
+  const renderItem = ({ item }) => <Comment data={item} />;
 
   const memoizedRenderItem = useMemo(() => renderItem, [comments]);
 
