@@ -1,21 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useSelector } from 'react-redux';
-import {
-  collection,
-  addDoc,
-  doc,
-  updateDoc,
-  onSnapshot,
-  serverTimestamp,
-  query,
-  orderBy,
-} from 'firebase/firestore';
-import { db } from '../../firebase/config';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { AntDesign } from '@expo/vector-icons';
-import { handleError } from '../../helpers/handleError';
-import { getUserData } from '../../helpers/handleFirebase';
+import { getAllComments, createComment } from '../../helpers/handleFirebase';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
@@ -24,39 +12,8 @@ export default function CommentsScreen({ route }) {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    const getAllComments = async () => {
-      try {
-        const docRef = doc(db, 'posts', postId);
-        const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt', 'desc'));
-        await onSnapshot(colRef, async data => {
-          const comments = [];
-          for (const doc of data.docs) {
-            const { userAvatar } = await getUserData(doc.data().userId);
-            comments.push({ ...doc.data(), id: doc.id, userAvatar });
-          }
-          setComments(comments);
-        });
-      } catch (e) {
-        handleError(e);
-      }
-    };
-    getAllComments();
+    getAllComments(postId, setComments);
   }, []);
-
-  const createComment = async () => {
-    try {
-      const docRef = doc(db, 'posts', postId);
-      const colRef = collection(docRef, 'comments');
-      await addDoc(colRef, {
-        commentText,
-        userId,
-        createdAt: serverTimestamp(),
-      });
-      await updateDoc(docRef, { comments: comments.length + 1 });
-    } catch (e) {
-      handleError(e);
-    }
-  };
 
   const getDate = item => item?.createdAt?.toDate()?.toLocaleDateString() || 'Сегодня';
 
@@ -126,7 +83,7 @@ export default function CommentsScreen({ route }) {
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => {
-              createComment().then(() => setCommentText(''));
+              createComment({ postId, commentText, userId }).then(() => setCommentText(''));
             }}
           >
             <AntDesign name="arrowup" size={24} color="#FFFFFF" />

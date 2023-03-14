@@ -9,6 +9,9 @@ import {
   arrayUnion,
   orderBy,
   onSnapshot,
+  addDoc,
+  serverTimestamp,
+  increment,
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { handleError } from './handleError';
@@ -52,6 +55,39 @@ export const getAllPosts = async (cb = () => {}) => {
       }
       cb(posts);
     });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const getAllComments = async (postId, cb = () => {}) => {
+  try {
+    const docRef = doc(db, 'posts', postId);
+    const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt', 'desc'));
+    await onSnapshot(colRef, async data => {
+      const comments = [];
+      for (const doc of data.docs) {
+        const { userAvatar } = await getUserData(doc.data().userId);
+        comments.push({ ...doc.data(), id: doc.id, userAvatar });
+      }
+      cb(comments);
+    });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const createComment = async data => {
+  const { postId, commentText, userId } = data;
+  try {
+    const docRef = doc(db, 'posts', postId);
+    const colRef = collection(docRef, 'comments');
+    await addDoc(colRef, {
+      commentText,
+      userId,
+      createdAt: serverTimestamp(),
+    });
+    await updateDoc(docRef, { comments: increment(1) });
   } catch (e) {
     handleError(e);
   }
