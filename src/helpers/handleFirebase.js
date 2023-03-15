@@ -44,7 +44,7 @@ export const updateUserData = async (uid, updateData) => {
   }
 };
 
-export const getAllPosts = async (cb = () => {}) => {
+export const getAllPosts = async setPosts => {
   try {
     const q = await query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     await onSnapshot(q, async data => {
@@ -53,14 +53,14 @@ export const getAllPosts = async (cb = () => {}) => {
         const { userName, userAvatar } = await getUserData(doc.data().userId);
         posts.push({ ...doc.data(), id: doc.id, userName, userAvatar });
       }
-      cb(posts);
+      setPosts(posts);
     });
   } catch (e) {
     handleError(e);
   }
 };
 
-export const getAllComments = async (postId, cb = () => {}) => {
+export const getAllComments = async (postId, setComments) => {
   try {
     const docRef = doc(db, 'posts', postId);
     const colRef = await query(collection(docRef, 'comments'), orderBy('createdAt', 'desc'));
@@ -70,7 +70,7 @@ export const getAllComments = async (postId, cb = () => {}) => {
         const { userAvatar } = await getUserData(doc.data().userId);
         comments.push({ ...doc.data(), id: doc.id, userAvatar });
       }
-      cb(comments);
+      setComments(comments);
     });
   } catch (e) {
     handleError(e);
@@ -93,7 +93,7 @@ export const createComment = async data => {
   }
 };
 
-export const getUserPosts = async (userId, cb = () => {}) => {
+export const getUserPosts = async (userId, setPosts) => {
   try {
     const q = await query(
       collection(db, 'posts'),
@@ -103,7 +103,7 @@ export const getUserPosts = async (userId, cb = () => {}) => {
 
     await onSnapshot(q, data => {
       const posts = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      cb(posts);
+      setPosts(posts);
     });
   } catch (e) {
     handleError(e);

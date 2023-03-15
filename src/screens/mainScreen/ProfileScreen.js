@@ -14,20 +14,18 @@ import {
 } from 'react-native';
 
 import { useSelector } from 'react-redux';
-import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
-import { db } from '../../firebase/config';
 import { Loader } from '../../components/Loader';
 import { PhotoEditPopup } from '../../components/PhotoEditPopup';
-import { handleError } from '../../helpers/handleError';
 import { Post } from '../../components/Post';
+import { getUserPosts } from '../../helpers/handleFirebase';
 
 export default function ProfileScreen({ navigation }) {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
   const userAvatar = useSelector(getUserAvatar);
 
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
 
@@ -36,23 +34,7 @@ export default function ProfileScreen({ navigation }) {
   }, [userAvatar]);
 
   useEffect(() => {
-    const getUserPosts = async () => {
-      try {
-        const q = await query(
-          collection(db, 'posts'),
-          orderBy('createdAt', 'desc'),
-          where('userId', '==', userId),
-        );
-
-        await onSnapshot(q, data => {
-          setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
-        });
-      } catch (e) {
-        handleError(e);
-      }
-    };
-
-    getUserPosts();
+    getUserPosts(userId, setPosts);
   }, []);
 
   const togglePopup = () => setIsVisible(!isVisible);
@@ -62,7 +44,9 @@ export default function ProfileScreen({ navigation }) {
   );
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
-  return (
+  return posts === null ? (
+    <Loader />
+  ) : (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
         <PhotoEditPopup
