@@ -93,6 +93,23 @@ export const createComment = async data => {
   }
 };
 
+export const getUserPosts = async (userId, cb = () => {}) => {
+  try {
+    const q = await query(
+      collection(db, 'posts'),
+      orderBy('createdAt', 'desc'),
+      where('userId', '==', userId),
+    );
+
+    await onSnapshot(q, data => {
+      const posts = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      cb(posts);
+    });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
 export const setLike = async (postId, userId) => {
   try {
     const docRef = doc(db, 'posts', postId);

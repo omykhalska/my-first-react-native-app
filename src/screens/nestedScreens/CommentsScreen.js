@@ -54,12 +54,16 @@ export default function CommentsScreen({ route }) {
               placeholderTextColor={'#BDBDBD'}
               onChangeText={setCommentText}
               value={commentText}
+              returnKeyType="go"
+              returnKeyLabel="go"
             />
-            <View style={[styles.submitBtn, styles.shadow]}>
-              <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
-                <AntDesign name="arrowup" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
+            {commentText ? (
+              <View style={[styles.submitBtn, styles.shadow]}>
+                <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
+                  <AntDesign name="arrowup" size={24} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+            ) : null}
           </>
         )}
       </View>

@@ -54,7 +54,7 @@ export default function CreatePostsScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    permissionFunction().catch(handleError);
+    permissionFunction();
   }, []);
 
   if (errorMsg) {
