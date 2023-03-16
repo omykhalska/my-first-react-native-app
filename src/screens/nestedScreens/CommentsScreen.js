@@ -1,20 +1,33 @@
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSelector } from 'react-redux';
 import { AntDesign } from '@expo/vector-icons';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { getAllComments, createComment } from '../../helpers/handleFirebase';
 import { Comment } from '../../components/Comment';
 import { Loader } from '../../components/Loader';
+import { useKeyboard } from '../../helpers/hooks';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
 
-  const userId = useSelector(getUserId);
-
   const [commentIsUploading, setCommentIsUploading] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState(null);
+
+  const isKeyboardVisible = useKeyboard();
+
+  const userId = useSelector(getUserId);
 
   useEffect(() => {
     getAllComments(postId, setComments);
@@ -35,28 +48,31 @@ export default function CommentsScreen({ route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View>
         <Image source={{ uri: postImage }} style={styles.picture} />
       </View>
+
       <View style={styles.commentsArea}>
         {!comments && <Loader />}
         <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
       </View>
-      <View style={{ height: 96 }}>
+      <View style={{ height: 96, marginBottom: isKeyboardVisible ? 4 : 0 }}>
         {commentIsUploading ? (
           <Text style={styles.notification}>Sending your comment...</Text>
         ) : (
           <>
-            <TextInput
-              style={[styles.textArea, styles.shadow]}
-              placeholder="Комментировать..."
-              placeholderTextColor={'#BDBDBD'}
-              onChangeText={setCommentText}
-              value={commentText}
-              returnKeyType="go"
-              returnKeyLabel="go"
-            />
+            <KeyboardAvoidingView>
+              <TextInput
+                style={[styles.textArea, styles.shadow]}
+                placeholder="Комментировать..."
+                placeholderTextColor={'#BDBDBD'}
+                onChangeText={setCommentText}
+                value={commentText}
+                returnKeyType="done"
+                returnKeyLabel="done"
+              />
+            </KeyboardAvoidingView>
             {commentText ? (
               <View style={[styles.submitBtn, styles.shadow]}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
@@ -67,7 +83,7 @@ export default function CommentsScreen({ route }) {
           </>
         )}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -92,9 +108,9 @@ const styles = StyleSheet.create({
   },
   textArea: {
     marginTop: 30,
-    height: 50,
+    height: 52,
     padding: 16,
-    paddingRight: 40,
+    paddingRight: 54,
     backgroundColor: '#F6F6F6',
     borderRadius: 100,
     fontFamily: 'Inter-Medium',
