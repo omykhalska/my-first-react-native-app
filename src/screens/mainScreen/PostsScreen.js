@@ -49,7 +49,7 @@ export default function PostsScreen({ navigation }) {
         ) : (
           <View style={styles.publications}>
             <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
-              Здесь еще нет публикаций...
+              No publications here yet...
             </Text>
           </View>
         )}

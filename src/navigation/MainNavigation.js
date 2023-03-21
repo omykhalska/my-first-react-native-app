@@ -31,9 +31,9 @@ const MainNavigation = () => {
       <Stack.Screen
         name="Comments"
         component={nestedScreens.CommentsScreen}
-        options={{ title: 'Комментарии' }}
+        options={{ title: 'Comments' }}
       />
-      <Stack.Screen name="Map" component={nestedScreens.MapScreen} options={{ title: 'Карта' }} />
+      <Stack.Screen name="Map" component={nestedScreens.MapScreen} options={{ title: 'Map' }} />
     </Stack.Navigator>
   );
 };

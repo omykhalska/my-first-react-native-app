@@ -80,7 +80,7 @@ export default function ProfileScreen({ navigation }) {
             ) : (
               <View style={styles.publications}>
                 <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
-                  У Вас еще нет публикаций...
+                  No publications here yet...
                 </Text>
               </View>
             )}

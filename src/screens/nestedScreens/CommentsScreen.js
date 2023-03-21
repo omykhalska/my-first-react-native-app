@@ -65,7 +65,7 @@ export default function CommentsScreen({ route }) {
             <KeyboardAvoidingView>
               <TextInput
                 style={[styles.textArea, styles.shadow]}
-                placeholder="Комментировать..."
+                placeholder="Write your comment"
                 placeholderTextColor={'#BDBDBD'}
                 onChangeText={setCommentText}
                 value={commentText}

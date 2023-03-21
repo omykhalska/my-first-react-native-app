@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 
 export const handleError = e => {
-  Alert.alert('Произошла ошибка', e.message);
+  Alert.alert('An error has occurred', e.message);
   console.log(e.message);
 };

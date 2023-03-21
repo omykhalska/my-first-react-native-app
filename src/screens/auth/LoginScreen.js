@@ -18,11 +18,8 @@ import { useDispatch } from 'react-redux';
 import { authLogInUser } from '../../redux/auth/authOperations';
 
 const loginSchema = yup.object({
-  email: yup
-    .string()
-    .required('Это поле не может быть пустым')
-    .email('Невалидный электронный адрес'),
-  password: yup.string().required('Это поле не может быть пустым'),
+  email: yup.string().required('This field can not be empty').email('Invalid e-mail address'),
+  password: yup.string().required('This field can not be empty'),
 });
 
 export default function LoginScreen({ navigation }) {
@@ -66,7 +63,7 @@ export default function LoginScreen({ navigation }) {
             >
               {props => (
                 <View>
-                  <Text style={styles.formTitle}>Войти</Text>
+                  <Text style={styles.formTitle}>Login</Text>
                   <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
                     <TextInput
                       value={props.values.email}
@@ -82,7 +79,7 @@ export default function LoginScreen({ navigation }) {
                       blurOnSubmit={false}
                       returnKeyType="next"
                       returnKeyLabel="next"
-                      placeholder="Адрес электронной почты"
+                      placeholder="E-mail address"
                       placeholderTextColor="#BDBDBD"
                       autoComplete={'email'}
                       keyboardType={'email-address'}
@@ -111,7 +108,7 @@ export default function LoginScreen({ navigation }) {
                         ref={passwordRef}
                         returnKeyType="go"
                         returnKeyLabel="go"
-                        placeholder="Пароль"
+                        placeholder="Password"
                         placeholderTextColor="#BDBDBD"
                         secureTextEntry={isHiddenPassword}
                         style={[
@@ -147,7 +144,7 @@ export default function LoginScreen({ navigation }) {
                       display: isKeyboardVisible ? 'none' : 'flex',
                     }}
                   >
-                    <Text style={styles.buttonText}>Войти</Text>
+                    <Text style={styles.buttonText}>Log in</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -160,7 +157,7 @@ export default function LoginScreen({ navigation }) {
                   display: isKeyboardVisible ? 'none' : 'flex',
                 }}
               >
-                Нет аккаунта? Зарегистрироваться
+                Don't have an account? SIGN UP
               </Text>
             </TouchableOpacity>
           </View>

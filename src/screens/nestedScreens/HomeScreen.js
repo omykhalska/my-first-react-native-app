@@ -58,7 +58,7 @@ export default function HomeScreen() {
           tabBarActiveBackgroundColor: '#fff',
           tabBarIcon: ({ color }) => <Feather name="grid" size={24} color={color} />,
 
-          title: 'Публикации',
+          title: 'Feed',
           headerRightContainerStyle: {
             paddingRight: 10,
           },
@@ -90,7 +90,7 @@ export default function HomeScreen() {
             backgroundColor: '#FF6C00',
           },
           tabBarIcon: () => <AntDesign name="plus" size={24} color="#fff" />,
-          title: 'Создать публикацию',
+          title: 'Create a post',
           headerLeftContainerStyle: {
             paddingLeft: 10,
           },

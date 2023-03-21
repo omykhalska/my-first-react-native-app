@@ -26,18 +26,15 @@ import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 const registerSchema = yup.object({
   login: yup
     .string()
-    .required('Это поле не может быть пустым')
-    .min(2, 'Слишком короткий логин')
-    .max(32, 'Слишком длинный логин'),
-  email: yup
-    .string()
-    .required('Это поле не может быть пустым')
-    .email('Невалидный электронный адрес'),
+    .required('This field can not be empty')
+    .min(2, 'Username is too short')
+    .max(32, 'Username is too long'),
+  email: yup.string().required('This field can not be empty').email('Invalid e-mail address'),
   password: yup
     .string()
-    .required('Это поле не может быть пустым')
-    .min(8, 'Слишком короткий пароль')
-    .max(32, 'Пароль не может содержать больше 32 символов'),
+    .required('This field can not be empty')
+    .min(8, 'Password is too short')
+    .max(32, 'Password cannot be longer than 32 characters'),
 });
 
 export default function RegistrationScreen({ navigation }) {
@@ -128,7 +125,7 @@ export default function RegistrationScreen({ navigation }) {
             >
               {props => (
                 <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
-                  <Text style={styles.formTitle}>Регистрация</Text>
+                  <Text style={styles.formTitle}>Create Account</Text>
 
                   <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <View>
@@ -144,7 +141,7 @@ export default function RegistrationScreen({ navigation }) {
                         blurOnSubmit={false}
                         returnKeyType="next"
                         returnKeyLabel="next"
-                        placeholder="Логин"
+                        placeholder="Your Name"
                         placeholderTextColor="#BDBDBD"
                         style={[
                           focusedItem === 'login'
@@ -172,7 +169,7 @@ export default function RegistrationScreen({ navigation }) {
                         blurOnSubmit={false}
                         returnKeyType="next"
                         returnKeyLabel="next"
-                        placeholder="Адрес электронной почты"
+                        placeholder="E-mail"
                         placeholderTextColor="#BDBDBD"
                         autoComplete="email"
                         keyboardType="email-address"
@@ -200,7 +197,7 @@ export default function RegistrationScreen({ navigation }) {
                         ref={passwordRef}
                         returnKeyType="go"
                         returnKeyLabel="go"
-                        placeholder="Пароль"
+                        placeholder="Create Password"
                         placeholderTextColor="#BDBDBD"
                         secureTextEntry={isHiddenPassword}
                         style={[
@@ -236,7 +233,7 @@ export default function RegistrationScreen({ navigation }) {
                     activeOpacity={0.8}
                     onPress={props.handleSubmit}
                   >
-                    <Text style={styles.buttonText}>Зарегистрироваться</Text>
+                    <Text style={styles.buttonText}>Create Account</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -253,7 +250,7 @@ export default function RegistrationScreen({ navigation }) {
                   display: isKeyboardVisible ? 'none' : 'flex',
                 }}
               >
-                Уже есть аккаунт? Войти
+                Already have an account? SIGN IN
               </Text>
             </TouchableOpacity>
           </View>

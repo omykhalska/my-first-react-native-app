@@ -3,19 +3,19 @@ export const handleAuthErrors = error => {
   const errorMessage = error.message;
   switch (errorCode) {
     case 'auth/weak-password':
-      alert('Слишком слабый пароль');
+      alert('The password is too weak');
       break;
     case 'auth/email-already-in-use':
-      alert('Аккаунт с таким электронным адресом уже зарегистрирован');
+      alert('An account with this email address is already registered');
       break;
     case 'auth/invalid-email':
-      alert('Невалидный электронный адрес');
+      alert('Invalid e-mail address');
       break;
     case 'auth/user-not-found':
-      alert('Пользователь не найден');
+      alert('No user was found');
       break;
     case 'auth/wrong-password':
-      alert('Неправильный пароль');
+      alert('Wrong password');
       break;
     default:
       alert(errorMessage);

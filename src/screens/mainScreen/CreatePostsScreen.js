@@ -26,7 +26,7 @@ import { Loader } from '../../components/Loader';
 import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
 
 const publicationSchema = yup.object({
-  title: yup.string().required('Это поле не может быть пустым'),
+  title: yup.string().required('This field can not be empty'),
 });
 
 const imgOptions = {
@@ -202,7 +202,7 @@ export default function CreatePostsScreen({ navigation }) {
                     onBlur={() => {
                       setFieldTouched('title');
                     }}
-                    placeholder="Название..."
+                    placeholder="Write your post title"
                     placeholderTextColor="#BDBDBD"
                     style={{ ...styles.input, fontWeight: '500' }}
                     underlineColorAndroid={'transparent'}
@@ -233,7 +233,7 @@ export default function CreatePostsScreen({ navigation }) {
                             },
                       ]}
                     >
-                      Опубликовать
+                      Publish
                     </Text>
                   </TouchableOpacity>
                 </View>
