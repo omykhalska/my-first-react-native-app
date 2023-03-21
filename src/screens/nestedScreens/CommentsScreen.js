@@ -57,7 +57,7 @@ export default function CommentsScreen({ route }) {
         {!comments && <Loader />}
         <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
       </View>
-      <View style={{ height: 96, marginBottom: isKeyboardVisible ? 4 : 0 }}>
+      <View style={{ height: 96, marginBottom: isKeyboardVisible ? 8 : 0 }}>
         {commentIsUploading ? (
           <Text style={styles.notification}>Sending your comment...</Text>
         ) : (

@@ -1,11 +1,14 @@
 import { ActivityIndicator, StyleSheet } from 'react-native';
 
-export const Loader = ({ style = {} }) => (
-  <ActivityIndicator
-    size="large"
-    color="#FF6C00"
-    style={{ ...styles.loadingIndicator, ...style }}
-  />
+export const Loader = ({ style = {}, children }) => (
+  <>
+    <ActivityIndicator
+      size="large"
+      color="#FF6C00"
+      style={{ ...styles.loadingIndicator, ...style }}
+    />
+    {children}
+  </>
 );
 
 const styles = StyleSheet.create({

@@ -29,14 +29,14 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
 
   const onDeletePhoto = () => {
     onPress();
-    Alert.alert('Удалить фото профиля', 'Вы подтверждаете удаление ?', [
+    Alert.alert('Delete profile picture', 'Do you confirm the deletion ?', [
       {
-        text: 'Отменить',
+        text: 'Cancel',
         onPress: () => {},
         style: 'cancel',
       },
       {
-        text: 'Удалить',
+        text: 'Delete',
         onPress: async () => {
           await removePhoto();
           dispatch(authUpdateUserPhoto(''));
@@ -97,7 +97,7 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
         <View style={styles.backdrop}>
           <View style={styles.menuView}>
             <View style={styles.titleBox}>
-              <Text style={styles.title}>Фото профиля</Text>
+              <Text style={styles.title}>Profile picture</Text>
               {userAvatar && (
                 <TouchableOpacity style={{}} activeOpacity={0.8} onPress={onDeletePhoto}>
                   <MaterialIcons name="delete" size={24} color="rgba(0,0,0,0.6)" />
@@ -110,14 +110,14 @@ export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
                 <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onPickPhoto}>
                   <MaterialIcons name="image-search" size={24} color="#FF6C00" />
                 </TouchableOpacity>
-                <Text style={styles.buttonText}>Галерея</Text>
+                <Text style={styles.buttonText}>Gallery</Text>
               </View>
 
               <View style={styles.centered}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onTakePhoto}>
                   <MaterialIcons name="photo-camera" size={24} color="#FF6C00" />
                 </TouchableOpacity>
-                <Text style={styles.buttonText}>Камера</Text>
+                <Text style={styles.buttonText}>Camera</Text>
               </View>
             </View>
           </View>

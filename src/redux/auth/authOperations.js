@@ -50,7 +50,7 @@ export const authLogInUser = (email, password) => async () => {
 export const authLogOutUser = () => async dispatch => {
   try {
     await signOut(auth);
-    dispatch(authSlice.actions.signOutUser());
+    dispatch(authSlice.actions.signOutUser({ stateChange: false }));
   } catch (error) {
     handleAuthErrors(error);
   }
@@ -68,6 +68,8 @@ export const authStateChangeUser = () => async dispatch => {
 
       dispatch(authSlice.actions.updateUserProfile(update));
       dispatch(authSlice.actions.authStateChange({ stateChange: true }));
+    } else {
+      dispatch(authSlice.actions.authStateChange({ stateChange: false }));
     }
   });
 };
