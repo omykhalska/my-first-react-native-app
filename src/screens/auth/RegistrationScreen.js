@@ -22,6 +22,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../../firebase/config';
 import { handleError } from '../../helpers/handleError';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
+import { useKeyboard } from '../../helpers/hooks';
 
 const registerSchema = yup.object({
   login: yup
@@ -40,9 +41,10 @@ const registerSchema = yup.object({
 export default function RegistrationScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [imageUri, setImageUri] = useState(null);
+
+  const { isKeyboardVisible } = useKeyboard();
+  const { keyboardHeight } = useKeyboard();
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -50,23 +52,10 @@ export default function RegistrationScreen({ navigation }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', e => {
-      setIsKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
-
-  useEffect(() => {
     permissionFunction();
   }, []);
+
+  //TODO: винести функції завантаження аватарки в helpers
 
   const pickAvatar = async () => {
     const photo = await pickImage();

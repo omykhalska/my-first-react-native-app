@@ -13,9 +13,10 @@ import {
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { authLogInUser } from '../../redux/auth/authOperations';
+import { useKeyboard } from '../../helpers/hooks';
 
 const loginSchema = yup.object({
   email: yup.string().required('This field can not be empty').email('Invalid e-mail address'),
@@ -25,27 +26,13 @@ const loginSchema = yup.object({
 export default function LoginScreen({ navigation }) {
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  const { isKeyboardVisible } = useKeyboard();
+  const { keyboardHeight } = useKeyboard();
 
   const passwordRef = useRef(null);
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', e => {
-      setIsKeyboardVisible(true);
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      setIsKeyboardVisible(false);
-    });
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
-  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
