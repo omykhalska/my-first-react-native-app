@@ -45,7 +45,9 @@ export default function ProfileScreen({ navigation }) {
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
   return posts === null ? (
-    <Loader />
+    <Loader>
+      <Text>Downloading data...</Text>
+    </Loader>
   ) : (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>

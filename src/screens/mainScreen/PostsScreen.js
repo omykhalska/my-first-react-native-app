@@ -25,7 +25,11 @@ export default function PostsScreen({ navigation }) {
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
 
   if (posts === null) {
-    return <Loader />;
+    return (
+      <Loader>
+        <Text>Downloading data...</Text>
+      </Loader>
+    );
   } else {
     return (
       <View style={styles.container}>

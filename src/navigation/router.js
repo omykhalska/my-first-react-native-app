@@ -1,6 +1,7 @@
 import AuthNavigation from './AuthNavigation';
 import MainNavigation from './MainNavigation';
 import { Loader } from '../components/Loader';
+import { Text } from 'react-native';
 
 const useRoute = isAuth => {
   switch (isAuth) {
@@ -9,7 +10,11 @@ const useRoute = isAuth => {
     case true:
       return <MainNavigation />;
     default:
-      return <Loader />;
+      return (
+        <Loader>
+          <Text>Login verification...</Text>
+        </Loader>
+      );
   }
 };
 
