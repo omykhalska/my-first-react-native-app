@@ -16,7 +16,7 @@ import * as yup from 'yup';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import uuid from 'react-native-uuid';
-import { storage, db } from '../../firebase/config';
+import { storage, db } from '../../firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';

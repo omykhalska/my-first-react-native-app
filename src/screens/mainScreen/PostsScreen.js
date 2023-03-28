@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { getAllPosts } from '../../helpers/handleFirebase';
+import { getAllPosts } from '../../firebase';
 import { getUserAvatar } from '../../redux/auth/authSelectors';
 import { useSelector } from 'react-redux';
 import { Post } from '../../components/Post';

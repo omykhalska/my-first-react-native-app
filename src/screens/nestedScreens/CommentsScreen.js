@@ -13,7 +13,7 @@ import {
 import { useSelector } from 'react-redux';
 import { AntDesign } from '@expo/vector-icons';
 import { getUserId } from '../../redux/auth/authSelectors';
-import { getAllComments, createComment } from '../../helpers/handleFirebase';
+import { getAllComments, createComment } from '../../firebase';
 import { Comment } from '../../components/Comment';
 import { Loader } from '../../components/Loader';
 import { useKeyboard } from '../../helpers/hooks';

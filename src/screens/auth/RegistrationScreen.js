@@ -19,7 +19,7 @@ import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
 import uuid from 'react-native-uuid';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { storage } from '../../firebase/config';
+import { storage } from '../../firebase';
 import { handleError } from '../../helpers/handleError';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
@@ -39,6 +39,7 @@ const registerSchema = yup.object({
 });
 
 export default function RegistrationScreen({ navigation }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [imageUri, setImageUri] = useState(null);
@@ -77,9 +78,11 @@ export default function RegistrationScreen({ navigation }) {
   };
 
   const handleRegisterClick = async values => {
+    setIsLoading(true);
     const avatarUrl = await uploadAvatarToServer();
     const data = { ...values, avatar: avatarUrl };
     dispatch(authRegisterUser(data));
+    setIsLoading(false);
   };
 
   const removeAvatar = () => {
@@ -221,6 +224,7 @@ export default function RegistrationScreen({ navigation }) {
                     }}
                     activeOpacity={0.8}
                     onPress={props.handleSubmit}
+                    disabled={isLoading}
                   >
                     <Text style={styles.buttonText}>Create Account</Text>
                   </TouchableOpacity>

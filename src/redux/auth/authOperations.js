@@ -1,4 +1,4 @@
-import { auth, db } from '../../firebase/config';
+import { auth, db } from '../../firebase';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -9,7 +9,7 @@ import {
 import { handleAuthErrors } from '../../helpers/handleAuthErrors';
 import { authSlice } from './authReducer';
 import { addDoc, collection } from 'firebase/firestore';
-import { updateUserData } from '../../helpers/handleFirebase';
+import { updateUserData } from '../../firebase';
 
 export const authRegisterUser = ({ login, email, password, avatar }) => {
   return async (dispatch, _) => {

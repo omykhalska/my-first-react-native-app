@@ -16,9 +16,9 @@ import {
 import { useSelector } from 'react-redux';
 import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { Loader } from '../../components/Loader';
-import { PhotoEditPopup } from '../../components/PhotoEditPopup';
+import { AvatarEditPopup } from '../../components/AvatarEditPopup';
 import { Post } from '../../components/Post';
-import { getUserPosts } from '../../helpers/handleFirebase';
+import { getUserPosts } from '../../firebase';
 
 export default function ProfileScreen({ navigation }) {
   const userName = useSelector(getUserName);
@@ -51,7 +51,7 @@ export default function ProfileScreen({ navigation }) {
   ) : (
     <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
       <SafeAreaView style={styles.container}>
-        <PhotoEditPopup
+        <AvatarEditPopup
           visible={isVisible}
           onPress={togglePopup}
           setIsLoadingPhoto={setIsLoadingPhoto}

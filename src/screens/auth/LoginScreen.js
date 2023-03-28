@@ -24,6 +24,7 @@ const loginSchema = yup.object({
 });
 
 export default function LoginScreen({ navigation }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
 
@@ -43,8 +44,10 @@ export default function LoginScreen({ navigation }) {
               initialValues={{ email: '', password: '' }}
               validationSchema={loginSchema}
               onSubmit={(values, { resetForm }) => {
+                setIsLoading(true);
                 const { email, password } = values;
                 dispatch(authLogInUser(email, password));
+                setIsLoading(false);
                 resetForm();
               }}
             >
@@ -130,6 +133,7 @@ export default function LoginScreen({ navigation }) {
                       ...styles.buttonContainer,
                       display: isKeyboardVisible ? 'none' : 'flex',
                     }}
+                    disabled={isLoading}
                   >
                     <Text style={styles.buttonText}>Log in</Text>
                   </TouchableOpacity>

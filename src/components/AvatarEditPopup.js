@@ -11,7 +11,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
 import uuid from 'react-native-uuid';
-import { storage } from '../firebase/config';
+import { storage } from '../firebase';
 import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
@@ -23,7 +23,7 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-export const PhotoEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
+export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
 
