@@ -23,6 +23,7 @@ import { storage } from '../../firebase';
 import { handleError } from '../../helpers/handleError';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
+import { COLORS } from '../../constants';
 
 const registerSchema = yup.object({
   login: yup
@@ -97,7 +98,7 @@ export default function RegistrationScreen({ navigation }) {
             <Image source={{ uri: imageUri }} style={styles.image} />
             {!imageUri ? (
               <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={pickAvatar}>
-                <AntDesign name="pluscircleo" size={25} color="#FF6C00" />
+                <AntDesign name="pluscircleo" size={25} color={COLORS.accentColor} />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
@@ -105,7 +106,7 @@ export default function RegistrationScreen({ navigation }) {
                 style={styles.buttonIcon}
                 onPress={removeAvatar}
               >
-                <AntDesign name="delete" size={25} color="#FF6C00" />
+                <AntDesign name="delete" size={25} color={COLORS.accentColor} />
               </TouchableOpacity>
             )}
           </View>
@@ -134,7 +135,7 @@ export default function RegistrationScreen({ navigation }) {
                         returnKeyType="next"
                         returnKeyLabel="next"
                         placeholder="Your Name"
-                        placeholderTextColor="#BDBDBD"
+                        placeholderTextColor={COLORS.textSecondaryColor}
                         style={[
                           focusedItem === 'login'
                             ? { ...styles.input, ...styles.inputOnFocus }
@@ -162,7 +163,7 @@ export default function RegistrationScreen({ navigation }) {
                         returnKeyType="next"
                         returnKeyLabel="next"
                         placeholder="E-mail"
-                        placeholderTextColor="#BDBDBD"
+                        placeholderTextColor={COLORS.textSecondaryColor}
                         autoComplete="email"
                         keyboardType="email-address"
                         style={[
@@ -190,7 +191,7 @@ export default function RegistrationScreen({ navigation }) {
                         returnKeyType="go"
                         returnKeyLabel="go"
                         placeholder="Create Password"
-                        placeholderTextColor="#BDBDBD"
+                        placeholderTextColor={COLORS.textSecondaryColor}
                         secureTextEntry={isHiddenPassword}
                         style={[
                           focusedItem === 'password'
@@ -207,7 +208,7 @@ export default function RegistrationScreen({ navigation }) {
                         <Ionicons
                           name={isHiddenPassword ? 'ios-eye' : 'ios-eye-off'}
                           size={28}
-                          color="#808080"
+                          color={COLORS.iconInputColor}
                         />
                       </TouchableOpacity>
 
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
     marginBottom: -60,
     width: 120,
     height: 120,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderRadius: 16,
     zIndex: 10,
   },
@@ -280,14 +281,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: '#AF0606',
+    color: COLORS.warningColor,
     fontSize: 12,
     textAlign: 'center',
   },
   regFormContainer: {
     alignSelf: 'stretch',
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
@@ -306,10 +307,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 16,
     paddingRight: 40,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: '#E8E8E8',
+    borderColor: COLORS.skeletonColor,
     borderRadius: 8,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
@@ -317,8 +318,8 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   inputOnFocus: {
-    backgroundColor: '#fff',
-    borderColor: '#FF6C00',
+    backgroundColor: COLORS.bgColor,
+    borderColor: COLORS.accentColor,
   },
   passwordIcon: {
     position: 'absolute',
@@ -329,7 +330,7 @@ const styles = StyleSheet.create({
     marginTop: 44,
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#FF6C00',
+    backgroundColor: COLORS.accentColor,
     borderRadius: 100,
     paddingHorizontal: 32,
     paddingVertical: 16,
@@ -339,7 +340,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#fff',
+    color: COLORS.bgColor,
   },
   text: {
     marginTop: 16,
@@ -349,6 +350,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#1B4371',
+    color: COLORS.textAuthColor,
   },
 });

@@ -24,6 +24,7 @@ import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
 import { Loader } from '../../components/Loader';
 import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
+import { COLORS, SHADOW } from '../../constants';
 
 const publicationSchema = yup.object({
   title: yup.string().required('This field can not be empty'),
@@ -151,25 +152,25 @@ export default function CreatePostsScreen({ navigation }) {
       >
         <View style={{ flex: 1 }}>
           {isLoading && <Loader />}
-          <View style={{ ...styles.pictureBox, ...styles.shadow }}>
+          <View style={[styles.pictureBox, SHADOW]}>
             {photoUrl ? (
               <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
             ) : (
               <View style={styles.buttonsBox}>
                 <TouchableOpacity
-                  style={{ ...styles.button, ...styles.shadow }}
+                  style={[styles.button, SHADOW]}
                   activeOpacity={0.8}
                   onPress={onPickImage}
                 >
-                  <MaterialIcons name="image-search" size={24} color="#FF6C00" />
+                  <MaterialIcons name="image-search" size={24} color={COLORS.accentColor} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={{ ...styles.button, ...styles.shadow }}
+                  style={[styles.button, SHADOW]}
                   activeOpacity={0.8}
                   onPress={onTakePhoto}
                 >
-                  <MaterialIcons name="photo-camera" size={24} color="#FF6C00" />
+                  <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
                 </TouchableOpacity>
               </View>
             )}
@@ -203,7 +204,7 @@ export default function CreatePostsScreen({ navigation }) {
                       setFieldTouched('title');
                     }}
                     placeholder="Write your post title"
-                    placeholderTextColor="#BDBDBD"
+                    placeholderTextColor={COLORS.textSecondaryColor}
                     style={{ ...styles.input, fontWeight: '500' }}
                     underlineColorAndroid={'transparent'}
                   />
@@ -219,7 +220,7 @@ export default function CreatePostsScreen({ navigation }) {
                         ? styles.submitBtn
                         : {
                             ...styles.submitBtn,
-                            backgroundColor: '#FF6C00',
+                            backgroundColor: COLORS.accentColor,
                           },
                     ]}
                   >
@@ -229,7 +230,7 @@ export default function CreatePostsScreen({ navigation }) {
                           ? styles.buttonText
                           : {
                               ...styles.buttonText,
-                              color: '#FFF',
+                              color: COLORS.bgColor,
                             },
                       ]}
                     >
@@ -250,9 +251,9 @@ export default function CreatePostsScreen({ navigation }) {
                       resetForm();
                     }}
                     opacity={0.8}
-                    style={{ ...styles.trashBtnBox, ...styles.shadow }}
+                    style={[styles.trashBtnBox, SHADOW]}
                   >
-                    <Feather name="trash-2" size={24} color="#BDBDBD" />
+                    <Feather name="trash-2" size={24} color={COLORS.textSecondaryColor} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -271,11 +272,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 32,
     fontFamily: 'Roboto-Regular',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
   },
   pictureBox: {
     height: 240,
-    backgroundColor: '#E8E8E8',
+    backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
     overflow: 'hidden',
     justifyContent: 'center',
@@ -289,18 +290,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 60,
     height: 60,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
     borderRadius: 30,
   },
   uploadImgBtn: {
     marginTop: 46,
-    backgroundColor: '#FF6C00',
+    backgroundColor: COLORS.accentColor,
   },
   text: {
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#fff',
+    color: COLORS.bgColor,
   },
   input: {
     height: 50,
@@ -309,14 +310,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomWidth: 1,
     borderStyle: 'solid',
-    borderBottomColor: '#E8E8E8',
+    borderBottomColor: COLORS.skeletonColor,
     fontFamily: 'Roboto-Regular',
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
   },
   errorText: {
-    color: '#AF0606',
+    color: COLORS.warningColor,
     fontSize: 12,
     textAlign: 'center',
   },
@@ -326,33 +327,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: 32,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderRadius: 100,
   },
   buttonText: {
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#BDBDBD',
+    color: COLORS.textSecondaryColor,
   },
   trashBtnBox: {
     width: 70,
     height: 40,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderRadius: 20,
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
-  },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
 });

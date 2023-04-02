@@ -5,6 +5,7 @@ import { getUserAvatar } from '../../redux/auth/authSelectors';
 import { useSelector } from 'react-redux';
 import { Post } from '../../components/Post';
 import { Loader } from '../../components/Loader';
+import { COLORS } from '../../constants';
 
 export default function PostsScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
@@ -43,8 +44,8 @@ export default function PostsScreen({ navigation }) {
                 <RefreshControl
                   refreshing={refreshing}
                   onRefresh={onRefresh}
-                  colors={['#FF6C00']}
-                  tintColor={'#FF6C00'}
+                  colors={[COLORS.accentColor]}
+                  tintColor={COLORS.accentColor}
                   title={'Refreshing...'}
                 />
               }
@@ -52,7 +53,9 @@ export default function PostsScreen({ navigation }) {
           </View>
         ) : (
           <View style={styles.publications}>
-            <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
+            <Text
+              style={{ ...styles.title, textAlign: 'center', color: COLORS.textSecondaryColor }}
+            >
               No publications here yet...
             </Text>
           </View>
@@ -67,7 +70,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     fontFamily: 'Roboto-Regular',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
   },
   publications: {
     flex: 1,
@@ -79,6 +82,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
 });

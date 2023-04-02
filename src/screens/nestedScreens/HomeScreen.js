@@ -5,14 +5,15 @@ import { CommonActions } from '@react-navigation/native';
 import { TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { authLogOutUser } from '../../redux/auth/authOperations';
+import { COLORS } from '../../constants';
 
 const HomeTabs = createBottomTabNavigator();
 
 const tabNavOptions = {
-  tabBarActiveTintColor: '#fff',
-  tabBarActiveBackgroundColor: '#FF6C00',
-  tabBarInactiveTintColor: '#212121',
-  tabBarInactiveBackgroundColor: '#fff',
+  tabBarActiveTintColor: COLORS.bgColor,
+  tabBarActiveBackgroundColor: COLORS.accentColor,
+  tabBarInactiveTintColor: COLORS.textPrimaryColor,
+  tabBarInactiveBackgroundColor: COLORS.bgColor,
   tabBarItemStyle: {
     marginTop: 8,
     height: 40,
@@ -30,8 +31,8 @@ const tabNavOptions = {
 
 const tabScreenOptions = {
   headerStyle: {
-    backgroundColor: '#fff',
-    shadowColor: '#000000',
+    backgroundColor: COLORS.bgColor,
+    shadowColor: COLORS.shadowColor,
     shadowOffset: { width: 0, height: 0.5 },
     shadowRadius: 27.18,
   },
@@ -40,7 +41,7 @@ const tabScreenOptions = {
     fontSize: 17,
     lineHeight: 22,
     letterSpacing: -0.408,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
 };
 
@@ -54,8 +55,8 @@ export default function HomeScreen() {
         component={mainScreen.PostsScreen}
         options={() => ({
           ...tabScreenOptions,
-          tabBarActiveTintColor: '#FF6C00',
-          tabBarActiveBackgroundColor: '#fff',
+          tabBarActiveTintColor: COLORS.accentColor,
+          tabBarActiveBackgroundColor: COLORS.bgColor,
           tabBarIcon: ({ color }) => <Feather name="grid" size={24} color={color} />,
 
           title: 'Feed',
@@ -68,7 +69,7 @@ export default function HomeScreen() {
                 dispatch(authLogOutUser());
               }}
             >
-              <Feather name="log-out" size={24} color="#BDBDBD" />
+              <Feather name="log-out" size={24} color={COLORS.textSecondaryColor} />
             </TouchableOpacity>
           ),
         })}
@@ -87,16 +88,16 @@ export default function HomeScreen() {
             maxWidth: 70,
             marginHorizontal: 10,
             borderRadius: 20,
-            backgroundColor: '#FF6C00',
+            backgroundColor: COLORS.accentColor,
           },
-          tabBarIcon: () => <AntDesign name="plus" size={24} color="#fff" />,
+          tabBarIcon: () => <AntDesign name="plus" size={24} color={COLORS.bgColor} />,
           title: 'Create a post',
           headerLeftContainerStyle: {
             paddingLeft: 10,
           },
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.dispatch(CommonActions.goBack())}>
-              <Feather name="arrow-left" size={24} color="#212121" />
+              <Feather name="arrow-left" size={24} color={COLORS.textPrimaryColor} />
             </TouchableOpacity>
           ),
         })}
@@ -106,8 +107,8 @@ export default function HomeScreen() {
         component={mainScreen.ProfileScreen}
         options={{
           tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
-          tabBarActiveTintColor: '#FF6C00',
-          tabBarActiveBackgroundColor: '#fff',
+          tabBarActiveTintColor: COLORS.accentColor,
+          tabBarActiveBackgroundColor: COLORS.bgColor,
           headerShown: false,
         }}
       />

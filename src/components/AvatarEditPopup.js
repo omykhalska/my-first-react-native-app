@@ -16,6 +16,7 @@ import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
 import { pickImage, takePhoto } from '../helpers/handleImagePicker';
+import { COLORS } from '../constants';
 
 const imgOptions = {
   quality: 1,
@@ -108,14 +109,14 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
             <View style={styles.buttonsBox}>
               <View style={styles.centered}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onPickPhoto}>
-                  <MaterialIcons name="image-search" size={24} color="#FF6C00" />
+                  <MaterialIcons name="image-search" size={24} color={COLORS.accentColor} />
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>Gallery</Text>
               </View>
 
               <View style={styles.centered}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onTakePhoto}>
-                  <MaterialIcons name="photo-camera" size={24} color="#FF6C00" />
+                  <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>Camera</Text>
               </View>
@@ -131,14 +132,14 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: COLORS.borderBtnColor,
   },
   menuView: {
     height: 'auto',
-    borderColor: '#ccc',
+    borderColor: COLORS.borderColor,
     borderWidth: 1,
     borderStyle: 'solid',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
     elevation: 20,
     padding: 16,
   },
@@ -151,7 +152,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: '500',
     fontSize: 22,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   buttonsBox: {
     flexDirection: 'row',
@@ -163,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 50,
     height: 50,
-    borderColor: 'rgba(0,0,0,0.6)',
+    borderColor: COLORS.borderBtnColor,
     borderWidth: 1,
     borderRadius: 25,
     marginBottom: 8,
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontWeight: '400',
     fontSize: 16,
-    color: 'rgba(0,0,0,0.6)',
+    color: COLORS.borderBtnColor,
     marginBottom: 8,
   },
   centered: {

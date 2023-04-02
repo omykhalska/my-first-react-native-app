@@ -1,8 +1,9 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { COLORS } from '../constants';
 
-export const Loader = ({ style = {}, children }) => (
+export const Loader = ({ size = 'large', style = {}, children }) => (
   <View style={styles.loadingIndicator}>
-    <ActivityIndicator size="large" color="#FF6C00" style={style} />
+    <ActivityIndicator size={size} color={COLORS.accentColor} style={style} />
     {children}
   </View>
 );

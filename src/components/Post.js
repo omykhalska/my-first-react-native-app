@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { setLike, removeLike } from '../firebase';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../redux/auth/authSelectors';
+import { COLORS } from '../constants';
 
 export const Post = ({ item, navigation, screen = 'Post' }) => {
   const [isLiked, setIsLiked] = useState(null);
@@ -42,7 +43,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
       <View style={styles.extraData}>
         <View style={styles.centered}>
           <TouchableOpacity style={styles.centered} onPress={toggleLike}>
-            <AntDesign name={isLiked ? 'like1' : 'like2'} size={24} color="#FF6C00" />
+            <AntDesign name={isLiked ? 'like1' : 'like2'} size={24} color={COLORS.accentColor} />
             <Text style={styles.commentsCount}>{item.likes?.length || 0}</Text>
           </TouchableOpacity>
 
@@ -52,7 +53,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
               navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
             }}
           >
-            <AntDesign name="message1" size={24} color="#FF6C00" />
+            <AntDesign name="message1" size={24} color={COLORS.accentColor} />
             <Text style={styles.commentsCount}>{item.comments}</Text>
           </TouchableOpacity>
         </View>
@@ -65,7 +66,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
                 navigation.navigate('Map', { location: item.location });
               }}
             >
-              <AntDesign name="enviromento" size={24} color="#FF6C00" />
+              <AntDesign name="enviromento" size={24} color={COLORS.accentColor} />
               <Text style={styles.location}>{item.address}</Text>
             </TouchableOpacity>
           </View>
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   userAvatar: {
     width: 28,
     height: 28,
-    backgroundColor: '#e8e8e8',
+    backgroundColor: COLORS.skeletonColor,
     borderRadius: 14,
   },
   userName: {
@@ -95,13 +96,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 14,
     lineHeight: 15,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   picture: {
     width: '100%',
     height: 240,
     resizeMode: 'cover',
-    backgroundColor: '#e8e8e8',
+    backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },
   title: {
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   extraData: {
     marginTop: 8,
@@ -130,14 +131,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   location: {
     marginLeft: 4,
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
     textDecorationLine: 'underline',
   },
 });

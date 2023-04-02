@@ -1,15 +1,16 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../redux/auth/authSelectors';
+import { COLORS } from '../constants';
 
 export const Comment = ({ data }) => {
   const { userId, userAvatar, commentText, createdAt } = data;
 
   const currentUserId = useSelector(getUserId);
 
-  const getDate = () => createdAt?.toDate().toLocaleDateString() || 'Сегодня';
+  const getDate = () => createdAt?.toDate().toLocaleDateString() || 'Today';
 
-  const getTime = () => createdAt?.toDate().toLocaleTimeString().slice(0, 5) || 'Только что';
+  const getTime = () => createdAt?.toDate().toLocaleTimeString().slice(0, 5) || 'Just now';
 
   return (
     <View
@@ -55,24 +56,24 @@ const styles = StyleSheet.create({
   },
   comment: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    backgroundColor: COLORS.bgCommentColor,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
     fontSize: 12,
     lineHeight: 18,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   commentDate: {
     marginTop: 8,
     fontSize: 10,
     lineHeight: 12,
-    color: '#BDBDBD',
+    color: COLORS.textSecondaryColor,
   },
   avatar: {
     width: 28,
     height: 28,
-    backgroundColor: '#e8e8e8',
+    backgroundColor: COLORS.skeletonColor,
     borderRadius: 14,
   },
 });

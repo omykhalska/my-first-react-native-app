@@ -17,6 +17,7 @@ import { getAllComments, createComment } from '../../firebase';
 import { Comment } from '../../components/Comment';
 import { Loader } from '../../components/Loader';
 import { useKeyboard } from '../../helpers/hooks';
+import { COLORS, SHADOW } from '../../constants';
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
@@ -64,9 +65,9 @@ export default function CommentsScreen({ route }) {
           <>
             <KeyboardAvoidingView>
               <TextInput
-                style={[styles.textArea, styles.shadow]}
+                style={[styles.textArea, SHADOW]}
                 placeholder="Write your comment"
-                placeholderTextColor={'#BDBDBD'}
+                placeholderTextColor={COLORS.textSecondaryColor}
                 onChangeText={setCommentText}
                 value={commentText}
                 returnKeyType="done"
@@ -74,9 +75,9 @@ export default function CommentsScreen({ route }) {
               />
             </KeyboardAvoidingView>
             {commentText ? (
-              <View style={[styles.submitBtn, styles.shadow]}>
+              <View style={[styles.submitBtn, SHADOW]}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
-                  <AntDesign name="arrowup" size={24} color="#FFFFFF" />
+                  <AntDesign name="arrowup" size={24} color={COLORS.bgColor} />
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -93,13 +94,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 32,
     fontFamily: 'Roboto-Regular',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
   },
   picture: {
     width: '100%',
     height: 240,
     resizeMode: 'cover',
-    backgroundColor: '#e8e8e8',
+    backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },
   commentsArea: {
@@ -111,13 +112,13 @@ const styles = StyleSheet.create({
     height: 52,
     padding: 16,
     paddingRight: 54,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderRadius: 100,
     fontFamily: 'Inter-Medium',
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   submitBtn: {
     position: 'absolute',
@@ -128,15 +129,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6C00',
+    backgroundColor: COLORS.accentColor,
     borderRadius: 17,
-  },
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: { height: 0, width: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 6,
   },
   notification: {
     marginTop: 30,

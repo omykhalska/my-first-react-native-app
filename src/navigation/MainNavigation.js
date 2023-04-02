@@ -1,12 +1,13 @@
 import nestedScreens from '../screens/nestedScreens';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { COLORS } from '../constants';
 
 const Stack = createNativeStackNavigator();
 
 const tabScreenOptions = {
   headerStyle: {
-    backgroundColor: '#fff',
-    shadowColor: '#000000',
+    backgroundColor: COLORS.bgColor,
+    shadowColor: COLORS.shadowColor,
     shadowOffset: { width: 0, height: 0.5 },
     shadowRadius: 27.18,
   },
@@ -15,7 +16,7 @@ const tabScreenOptions = {
     fontSize: 17,
     lineHeight: 22,
     letterSpacing: -0.408,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   headerTitleAlign: 'center',
 };

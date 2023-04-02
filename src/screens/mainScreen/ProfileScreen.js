@@ -19,6 +19,7 @@ import { Loader } from '../../components/Loader';
 import { AvatarEditPopup } from '../../components/AvatarEditPopup';
 import { Post } from '../../components/Post';
 import { getUserPosts } from '../../firebase';
+import { COLORS, SHADOW } from '../../constants';
 
 export default function ProfileScreen({ navigation }) {
   const userName = useSelector(getUserName);
@@ -66,8 +67,17 @@ export default function ProfileScreen({ navigation }) {
                   <Image source={{ uri: userAvatar }} style={styles.image} />
                 )}
               </View>
-              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={togglePopup}>
-                <MaterialIcons name="mode-edit" size={24} color="#FF6C00" style={styles.icon} />
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[styles.buttonIcon, SHADOW]}
+                onPress={togglePopup}
+              >
+                <MaterialIcons
+                  name="mode-edit"
+                  size={24}
+                  color={COLORS.accentColor}
+                  style={styles.icon}
+                />
               </TouchableOpacity>
             </View>
 
@@ -81,7 +91,9 @@ export default function ProfileScreen({ navigation }) {
               </>
             ) : (
               <View style={styles.publications}>
-                <Text style={{ ...styles.title, textAlign: 'center', color: '#BDBDBD' }}>
+                <Text
+                  style={{ ...styles.title, textAlign: 'center', color: COLORS.textSecondaryColor }}
+                >
                   No publications here yet...
                 </Text>
               </View>
@@ -110,7 +122,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     marginTop: 148 - StatusBar.currentHeight,
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.bgColor,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
@@ -121,7 +133,7 @@ const styles = StyleSheet.create({
     top: -60,
     width: 120,
     height: 120,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: COLORS.bgInputColor,
     borderRadius: 16,
   },
   avatar: {
@@ -129,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     zIndex: 10,
     overflow: 'hidden',
-    backgroundColor: '#e8e8e8',
+    backgroundColor: COLORS.skeletonColor,
   },
   buttonIcon: {
     position: 'absolute',
@@ -139,15 +151,7 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     zIndex: 11,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
+    backgroundColor: COLORS.bgColor,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 30,
     lineHeight: 35,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
   publications: {
     flex: 1,
@@ -175,6 +179,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,
-    color: '#212121',
+    color: COLORS.textPrimaryColor,
   },
 });

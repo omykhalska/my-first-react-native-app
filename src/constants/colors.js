@@ -1,0 +1,15 @@
+export default {
+  bgColor: '#fff',
+  bgInputColor: '#F6F6F6',
+  bgCommentColor: 'rgba(0, 0, 0, 0.03)',
+  skeletonColor: '#e8e8e8',
+  borderColor: '#ccc',
+  borderBtnColor: 'rgba(0,0,0,0.6)',
+  textPrimaryColor: '#212121',
+  textSecondaryColor: '#BDBDBD',
+  textAuthColor: '#1B4371',
+  iconInputColor: '#808080',
+  shadowColor: '#000',
+  warningColor: '#AF0606',
+  accentColor: '#FF6C00',
+};
