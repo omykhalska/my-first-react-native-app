@@ -19,7 +19,7 @@ import { Loader } from '../../components/Loader';
 import { AvatarEditPopup } from '../../components/AvatarEditPopup';
 import { Post } from '../../components/Post';
 import { getUserPosts } from '../../firebase';
-import { COLORS, SHADOW } from '../../constants';
+import { COLORS, IMAGES, SHADOW } from '../../constants';
 
 export default function ProfileScreen({ navigation }) {
   const userName = useSelector(getUserName);
@@ -50,7 +50,7 @@ export default function ProfileScreen({ navigation }) {
       <Text>Downloading data...</Text>
     </Loader>
   ) : (
-    <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
+    <ImageBackground source={IMAGES.bgPattern} style={styles.image}>
       <SafeAreaView style={styles.container}>
         <AvatarEditPopup
           visible={isVisible}

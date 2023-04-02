@@ -12,7 +12,6 @@ import {
   Image,
 } from 'react-native';
 import { Formik } from 'formik';
-import * as yup from 'yup';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
@@ -23,21 +22,7 @@ import { storage } from '../../firebase';
 import { handleError } from '../../helpers/handleError';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
-import { COLORS } from '../../constants';
-
-const registerSchema = yup.object({
-  login: yup
-    .string()
-    .required('This field can not be empty')
-    .min(2, 'Username is too short')
-    .max(32, 'Username is too long'),
-  email: yup.string().required('This field can not be empty').email('Invalid e-mail address'),
-  password: yup
-    .string()
-    .required('This field can not be empty')
-    .min(8, 'Password is too short')
-    .max(32, 'Password cannot be longer than 32 characters'),
-});
+import { COLORS, IMAGES, SCHEMAS } from '../../constants';
 
 export default function RegistrationScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -93,7 +78,7 @@ export default function RegistrationScreen({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
+        <ImageBackground source={IMAGES.bgPattern} style={styles.image}>
           <View style={styles.avatarContainer}>
             <Image source={{ uri: imageUri }} style={styles.image} />
             {!imageUri ? (
@@ -113,7 +98,7 @@ export default function RegistrationScreen({ navigation }) {
           <View style={styles.regFormContainer}>
             <Formik
               initialValues={{ login: '', email: '', password: '' }}
-              validationSchema={registerSchema}
+              validationSchema={SCHEMAS.registerSchema}
               onSubmit={handleRegisterClick}
             >
               {props => (

@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../redux/auth/authSelectors';
-import { COLORS } from '../constants';
+import { COLORS, IMAGES } from '../constants';
 
 export const Comment = ({ data }) => {
   const { userId, userAvatar, commentText, createdAt } = data;
@@ -25,10 +25,7 @@ export const Comment = ({ data }) => {
           marginRight: userId === currentUserId ? 0 : 16,
         }}
       >
-        <Image
-          source={userAvatar ? { uri: userAvatar } : require('../assets/blank-profile-picture.png')}
-          style={styles.avatar}
-        />
+        <Image source={userAvatar ? { uri: userAvatar } : IMAGES.user} style={styles.avatar} />
       </View>
       <View
         style={{

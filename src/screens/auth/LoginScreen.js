@@ -11,18 +11,12 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { Formik } from 'formik';
-import * as yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { authLogInUser } from '../../redux/auth/authOperations';
 import { useKeyboard } from '../../helpers/hooks';
-import { COLORS } from '../../constants';
-
-const loginSchema = yup.object({
-  email: yup.string().required('This field can not be empty').email('Invalid e-mail address'),
-  password: yup.string().required('This field can not be empty'),
-});
+import { COLORS, IMAGES, SCHEMAS } from '../../constants';
 
 export default function LoginScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,11 +33,11 @@ export default function LoginScreen({ navigation }) {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <ImageBackground source={require('../../assets/bg-image.jpg')} style={styles.image}>
+        <ImageBackground source={IMAGES.bgPattern} style={styles.image}>
           <View style={styles.regFormContainer}>
             <Formik
               initialValues={{ email: '', password: '' }}
-              validationSchema={loginSchema}
+              validationSchema={SCHEMAS.loginSchema}
               onSubmit={(values, { resetForm }) => {
                 setIsLoading(true);
                 const { email, password } = values;

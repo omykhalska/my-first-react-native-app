@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { setLike, removeLike } from '../firebase';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../redux/auth/authSelectors';
-import { COLORS } from '../constants';
+import { COLORS, IMAGES } from '../constants';
 
 export const Post = ({ item, navigation, screen = 'Post' }) => {
   const [isLiked, setIsLiked] = useState(null);
@@ -28,11 +28,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
       {screen === 'Post' ? (
         <View style={styles.userDataBox}>
           <Image
-            source={
-              item.userAvatar
-                ? { uri: item.userAvatar }
-                : require('../assets/blank-profile-picture.png')
-            }
+            source={item.userAvatar ? { uri: item.userAvatar } : IMAGES.user}
             style={styles.userAvatar}
           />
           <Text style={styles.userName}>{item.userName}</Text>

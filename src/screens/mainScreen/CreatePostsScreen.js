@@ -12,7 +12,6 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
-import * as yup from 'yup';
 import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
 import uuid from 'react-native-uuid';
@@ -24,11 +23,7 @@ import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
 import { Loader } from '../../components/Loader';
 import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
-import { COLORS, SHADOW } from '../../constants';
-
-const publicationSchema = yup.object({
-  title: yup.string().required('This field can not be empty'),
-});
+import { COLORS, SHADOW, SCHEMAS } from '../../constants';
 
 const imgOptions = {
   quality: 1,
@@ -177,7 +172,7 @@ export default function CreatePostsScreen({ navigation }) {
           </View>
           <Formik
             initialValues={{ title: '', location: '' }}
-            validationSchema={publicationSchema}
+            validationSchema={SCHEMAS.publicationSchema}
             onSubmit={(values, { resetForm }) => {
               sendPhoto(values).catch(handleError);
               resetForm();
