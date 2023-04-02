@@ -10,7 +10,7 @@ export const permissionFunction = async () => {
   }
 };
 
-export const pickImage = async options => {
+export const pickImage = async (options = {}) => {
   try {
     let result = await ImagePicker.launchImageLibraryAsync(options);
 

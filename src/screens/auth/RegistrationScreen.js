@@ -16,13 +16,16 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
-import uuid from 'react-native-uuid';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { storage } from '../../firebase';
-import { handleError } from '../../helpers/handleError';
+import { uploadAvatarToServer } from '../../firebase';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
+
+const imgOptions = {
+  quality: 1,
+  aspect: [1, 1],
+  allowsEditing: true,
+};
 
 export default function RegistrationScreen({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +33,7 @@ export default function RegistrationScreen({ navigation }) {
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
   const [imageUri, setImageUri] = useState(null);
 
-  const { isKeyboardVisible } = useKeyboard();
-  const { keyboardHeight } = useKeyboard();
+  const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -42,30 +44,14 @@ export default function RegistrationScreen({ navigation }) {
     permissionFunction();
   }, []);
 
-  //TODO: винести функції завантаження аватарки в helpers
-
   const pickAvatar = async () => {
-    const photo = await pickImage();
+    const photo = await pickImage(imgOptions);
     setImageUri(photo);
-  };
-
-  const uploadAvatarToServer = async () => {
-    try {
-      const id = uuid.v4();
-      const response = await fetch(imageUri);
-      const file = await response.blob();
-      const storageRef = ref(storage, `avatars/${id}`);
-
-      await uploadBytes(storageRef, file);
-      return await getDownloadURL(storageRef);
-    } catch (e) {
-      handleError(e);
-    }
   };
 
   const handleRegisterClick = async values => {
     setIsLoading(true);
-    const avatarUrl = await uploadAvatarToServer();
+    const avatarUrl = await uploadAvatarToServer(imageUri);
     const data = { ...values, avatar: avatarUrl };
     dispatch(authRegisterUser(data));
     setIsLoading(false);

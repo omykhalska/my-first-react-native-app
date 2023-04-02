@@ -15,11 +15,12 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { initializeAuth } from 'firebase/auth';
 import { getReactNativePersistence } from 'firebase/auth/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleError } from './helpers/handleError';
+import uuid from 'react-native-uuid';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB_q0Gem2u8WKRms8mWUgMeZ_Du0CM-OiE',
@@ -152,6 +153,28 @@ export const removeLike = async (postId, userId) => {
     await updateDoc(docRef, {
       likes: arrayRemove(userId),
     });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const uploadAvatarToServer = async image => {
+  try {
+    const id = uuid.v4();
+    const response = await fetch(image);
+    const file = await response.blob();
+    const storageRef = ref(storage, `avatars/${id}`);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const removeAvatar = async userAvatar => {
+  const avatarRef = ref(storage, userAvatar);
+  try {
+    await deleteObject(avatarRef);
   } catch (e) {
     handleError(e);
   }

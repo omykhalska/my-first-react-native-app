@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
-import uuid from 'react-native-uuid';
-import { storage } from '../firebase';
+import { removeAvatar, uploadAvatarToServer } from '../firebase';
 import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
@@ -39,7 +37,7 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
       {
         text: 'Delete',
         onPress: async () => {
-          await removePhoto();
+          await removeAvatar(userAvatar);
           dispatch(authUpdateUserPhoto(''));
         },
       },
@@ -61,33 +59,11 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
       if (photo) {
         setIsLoadingPhoto(true);
         const avatarUrl = await uploadAvatarToServer(photo);
-        userAvatar && (await removePhoto());
+        userAvatar && (await removeAvatar(userAvatar));
         dispatch(authUpdateUserPhoto(avatarUrl));
       }
     } catch (e) {
       setIsLoadingPhoto(false);
-      handleError(e);
-    }
-  };
-
-  const uploadAvatarToServer = async image => {
-    try {
-      const id = uuid.v4();
-      const response = await fetch(image);
-      const file = await response.blob();
-      const storageRef = ref(storage, `avatars/${id}`);
-      await uploadBytes(storageRef, file);
-      return await getDownloadURL(storageRef);
-    } catch (e) {
-      handleError(e);
-    }
-  };
-
-  const removePhoto = async () => {
-    const avatarRef = ref(storage, userAvatar);
-    try {
-      await deleteObject(avatarRef);
-    } catch (e) {
       handleError(e);
     }
   };
