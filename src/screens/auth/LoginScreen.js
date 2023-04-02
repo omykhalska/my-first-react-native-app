@@ -30,6 +30,12 @@ export default function LoginScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
+  const onSubmit = ({ email, password }) => {
+    setIsLoading(true);
+    dispatch(authLogInUser(email, password));
+    setIsLoading(false);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
@@ -39,10 +45,7 @@ export default function LoginScreen({ navigation }) {
               initialValues={{ email: '', password: '' }}
               validationSchema={SCHEMAS.loginSchema}
               onSubmit={(values, { resetForm }) => {
-                setIsLoading(true);
-                const { email, password } = values;
-                dispatch(authLogInUser(email, password));
-                setIsLoading(false);
+                onSubmit(values);
                 resetForm();
               }}
             >
