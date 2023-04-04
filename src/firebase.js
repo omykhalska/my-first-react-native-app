@@ -16,7 +16,13 @@ import {
   where,
 } from 'firebase/firestore';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
-import { initializeAuth } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  initializeAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from 'firebase/auth';
 import { getReactNativePersistence } from 'firebase/auth/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleError } from './helpers/handleError';
@@ -42,19 +48,34 @@ export const db = getFirestore(app);
 // Initialize Cloud Storage and get a reference to the service
 export const storage = getStorage(app);
 
-export const getUserData = async userId => {
-  try {
-    let user = {};
-    const q = await query(collection(db, 'users'), where('userId', '==', userId));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      user = { ...doc.data() };
-    });
-    return user;
-  } catch (e) {
-    handleError(e);
-  }
+// User Authentication
+
+export const createNewUser = async (login, email, password, avatar) => {
+  await createUserWithEmailAndPassword(auth, email, password);
+  await updateProfile(auth.currentUser, {
+    displayName: login,
+    photoURL: avatar,
+  });
+  const { uid, displayName, photoURL } = auth.currentUser;
+  const update = {
+    userId: uid,
+    userName: displayName,
+    userEmail: email,
+    userAvatar: photoURL,
+  };
+  await addDoc(collection(db, 'users'), update);
+  return update;
 };
+
+export const logInUser = async (email, password) => {
+  await signInWithEmailAndPassword(auth, email, password);
+};
+
+export const logOutUser = async () => {
+  await signOut(auth);
+};
+
+//Handle User & Post Data
 
 export const updateUserData = async (uid, updateData) => {
   try {
@@ -65,6 +86,37 @@ export const updateUserData = async (uid, updateData) => {
       const docRef = doc(db, 'users', docId);
       updateDoc(docRef, updateData);
     });
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const updateAvatar = async avatar => {
+  await updateProfile(auth.currentUser, {
+    photoURL: avatar,
+  });
+
+  const { uid, displayName, photoURL, email } = auth.currentUser;
+
+  await updateUserData(uid, { userAvatar: photoURL });
+
+  return {
+    userId: uid,
+    userName: displayName,
+    userEmail: email,
+    userAvatar: photoURL,
+  };
+};
+
+export const getUserData = async userId => {
+  try {
+    let user = {};
+    const q = await query(collection(db, 'users'), where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(doc => {
+      user = { ...doc.data() };
+    });
+    return user;
   } catch (e) {
     handleError(e);
   }

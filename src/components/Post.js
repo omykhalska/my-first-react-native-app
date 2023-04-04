@@ -1,9 +1,9 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { setLike, removeLike } from '../firebase';
 import { useSelector } from 'react-redux';
+import { AntDesign } from '@expo/vector-icons';
 import { getUserId } from '../redux/auth/authSelectors';
+import { setLike, removeLike } from '../firebase';
 import { COLORS, IMAGES } from '../constants';
 
 export const Post = ({ item, navigation, screen = 'Post' }) => {

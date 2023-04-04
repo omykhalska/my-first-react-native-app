@@ -1,38 +1,15 @@
-import { auth, db } from '../../firebase';
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile,
-} from 'firebase/auth';
-import { handleAuthErrors } from '../../helpers/handleAuthErrors';
 import { authSlice } from './authReducer';
-import { addDoc, collection } from 'firebase/firestore';
-import { updateUserData } from '../../firebase';
+import { createNewUser, logInUser, logOutUser, updateAvatar, auth } from '../../firebase';
+import { handleAuthErrors } from '../../helpers/handleAuthErrors';
+
+import { onAuthStateChanged } from 'firebase/auth';
 
 export const authRegisterUser = ({ login, email, password, avatar }) => {
   return async (dispatch, _) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const user = await createNewUser(login, email, password, avatar);
 
-      await updateProfile(auth.currentUser, {
-        displayName: login,
-        photoURL: avatar,
-      });
-
-      const { uid, displayName, photoURL } = auth.currentUser;
-
-      const update = {
-        userId: uid,
-        userName: displayName,
-        userEmail: email,
-        userAvatar: photoURL,
-      };
-
-      await addDoc(collection(db, 'users'), update);
-
-      dispatch(authSlice.actions.updateUserProfile(update));
+      dispatch(authSlice.actions.updateUserProfile(user));
     } catch (error) {
       handleAuthErrors(error);
     }
@@ -41,7 +18,7 @@ export const authRegisterUser = ({ login, email, password, avatar }) => {
 
 export const authLogInUser = (email, password) => async () => {
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    await logInUser(email, password);
   } catch (error) {
     handleAuthErrors(error);
   }
@@ -49,7 +26,8 @@ export const authLogInUser = (email, password) => async () => {
 
 export const authLogOutUser = () => async dispatch => {
   try {
-    await signOut(auth);
+    await logOutUser();
+
     dispatch(authSlice.actions.signOutUser({ stateChange: false }));
   } catch (error) {
     handleAuthErrors(error);
@@ -77,22 +55,9 @@ export const authStateChangeUser = () => async dispatch => {
 export const authUpdateUserPhoto = avatar => {
   return async (dispatch, _) => {
     try {
-      await updateProfile(auth.currentUser, {
-        photoURL: avatar,
-      });
+      const updatedUser = await updateAvatar(avatar);
 
-      const { uid, displayName, photoURL, email } = auth.currentUser;
-
-      await updateUserData(uid, { userAvatar: photoURL });
-
-      dispatch(
-        authSlice.actions.updateUserProfile({
-          userId: uid,
-          userName: displayName,
-          userEmail: email,
-          userAvatar: photoURL,
-        }),
-      );
+      dispatch(authSlice.actions.updateUserProfile(updatedUser));
     } catch (error) {
       handleAuthErrors(error);
     }
