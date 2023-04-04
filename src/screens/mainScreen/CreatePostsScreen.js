@@ -146,114 +146,119 @@ export default function CreatePostsScreen({ navigation }) {
         scrollEnabled={true}
       >
         <View style={{ flex: 1 }}>
-          {isLoading && <Loader />}
-          <View style={[styles.pictureBox, SHADOW]}>
-            {photoUrl ? (
-              <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
-            ) : (
-              <View style={styles.buttonsBox}>
-                <TouchableOpacity
-                  style={[styles.button, SHADOW]}
-                  activeOpacity={0.8}
-                  onPress={onPickImage}
-                >
-                  <MaterialIcons name="image-search" size={24} color={COLORS.accentColor} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, SHADOW]}
-                  activeOpacity={0.8}
-                  onPress={onTakePhoto}
-                >
-                  <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          <Formik
-            initialValues={{ title: '', location: '' }}
-            validationSchema={SCHEMAS.publicationSchema}
-            onSubmit={(values, { resetForm }) => {
-              sendPhoto(values).catch(handleError);
-              resetForm();
-              setPhotoUrl('');
-            }}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              setFieldTouched,
-              handleSubmit,
-              isValid,
-              dirty,
-              resetForm,
-            }) => (
-              <View style={{ flex: 1 }}>
-                <View style={{ flex: 1, minHeight: 300 }}>
-                  <TextInput
-                    value={values.title}
-                    onChangeText={handleChange('title')}
-                    onBlur={() => {
-                      setFieldTouched('title');
-                    }}
-                    placeholder="Write your post title"
-                    placeholderTextColor={COLORS.textSecondaryColor}
-                    style={{ ...styles.input, fontWeight: '500' }}
-                    underlineColorAndroid={'transparent'}
-                  />
-                  {errors.title && touched.title && (
-                    <Text style={styles.errorText}>{errors.title}</Text>
-                  )}
-                  <TouchableOpacity
-                    onPress={handleSubmit}
-                    activeOpacity={0.8}
-                    disabled={!(isValid && dirty && photoUrl)}
-                    style={[
-                      !(isValid && dirty && photoUrl)
-                        ? styles.submitBtn
-                        : {
-                            ...styles.submitBtn,
-                            backgroundColor: COLORS.accentColor,
-                          },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        !(isValid && dirty)
-                          ? styles.buttonText
-                          : {
-                              ...styles.buttonText,
-                              color: COLORS.bgColor,
-                            },
-                      ]}
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <>
+              <View style={[styles.pictureBox, SHADOW]}>
+                {photoUrl ? (
+                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
+                ) : (
+                  <View style={styles.buttonsBox}>
+                    <TouchableOpacity
+                      style={[styles.button, SHADOW]}
+                      activeOpacity={0.8}
+                      onPress={onPickImage}
                     >
-                      Publish
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                      <MaterialIcons name="image-search" size={24} color={COLORS.accentColor} />
+                    </TouchableOpacity>
 
-                <View
-                  style={{
-                    alignContent: 'center',
-                    borderColor: 'blue',
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={() => {
-                      setPhotoUrl('');
-                      resetForm();
-                    }}
-                    opacity={0.8}
-                    style={[styles.trashBtnBox, SHADOW]}
-                  >
-                    <Feather name="trash-2" size={24} color={COLORS.textSecondaryColor} />
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity
+                      style={[styles.button, SHADOW]}
+                      activeOpacity={0.8}
+                      onPress={onTakePhoto}
+                    >
+                      <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
-            )}
-          </Formik>
+              <Formik
+                initialValues={{ title: '', location: '' }}
+                validationSchema={SCHEMAS.publicationSchema}
+                onSubmit={(values, { resetForm }) => {
+                  sendPhoto(values).catch(handleError);
+                  resetForm();
+                  setPhotoUrl('');
+                }}
+              >
+                {({
+                  values,
+                  errors,
+                  touched,
+                  handleChange,
+                  setFieldTouched,
+                  handleSubmit,
+                  isValid,
+                  dirty,
+                  resetForm,
+                }) => (
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, minHeight: 300 }}>
+                      <TextInput
+                        value={values.title}
+                        onChangeText={handleChange('title')}
+                        onBlur={() => {
+                          setFieldTouched('title');
+                        }}
+                        placeholder="Write your post title"
+                        placeholderTextColor={COLORS.textSecondaryColor}
+                        style={{ ...styles.input, fontWeight: '500' }}
+                        underlineColorAndroid={'transparent'}
+                      />
+                      {errors.title && touched.title && (
+                        <Text style={styles.errorText}>{errors.title}</Text>
+                      )}
+                      <TouchableOpacity
+                        onPress={handleSubmit}
+                        activeOpacity={0.8}
+                        disabled={!(isValid && dirty && photoUrl)}
+                        style={[
+                          !(isValid && dirty && photoUrl)
+                            ? styles.submitBtn
+                            : {
+                                ...styles.submitBtn,
+                                backgroundColor: COLORS.accentColor,
+                              },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            !(isValid && dirty)
+                              ? styles.buttonText
+                              : {
+                                  ...styles.buttonText,
+                                  color: COLORS.bgColor,
+                                },
+                          ]}
+                        >
+                          Publish
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <View
+                      style={{
+                        alignContent: 'center',
+                        borderColor: 'blue',
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          setPhotoUrl('');
+                          resetForm();
+                        }}
+                        opacity={0.8}
+                        style={[styles.trashBtnBox, SHADOW]}
+                      >
+                        <Feather name="trash-2" size={24} color={COLORS.textSecondaryColor} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </Formik>
+            </>
+          )}
         </View>
       </KeyboardAwareScrollView>
     </TouchableWithoutFeedback>
