@@ -34,32 +34,38 @@ export default function PostsScreen({ navigation }) {
   } else {
     return (
       <View style={styles.container}>
-        {posts.length > 0 ? (
-          <View style={styles.publications}>
-            <FlatList
-              data={posts}
-              renderItem={memoizedRenderItem}
-              keyExtractor={item => item.id}
-              refreshControl={
-                <RefreshControl
-                  refreshing={refreshing}
-                  onRefresh={onRefresh}
-                  colors={[COLORS.accentColor]}
-                  tintColor={COLORS.accentColor}
-                  title={'Refreshing...'}
-                />
-              }
-            />
-          </View>
-        ) : (
-          <View style={styles.publications}>
-            <Text
-              style={{ ...styles.title, textAlign: 'center', color: COLORS.textSecondaryColor }}
-            >
-              No publications here yet...
-            </Text>
-          </View>
-        )}
+        <View style={styles.publications}>
+          <FlatList
+            data={posts}
+            renderItem={memoizedRenderItem}
+            keyExtractor={item => item.id}
+            ItemSeparatorComponent={({ highlighted }) => (
+              <View style={[styles.separator, highlighted && { marginLeft: 0 }]} />
+            )}
+            ListEmptyComponent={
+              <View style={styles.publications}>
+                <Text
+                  style={{
+                    ...styles.title,
+                    textAlign: 'center',
+                    color: COLORS.textSecondaryColor,
+                  }}
+                >
+                  No publications here yet...
+                </Text>
+              </View>
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[COLORS.accentColor]}
+                tintColor={COLORS.accentColor}
+                title={'Refreshing...'}
+              />
+            }
+          />
+        </View>
       </View>
     );
   }
@@ -83,5 +89,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 19,
     color: COLORS.textPrimaryColor,
+  },
+  separator: {
+    width: '100%',
+    height: 24,
   },
 });

@@ -102,7 +102,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
 
 const styles = StyleSheet.create({
   publication: {
-    marginBottom: 32,
+    marginBottom: 8,
   },
   userDataBox: {
     flexDirection: 'row',
