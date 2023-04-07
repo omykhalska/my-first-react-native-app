@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -12,13 +13,9 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Formik } from 'formik';
-import { useEffect, useState } from 'react';
 import * as Location from 'expo-location';
-import uuid from 'react-native-uuid';
-import { storage, db } from '../../firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useSelector } from 'react-redux';
+import { uploadPostToServer } from '../../firebase';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
 import { Loader } from '../../components/Loader';
@@ -98,46 +95,24 @@ export default function CreatePostsScreen({ navigation }) {
     }
   };
 
-  const uploadPhotoToServer = async () => {
+  const sendPhoto = async ({ title }) => {
     try {
-      const id = uuid.v4();
-      const response = await fetch(photoUrl);
-      const file = await response.blob();
-      const storageRef = ref(storage, `postsImg/${id}`);
-
-      await uploadBytes(storageRef, file);
-      return await getDownloadURL(storageRef);
-    } catch (e) {
-      handleError(e);
-    }
-  };
-
-  const uploadPostToServer = async values => {
-    try {
-      setIsLoading(true);
-      const snapshot = await uploadPhotoToServer();
-
-      await addDoc(collection(db, 'posts'), {
-        photo: snapshot,
-        title: values.title,
+      const data = {
+        title,
         location,
         address,
         userId,
-        createdAt: serverTimestamp(),
-        comments: 0,
-        likes: [],
-      });
+      };
+      setIsLoading(true);
+      await uploadPostToServer({ data, photoUrl, photoDir: 'postsImg' });
     } catch (e) {
       handleError(e);
     } finally {
       setIsLoading(false);
+      navigation.navigate('Home');
     }
   };
 
-  const sendPhoto = async values => {
-    await uploadPostToServer(values);
-    navigation.navigate('Home');
-  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAwareScrollView

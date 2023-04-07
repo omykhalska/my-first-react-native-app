@@ -16,7 +16,7 @@ import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
-import { uploadAvatarToServer } from '../../firebase';
+import { uploadPhotoToServer } from '../../firebase';
 import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
@@ -51,7 +51,7 @@ export default function RegistrationScreen({ navigation }) {
 
   const handleRegisterClick = async values => {
     setIsLoading(true);
-    const avatarUrl = await uploadAvatarToServer(imageUri);
+    const avatarUrl = await uploadPhotoToServer({ photoUrl: imageUri, photoDir: 'avatars' });
     const data = { ...values, avatar: avatarUrl };
     dispatch(authRegisterUser(data));
     setIsLoading(false);

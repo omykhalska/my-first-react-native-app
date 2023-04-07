@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   addDoc,
   arrayRemove,
@@ -40,9 +40,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 
-export const app = initializeApp(firebaseConfig);
-// let app;
-// getApps().length === 0 ? (app = initializeApp(firebaseConfig)) : (app = getApp());
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
 
@@ -214,14 +212,33 @@ export const removeLike = async (postId, userId) => {
   }
 };
 
-export const uploadAvatarToServer = async image => {
+export const uploadPhotoToServer = async ({ photoUrl, photoDir }) => {
   try {
     const id = uuid.v4();
-    const response = await fetch(image);
+    const url = `${photoDir}/${id}`;
+
+    const response = await fetch(photoUrl);
     const file = await response.blob();
-    const storageRef = ref(storage, `avatars/${id}`);
+    const storageRef = ref(storage, url);
+
     await uploadBytes(storageRef, file);
     return await getDownloadURL(storageRef);
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const uploadPostToServer = async ({ data, photoUrl, photoDir }) => {
+  try {
+    const snapshot = await uploadPhotoToServer({ photoUrl, photoDir });
+
+    await addDoc(collection(db, 'posts'), {
+      ...data,
+      photo: snapshot,
+      createdAt: serverTimestamp(),
+      comments: 0,
+      likes: [],
+    });
   } catch (e) {
     handleError(e);
   }

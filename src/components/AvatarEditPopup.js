@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeAvatar, uploadAvatarToServer } from '../firebase';
+import { removeAvatar, uploadPhotoToServer } from '../firebase';
 import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
@@ -58,7 +58,7 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
       const photo = await imagePickerFn(imgOptions);
       if (photo) {
         setIsLoadingPhoto(true);
-        const avatarUrl = await uploadAvatarToServer(photo);
+        const avatarUrl = await uploadPhotoToServer({ photoUrl: photo, photoDir: 'avatars' });
         userAvatar && (await removeAvatar(userAvatar));
         dispatch(authUpdateUserPhoto(avatarUrl));
       }
