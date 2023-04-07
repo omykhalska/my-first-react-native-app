@@ -13,6 +13,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  deleteDoc,
   where,
 } from 'firebase/firestore';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
@@ -41,6 +42,7 @@ const firebaseConfig = {
 // Initialize Firebase
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// const app = initializeApp(firebaseConfig);
 
 export const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
 
@@ -245,9 +247,17 @@ export const uploadPostToServer = async ({ data, photoUrl, photoDir }) => {
 };
 
 export const removeAvatar = async userAvatar => {
-  const avatarRef = ref(storage, userAvatar);
   try {
-    await deleteObject(avatarRef);
+    await deleteObject(ref(storage, userAvatar));
+  } catch (e) {
+    handleError(e);
+  }
+};
+
+export const deletePost = async ({ photo, id }) => {
+  try {
+    await deleteObject(ref(storage, photo));
+    await deleteDoc(doc(db, 'posts', id));
   } catch (e) {
     handleError(e);
   }

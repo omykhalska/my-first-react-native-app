@@ -28,7 +28,7 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
 
   const onDeletePhoto = () => {
     onPress();
-    Alert.alert('Delete profile picture', 'Do you confirm the deletion ?', [
+    Alert.alert('Delete your profile picture', 'Do you confirm the deletion ?', [
       {
         text: 'Cancel',
         onPress: () => {},

@@ -1,9 +1,9 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import { getUserId } from '../redux/auth/authSelectors';
-import { setLike, removeLike } from '../firebase';
+import { setLike, removeLike, deletePost } from '../firebase';
 import { COLORS, IMAGES } from '../constants';
 
 export const Post = ({ item, navigation, screen = 'Post' }) => {
@@ -23,19 +23,47 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
     }
   };
 
+  const onDeletePost = async () => {
+    Alert.alert('Delete this post', 'Do you confirm the deletion ?', [
+      {
+        text: 'Cancel',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          await deletePost(item);
+        },
+      },
+    ]);
+  };
+
   return (
     <View style={styles.publication}>
       {screen === 'Post' ? (
-        <View style={styles.userDataBox}>
-          <Image
-            source={item.userAvatar ? { uri: item.userAvatar } : IMAGES.user}
-            style={styles.userAvatar}
-          />
-          <Text style={styles.userName}>{item.userName}</Text>
-        </View>
-      ) : null}
-      <Image source={{ uri: item.photo }} style={styles.picture} />
-      <Text style={styles.title}>{item.title}</Text>
+        <>
+          <View style={styles.userDataBox}>
+            <Image
+              source={item.userAvatar ? { uri: item.userAvatar } : IMAGES.user}
+              style={styles.userAvatar}
+            />
+            <Text style={styles.userName}>{item.userName}</Text>
+          </View>
+          <Image source={{ uri: item.photo }} style={styles.picture} />
+          <Text style={{ ...styles.title, marginTop: 8 }}>{item.title}</Text>
+        </>
+      ) : (
+        <>
+          <View style={[styles.centered, styles.titleBox]}>
+            <Text style={styles.title}>{item.title}</Text>
+            <TouchableOpacity onPress={onDeletePost}>
+              <Feather name="delete" size={24} color={COLORS.textPrimaryColor} />
+            </TouchableOpacity>
+          </View>
+          <Image source={{ uri: item.photo }} style={styles.picture} />
+        </>
+      )}
       <View style={styles.extraData}>
         <View style={styles.centered}>
           <TouchableOpacity style={styles.centered} onPress={toggleLike}>
@@ -101,8 +129,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },
+  titleBox: {
+    flex: 1,
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   title: {
-    marginTop: 8,
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 19,

@@ -105,11 +105,11 @@ export default function CreatePostsScreen({ navigation }) {
       };
       setIsLoading(true);
       await uploadPostToServer({ data, photoUrl, photoDir: 'postsImg' });
+      navigation.navigate('Home');
     } catch (e) {
       handleError(e);
     } finally {
       setIsLoading(false);
-      navigation.navigate('Home');
     }
   };
 
