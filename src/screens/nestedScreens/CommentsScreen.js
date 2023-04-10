@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
+  Dimensions,
   FlatList,
   Image,
   KeyboardAvoidingView,
@@ -18,6 +19,8 @@ import { Comment } from '../../components/Comment';
 import { Loader } from '../../components/Loader';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, SHADOW } from '../../constants';
+
+const imgHeight = Math.round(((Dimensions.get('window').width - 32) / 1.4) * 0.75);
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
@@ -97,9 +100,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgColor,
   },
   picture: {
-    width: '100%',
-    height: 240,
-    resizeMode: 'cover',
+    width: '85%',
+    height: imgHeight,
+    resizeMode: 'center',
+    alignSelf: 'center',
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },
