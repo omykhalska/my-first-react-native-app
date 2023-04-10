@@ -1,10 +1,12 @@
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { getUserId } from '../redux/auth/authSelectors';
 import { setLike, removeLike, deletePost } from '../firebase';
 import { COLORS, IMAGES } from '../constants';
+
+const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
 
 export const Post = ({ item, navigation, screen = 'Post' }) => {
   const [isLiked, setIsLiked] = useState(null);
@@ -124,8 +126,8 @@ const styles = StyleSheet.create({
   },
   picture: {
     width: '100%',
-    height: 240,
-    resizeMode: 'cover',
+    height: imgHeight,
+    resizeMode: 'center',
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },
