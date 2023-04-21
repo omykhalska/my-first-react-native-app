@@ -18,7 +18,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.oksanaL.PicTrendy"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,7 +29,8 @@
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "android.permission.RECORD_AUDIO"
-      ]
+      ],
+      "package": "com.oksanaL.PicTrendy"
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
