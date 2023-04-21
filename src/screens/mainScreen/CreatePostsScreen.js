@@ -25,8 +25,11 @@ import { COLORS, SHADOW, SCHEMAS } from '../../constants';
 const imgOptions = {
   quality: 1,
   allowsEditing: true,
-  aspect: [Dimensions.get('window').width, 240],
+  // aspect: [4, 3],
+  aspect: [Dimensions.get('window').width, 0.75 * Dimensions.get('window').width],
 };
+
+const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
 
 export default function CreatePostsScreen({ navigation }) {
   const [photoUrl, setPhotoUrl] = useState('');
@@ -127,7 +130,7 @@ export default function CreatePostsScreen({ navigation }) {
             <>
               <View style={[styles.pictureBox, SHADOW]}>
                 {photoUrl ? (
-                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: 240 }} />
+                  <Image source={{ uri: photoUrl }} style={{ width: '100%', height: '100%' }} />
                 ) : (
                   <View style={styles.buttonsBox}>
                     <TouchableOpacity
@@ -250,7 +253,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgColor,
   },
   pictureBox: {
-    height: 240,
+    height: imgHeight,
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
     overflow: 'hidden',

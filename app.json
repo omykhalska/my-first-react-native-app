@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "myFirstApp",
-    "slug": "myFirstApp",
+    "name": "PicTrendy",
+    "slug": "PicTrendy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
@@ -25,7 +25,10 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
@@ -37,6 +40,12 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cd2e4566-4e6f-4913-938f-a40f9093723b"
+      }
+    },
+    "owner": "oksanal"
   }
 }
