@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  Alert,
   Dimensions,
   Image,
   Keyboard,
@@ -19,14 +20,19 @@ import { uploadPostToServer } from '../../firebase';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
 import { Loader } from '../../components/Loader';
-import { permissionFunction, pickImage, takePhoto } from '../../helpers/handleImagePicker';
+import {
+  permissionCameraFunction,
+  permissionFunction,
+  pickImage,
+  takePhoto,
+} from '../../helpers/handleImagePicker';
 import { COLORS, SHADOW, SCHEMAS } from '../../constants';
 
 const imgOptions = {
   quality: 1,
   allowsEditing: true,
-  // aspect: [4, 3],
-  aspect: [Dimensions.get('window').width, 0.75 * Dimensions.get('window').width],
+  aspect: [4, 3],
+  // aspect: [Dimensions.get('window').width, 0.75 * Dimensions.get('window').width],
 };
 
 const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
@@ -35,7 +41,6 @@ export default function CreatePostsScreen({ navigation }) {
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
-  const [errorMsg, setErrorMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const userId = useSelector(getUserId);
@@ -44,7 +49,10 @@ export default function CreatePostsScreen({ navigation }) {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
+        Alert.alert(
+          'Location permission',
+          'Permission to access location was denied. You can grant permission in the phone settings.',
+        );
       }
     })();
   }, []);
@@ -53,9 +61,9 @@ export default function CreatePostsScreen({ navigation }) {
     permissionFunction();
   }, []);
 
-  if (errorMsg) {
-    return <Text>{errorMsg}</Text>;
-  }
+  useEffect(() => {
+    permissionCameraFunction();
+  }, []);
 
   const getAddress = async coords => {
     try {

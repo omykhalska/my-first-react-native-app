@@ -15,7 +15,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.oksanaL.PicTrendy"
+      "bundleIdentifier": "com.oksanaL.PicTrendy",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to take pictures for your posts and picture profile.",
+        "NSLocationWhenInUseUsageDescription": "This app uses the location permission to determine where the photo was taken for your post."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +28,11 @@
       },
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ],
       "package": "com.oksanaL.PicTrendy"
     },
@@ -35,7 +43,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "PicTrendy accesses your photos to let you share them with your friends.",
+          "savePhotosPermission": "Allow PicTrendy to save photos."
         }
       ]
     ],

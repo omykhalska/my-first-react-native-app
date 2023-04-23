@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   picture: {
     width: '100%',
     height: imgHeight,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
   },

@@ -4,6 +4,7 @@ import {
   FlatList,
   Image,
   KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -66,15 +67,15 @@ export default function CommentsScreen({ route }) {
           <Text style={styles.notification}>Sending your comment...</Text>
         ) : (
           <>
-            <KeyboardAvoidingView>
+            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
               <TextInput
                 style={[styles.textArea, SHADOW]}
                 placeholder="Write your comment"
                 placeholderTextColor={COLORS.textSecondaryColor}
                 onChangeText={setCommentText}
                 value={commentText}
-                returnKeyType="done"
-                returnKeyLabel="done"
+                returnKeyType="send"
+                returnKeyLabel="send"
               />
             </KeyboardAvoidingView>
             {commentText ? (
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   picture: {
     width: '85%',
     height: imgHeight,
-    resizeMode: 'center',
+    resizeMode: 'cover',
     alignSelf: 'center',
     backgroundColor: COLORS.skeletonColor,
     borderRadius: 8,
