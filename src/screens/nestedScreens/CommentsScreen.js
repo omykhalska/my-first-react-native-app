@@ -6,12 +6,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useSelector } from 'react-redux';
 import { AntDesign } from '@expo/vector-icons';
 import { getUserId } from '../../redux/auth/authSelectors';
@@ -29,6 +31,9 @@ export default function CommentsScreen({ route }) {
   const [commentIsUploading, setCommentIsUploading] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState(null);
+  const [height, setHeight] = useState(0);
+
+  const headerHeight = useHeaderHeight();
 
   const isKeyboardVisible = useKeyboard();
 
@@ -62,29 +67,35 @@ export default function CommentsScreen({ route }) {
         {!comments && <Loader />}
         <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
       </View>
-      <View style={{ height: 96, marginBottom: isKeyboardVisible ? 8 : 0 }}>
+      <View style={{ minHeight: 96, marginBottom: isKeyboardVisible ? 8 : 0 }}>
         {commentIsUploading ? (
           <Text style={styles.notification}>Sending your comment...</Text>
         ) : (
           <>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
+            <KeyboardAvoidingView
+              keyboardVerticalOffset={headerHeight + StatusBar.currentHeight}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              style={{ flex: 1 }}
+            >
               <TextInput
-                style={[styles.textArea, SHADOW]}
+                style={[styles.textArea, SHADOW, { height: Math.max(52, height) }]}
                 placeholder="Write your comment"
                 placeholderTextColor={COLORS.textSecondaryColor}
                 onChangeText={setCommentText}
+                onContentSizeChange={event => setHeight(event.nativeEvent.contentSize.height)}
                 value={commentText}
+                multiline
                 returnKeyType="send"
                 returnKeyLabel="send"
               />
             </KeyboardAvoidingView>
-            {commentText ? (
+            {commentText && (
               <View style={[styles.submitBtn, SHADOW]}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
                   <AntDesign name="arrowup" size={24} color={COLORS.bgColor} />
                 </TouchableOpacity>
               </View>
-            ) : null}
+            )}
           </>
         )}
       </View>
@@ -114,7 +125,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     marginTop: 30,
-    height: 52,
+    maxHeight: 76,
     padding: 16,
     paddingRight: 54,
     backgroundColor: COLORS.bgInputColor,
