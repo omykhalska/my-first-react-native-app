@@ -153,9 +153,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  messageIcon: {
-    transform: [{ rotateY: '180deg' }],
-  },
   commentsCount: {
     marginLeft: 6,
     fontWeight: '500',
