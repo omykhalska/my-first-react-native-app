@@ -77,7 +77,7 @@ export default function HomeScreen() {
       <HomeTabs.Screen
         name="Create"
         component={mainScreen.CreatePostsScreen}
-        options={({ navigation }) => ({
+        options={({ navigation, route }) => ({
           ...tabScreenOptions,
           tabBarStyle: {
             display: 'none',
@@ -96,7 +96,14 @@ export default function HomeScreen() {
             paddingLeft: 10,
           },
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.dispatch(CommonActions.goBack())}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.setParams({
+                  image: route.params.image === '',
+                });
+                navigation.dispatch(CommonActions.goBack());
+              }}
+            >
               <Feather name="arrow-left" size={24} color={COLORS.textPrimaryColor} />
             </TouchableOpacity>
           ),

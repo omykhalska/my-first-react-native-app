@@ -35,6 +35,11 @@ const MainNavigation = () => {
         options={{ title: 'Comments' }}
       />
       <Stack.Screen name="Map" component={nestedScreens.MapScreen} options={{ title: 'Map' }} />
+      <Stack.Screen
+        name="Camera"
+        component={nestedScreens.CameraScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };

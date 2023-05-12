@@ -20,28 +20,26 @@ import { uploadPostToServer } from '../../firebase';
 import { getUserId } from '../../redux/auth/authSelectors';
 import { handleError } from '../../helpers/handleError';
 import { Loader } from '../../components/Loader';
-import {
-  permissionCameraFunction,
-  permissionFunction,
-  pickImage,
-  takePhoto,
-} from '../../helpers/handleImagePicker';
+import { pickImage } from '../../helpers/handleImagePicker';
 import { COLORS, SHADOW, SCHEMAS } from '../../constants';
+import { useMediaLibraryPermissions } from 'expo-image-picker';
 
 const imgOptions = {
   quality: 1,
   allowsEditing: true,
   aspect: [4, 3],
-  // aspect: [Dimensions.get('window').width, 0.75 * Dimensions.get('window').width],
 };
 
 const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
 
-export default function CreatePostsScreen({ navigation }) {
+export default function CreatePostsScreen({ navigation, route }) {
+  const photo = route?.params?.image || '';
+
   const [photoUrl, setPhotoUrl] = useState('');
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [status, requestPermission] = useMediaLibraryPermissions();
 
   const userId = useSelector(getUserId);
 
@@ -58,12 +56,22 @@ export default function CreatePostsScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    permissionFunction();
-  }, []);
+    onTakenPhoto();
+  }, [photo]);
 
-  useEffect(() => {
-    permissionCameraFunction();
-  }, []);
+  const onTakenPhoto = async () => {
+    try {
+      setPhotoUrl(photo);
+
+      if (photo !== '') {
+        const { coords } = await Location.getCurrentPositionAsync();
+        setLocation(coords);
+        await getAddress(coords);
+      }
+    } catch (e) {
+      handleError(e);
+    }
+  };
 
   const getAddress = async coords => {
     try {
@@ -82,25 +90,16 @@ export default function CreatePostsScreen({ navigation }) {
     }
   };
 
-  const onTakePhoto = async () => {
-    try {
-      const photo = await takePhoto(imgOptions);
-      setPhotoUrl(photo);
-
-      const { coords } = await Location.getCurrentPositionAsync();
-      setLocation(coords);
-      await getAddress(coords);
-    } catch (e) {
-      handleError(e);
-    }
-  };
-
   const onPickImage = async () => {
     try {
-      const image = await pickImage(imgOptions);
-      setAddress('');
-      setLocation(null);
-      setPhotoUrl(image);
+      if (!status.granted) {
+        await requestPermission();
+      } else {
+        const image = await pickImage(imgOptions);
+        setAddress('');
+        setLocation(null);
+        setPhotoUrl(image);
+      }
     } catch (e) {
       handleError(e);
     }
@@ -152,7 +151,10 @@ export default function CreatePostsScreen({ navigation }) {
                     <TouchableOpacity
                       style={[styles.button, SHADOW]}
                       activeOpacity={0.8}
-                      onPress={onTakePhoto}
+                      // onPress={onTakePhoto}
+                      onPress={() => {
+                        navigation.navigate('Camera');
+                      }}
                     >
                       <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
                     </TouchableOpacity>
