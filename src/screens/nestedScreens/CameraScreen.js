@@ -1,6 +1,7 @@
 import { Camera, CameraType } from 'expo-camera';
 import { useState } from 'react';
-import { Button, Image, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Button, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants';
 
 export default function CameraScreen({ navigation }) {
@@ -35,22 +36,34 @@ export default function CameraScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <StatusBar />
+      <StatusBar style="auto" />
       {image ? (
         <>
           <View style={styles.cameraContainer}>
             <Image source={{ uri: image }} style={styles.fixedRatio} />
           </View>
-          <Button title="Cancel" onPress={() => setImage(null)}></Button>
-          <Button title="Send" onPress={() => navigation.navigate('Create', { image })} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={() => setImage(null)}>
+              <MaterialIcons name="clear" size={48} color={COLORS.bgColor} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Create', { image })}>
+              <MaterialIcons name="check" size={48} color={COLORS.bgColor} />
+            </TouchableOpacity>
+          </View>
         </>
       ) : (
         <>
           <View style={styles.cameraContainer}>
             <Camera ref={ref => setCamera(ref)} style={styles.fixedRatio} type={type} />
           </View>
-          <Button title="Flip Image" onPress={toggleCameraType}></Button>
-          <Button title="Take Picture" onPress={takePicture} />
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={toggleCameraType}>
+              <MaterialIcons name="flip-camera-android" size={48} color={COLORS.bgColor} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={takePicture}>
+              <MaterialIcons name="camera" size={48} color={COLORS.bgColor} />
+            </TouchableOpacity>
+          </View>
         </>
       )}
     </View>
@@ -74,26 +87,12 @@ const styles = StyleSheet.create({
   fixedRatio: {
     flex: 1,
     aspectRatio: 3 / 4,
+    alignSelf: 'center',
   },
-  // btnBox: {
-  //   width: '100%',
-  //   minHeight: 150,
-  //   backgroundColor: 'red',
-  // },
-  // buttonContainer: {
-  //   flex: 1,
-  //   flexDirection: 'row',
-  //   backgroundColor: 'transparent',
-  //   margin: 64,
-  // },
-  // button: {
-  //   flex: 1,
-  //   alignSelf: 'flex-end',
-  //   alignItems: 'center',
-  // },
-  // text: {
-  //   fontSize: 24,
-  //   fontWeight: 'bold',
-  //   color: COLORS.bgColor,
-  // },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    minHeight: 150,
+  },
 });
