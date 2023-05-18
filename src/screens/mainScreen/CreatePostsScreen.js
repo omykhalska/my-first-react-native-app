@@ -39,6 +39,7 @@ export default function CreatePostsScreen({ navigation, route }) {
   const [location, setLocation] = useState(null);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
   const [status, requestPermission] = useMediaLibraryPermissions();
 
   const userId = useSelector(getUserId);
@@ -151,9 +152,8 @@ export default function CreatePostsScreen({ navigation, route }) {
                     <TouchableOpacity
                       style={[styles.button, SHADOW]}
                       activeOpacity={0.8}
-                      // onPress={onTakePhoto}
                       onPress={() => {
-                        navigation.navigate('Camera');
+                        navigation.navigate('Camera', { previous_screen: 'Create' });
                       }}
                     >
                       <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />

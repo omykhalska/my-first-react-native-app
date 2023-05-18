@@ -13,22 +13,34 @@ import {
   Dimensions,
 } from 'react-native';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getUserAvatar, getUserId, getUserName } from '../../redux/auth/authSelectors';
 import { Loader } from '../../components/Loader';
 import { AvatarEditPopup } from '../../components/AvatarEditPopup';
 import { Post } from '../../components/Post';
-import { getUserPosts } from '../../firebase';
+import { getUserPosts, removeAvatar, uploadPhotoToServer } from '../../firebase';
 import { COLORS, IMAGES, SHADOW } from '../../constants';
+import { authUpdateUserPhoto } from '../../redux/auth/authOperations';
+import { handleError } from '../../helpers/handleError';
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen({ navigation, route }) {
   const userName = useSelector(getUserName);
   const userId = useSelector(getUserId);
   const userAvatar = useSelector(getUserAvatar);
 
+  const dispatch = useDispatch();
+
+  const photo = route?.params?.image || null;
+
   const [posts, setPosts] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
+
+  useEffect(() => {
+    if (photo) {
+      changePhoto();
+    }
+  }, [route?.params?.image]);
 
   useEffect(() => {
     setIsLoadingPhoto(false);
@@ -39,6 +51,19 @@ export default function ProfileScreen({ navigation }) {
   }, []);
 
   const togglePopup = () => setIsVisible(!isVisible);
+
+  const changePhoto = async () => {
+    try {
+      setIsLoadingPhoto(true);
+      const avatarUrl = await uploadPhotoToServer({ photoUrl: photo, photoDir: 'avatars' });
+      userAvatar && (await removeAvatar(userAvatar));
+      dispatch(authUpdateUserPhoto(avatarUrl));
+      navigation.setParams({ image: '' });
+    } catch (e) {
+      setIsLoadingPhoto(false);
+      handleError(e);
+    }
+  };
 
   const renderItem = item => (
     <Post key={item.id} item={item} navigation={navigation} screen={ProfileScreen} />
@@ -56,6 +81,7 @@ export default function ProfileScreen({ navigation }) {
           visible={isVisible}
           onPress={togglePopup}
           setIsLoadingPhoto={setIsLoadingPhoto}
+          navigation={navigation}
         />
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <View style={styles.contentBox}>

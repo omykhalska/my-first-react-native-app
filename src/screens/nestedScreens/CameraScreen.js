@@ -4,7 +4,9 @@ import { Button, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } fr
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants';
 
-export default function CameraScreen({ navigation }) {
+export default function CameraScreen({ navigation, route }) {
+  const { previous_screen } = route.params;
+
   const [camera, setCamera] = useState(null);
   const [permission, requestPermission] = Camera.useCameraPermissions(null);
   const [image, setImage] = useState(null);
@@ -46,7 +48,7 @@ export default function CameraScreen({ navigation }) {
             <TouchableOpacity onPress={() => setImage(null)}>
               <MaterialIcons name="clear" size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Create', { image })}>
+            <TouchableOpacity onPress={() => navigation.navigate(previous_screen, { image })}>
               <MaterialIcons name="check" size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
           </View>

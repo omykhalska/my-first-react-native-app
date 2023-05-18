@@ -13,7 +13,7 @@ import { removeAvatar, uploadPhotoToServer } from '../firebase';
 import { getUserAvatar } from '../redux/auth/authSelectors';
 import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
-import { pickImage, takePhoto } from '../helpers/handleImagePicker';
+import { pickImage } from '../helpers/handleImagePicker';
 import { COLORS } from '../constants';
 
 const imgOptions = {
@@ -22,7 +22,7 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
+export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto, navigation }) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
 
@@ -45,7 +45,7 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto }) => {
   };
 
   const onTakePhoto = async () => {
-    await changePhoto(takePhoto);
+    navigation.navigate('Camera', { previous_screen: 'Profile' });
   };
 
   const onPickPhoto = async () => {
