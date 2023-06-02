@@ -13,13 +13,15 @@ import {
 } from 'react-native';
 import { Formik } from 'formik';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
 import { uploadPhotoToServer } from '../../firebase';
-import { permissionFunction, pickImage } from '../../helpers/handleImagePicker';
+import { pickImage } from '../../helpers/handleImagePicker';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
+import { useMediaLibraryPermissions } from 'expo-image-picker';
+import { handleError } from '../../helpers/handleError';
 
 const imgOptions = {
   quality: 1,
@@ -28,6 +30,7 @@ const imgOptions = {
 };
 
 export default function RegistrationScreen({ navigation }) {
+  const [status, requestPermission] = useMediaLibraryPermissions();
   const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
@@ -40,13 +43,17 @@ export default function RegistrationScreen({ navigation }) {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    permissionFunction();
-  }, []);
-
   const pickAvatar = async () => {
-    const photo = await pickImage(imgOptions);
-    setImageUri(photo);
+    try {
+      if (!status.granted) {
+        await requestPermission();
+      } else {
+        const photo = await pickImage(imgOptions);
+        setImageUri(photo);
+      }
+    } catch (e) {
+      handleError(e);
+    }
   };
 
   const handleRegisterClick = async values => {
