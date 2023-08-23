@@ -1,16 +1,16 @@
 import * as ImagePicker from 'expo-image-picker';
-import { handleError } from './handleError';
+import {handleError} from './handleError';
 
 export const pickImage = async (options = {}) => {
-  try {
-    let result = await ImagePicker.launchImageLibraryAsync(options);
+    try {
+        let result = await ImagePicker.launchImageLibraryAsync(options);
 
-    if (!result.cancelled) {
-      return result.uri;
+        if (!result.canceled) {
+            return result.assets[0].uri;
+        }
+    } catch (e) {
+        handleError(e);
     }
-  } catch (e) {
-    handleError(e);
-  }
 };
 
 // export const takePhoto = async options => {

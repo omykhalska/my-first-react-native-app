@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import {initializeApp, getApps, getApp} from 'firebase/app';
 import {
   addDoc,
   arrayRemove,
@@ -16,7 +16,7 @@ import {
   deleteDoc,
   where,
 } from 'firebase/firestore';
-import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
 import {
   createUserWithEmailAndPassword,
   initializeAuth,
@@ -24,9 +24,9 @@ import {
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { getReactNativePersistence } from 'firebase/auth/react-native';
+import {getReactNativePersistence} from 'firebase/auth/react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { handleError } from './helpers/handleError';
+import {handleError} from './helpers/handleError';
 import uuid from 'react-native-uuid';
 
 const firebaseConfig = {
@@ -44,7 +44,7 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 // const app = initializeApp(firebaseConfig);
 
-export const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+export const auth = initializeAuth(app, {persistence: getReactNativePersistence(AsyncStorage)});
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
@@ -60,7 +60,7 @@ export const createNewUser = async (login, email, password, avatar) => {
     displayName: login,
     photoURL: avatar,
   });
-  const { uid, displayName, photoURL } = auth.currentUser;
+  const {uid, displayName, photoURL} = auth.currentUser;
   const update = {
     userId: uid,
     userName: displayName,
@@ -100,9 +100,9 @@ export const updateAvatar = async avatar => {
     photoURL: avatar,
   });
 
-  const { uid, displayName, photoURL, email } = auth.currentUser;
+  const {uid, displayName, photoURL, email} = auth.currentUser;
 
-  await updateUserData(uid, { userAvatar: photoURL });
+  await updateUserData(uid, {userAvatar: photoURL});
 
   return {
     userId: uid,
@@ -118,7 +118,7 @@ export const getUserData = async userId => {
     const q = await query(collection(db, 'users'), where('userId', '==', userId));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach(doc => {
-      user = { ...doc.data() };
+      user = {...doc.data()};
     });
     return user;
   } catch (e) {
@@ -132,8 +132,8 @@ export const getAllPosts = async setPosts => {
     await onSnapshot(q, async data => {
       const posts = [];
       for (const doc of data.docs) {
-        const { userName, userAvatar } = await getUserData(doc.data().userId);
-        posts.push({ ...doc.data(), id: doc.id, userName, userAvatar });
+        const {userName, userAvatar} = await getUserData(doc.data().userId);
+        posts.push({...doc.data(), id: doc.id, userName, userAvatar});
       }
       setPosts(posts);
     });
@@ -149,8 +149,8 @@ export const getAllComments = async (postId, setComments) => {
     await onSnapshot(colRef, async data => {
       const comments = [];
       for (const doc of data.docs) {
-        const { userAvatar } = await getUserData(doc.data().userId);
-        comments.push({ ...doc.data(), id: doc.id, userAvatar });
+        const {userAvatar} = await getUserData(doc.data().userId);
+        comments.push({...doc.data(), id: doc.id, userAvatar});
       }
       setComments(comments);
     });
@@ -160,7 +160,7 @@ export const getAllComments = async (postId, setComments) => {
 };
 
 export const createComment = async data => {
-  const { postId, commentText, userId } = data;
+  const {postId, commentText, userId} = data;
   try {
     const docRef = doc(db, 'posts', postId);
     const colRef = collection(docRef, 'comments');
@@ -169,7 +169,7 @@ export const createComment = async data => {
       userId,
       createdAt: serverTimestamp(),
     });
-    await updateDoc(docRef, { comments: increment(1) });
+    await updateDoc(docRef, {comments: increment(1)});
   } catch (e) {
     handleError(e);
   }
@@ -178,13 +178,13 @@ export const createComment = async data => {
 export const getUserPosts = async (userId, setPosts) => {
   try {
     const q = await query(
-      collection(db, 'posts'),
-      orderBy('createdAt', 'desc'),
-      where('userId', '==', userId),
+        collection(db, 'posts'),
+        orderBy('createdAt', 'desc'),
+        where('userId', '==', userId),
     );
 
     await onSnapshot(q, data => {
-      const posts = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      const posts = data.docs.map(doc => ({...doc.data(), id: doc.id}));
       setPosts(posts);
     });
   } catch (e) {
@@ -214,25 +214,39 @@ export const removeLike = async (postId, userId) => {
   }
 };
 
-export const uploadPhotoToServer = async ({ photoUrl, photoDir }) => {
+export const uploadPhotoToServer = async ({photoUrl, photoDir}) => {
   try {
     const id = uuid.v4();
     const url = `${photoDir}/${id}`;
 
-    const response = await fetch(photoUrl);
-    const file = await response.blob();
-    const storageRef = ref(storage, url);
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", photoUrl, true);
+      xhr.send(null);
+    });
 
-    await uploadBytes(storageRef, file);
+    const storageRef = ref(storage, url);
+    await uploadBytes(storageRef, blob);
+
+    blob.close();
+
     return await getDownloadURL(storageRef);
   } catch (e) {
     handleError(e);
   }
 };
 
-export const uploadPostToServer = async ({ data, photoUrl, photoDir }) => {
+export const uploadPostToServer = async ({data, photoUrl, photoDir}) => {
   try {
-    const snapshot = await uploadPhotoToServer({ photoUrl, photoDir });
+    const snapshot = await uploadPhotoToServer({photoUrl, photoDir});
 
     await addDoc(collection(db, 'posts'), {
       ...data,
@@ -254,7 +268,7 @@ export const removeAvatar = async userAvatar => {
   }
 };
 
-export const deletePost = async ({ photo, id }) => {
+export const deletePost = async ({photo, id}) => {
   try {
     await deleteObject(ref(storage, photo));
     await deleteDoc(doc(db, 'posts', id));
