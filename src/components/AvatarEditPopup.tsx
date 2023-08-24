@@ -6,6 +6,8 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +17,7 @@ import { authUpdateUserPhoto } from '../redux/auth/authOperations';
 import { handleError } from '../helpers/handleError';
 import { pickImage } from '../helpers/handleImagePicker';
 import { COLORS } from '../constants';
+import { NavigationProp } from '@react-navigation/native';
 
 const imgOptions = {
   quality: 1,
@@ -22,26 +25,42 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto, navigation }) => {
+type Props = {
+  visible: boolean;
+  onPress: () => void;
+  setIsLoadingPhoto: (arg: boolean) => void;
+  navigation: NavigationProp<any, any>;
+};
+
+export const AvatarEditPopup = ({
+  visible,
+  onPress,
+  setIsLoadingPhoto,
+  navigation,
+}: Props) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
 
   const onDeletePhoto = () => {
     onPress();
-    Alert.alert('Delete your profile picture', 'Do you confirm the deletion ?', [
-      {
-        text: 'Cancel',
-        onPress: () => {},
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        onPress: async () => {
-          await removeAvatar(userAvatar);
-          dispatch(authUpdateUserPhoto(''));
+    Alert.alert(
+      'Delete your profile picture',
+      'Do you confirm the deletion ?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: 'Delete',
+          onPress: async () => {
+            await removeAvatar(userAvatar);
+            dispatch(authUpdateUserPhoto(''));
+          },
+        },
+      ]
+    );
   };
 
   const onTakePhoto = async () => {
@@ -52,13 +71,18 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto, navigatio
     await changePhoto(pickImage);
   };
 
-  const changePhoto = async imagePickerFn => {
+  const changePhoto = async (
+    imagePickerFn: (options?: {}) => Promise<string | undefined>
+  ) => {
     try {
       onPress();
       const photo = await imagePickerFn(imgOptions);
       if (photo) {
         setIsLoadingPhoto(true);
-        const avatarUrl = await uploadPhotoToServer({ photoUrl: photo, photoDir: 'avatars' });
+        const avatarUrl = await uploadPhotoToServer({
+          photoUrl: photo,
+          photoDir: 'avatars',
+        });
         userAvatar && (await removeAvatar(userAvatar));
         dispatch(authUpdateUserPhoto(avatarUrl));
       }
@@ -69,30 +93,59 @@ export const AvatarEditPopup = ({ visible, onPress, setIsLoadingPhoto, navigatio
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible} onRequestClose={onPress}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onPress}
+    >
       <TouchableWithoutFeedback onPress={onPress}>
         <View style={styles.backdrop}>
           <View style={styles.menuView}>
             <View style={styles.titleBox}>
               <Text style={styles.title}>Profile picture</Text>
               {userAvatar && (
-                <TouchableOpacity style={{}} activeOpacity={0.8} onPress={onDeletePhoto}>
-                  <MaterialIcons name="delete" size={24} color="rgba(0,0,0,0.6)" />
+                <TouchableOpacity
+                  style={{}}
+                  activeOpacity={0.8}
+                  onPress={onDeletePhoto}
+                >
+                  <MaterialIcons
+                    name="delete"
+                    size={24}
+                    color="rgba(0,0,0,0.6)"
+                  />
                 </TouchableOpacity>
               )}
             </View>
 
             <View style={styles.buttonsBox}>
               <View style={styles.centered}>
-                <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onPickPhoto}>
-                  <MaterialIcons name="image-search" size={24} color={COLORS.accentColor} />
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={onPickPhoto}
+                >
+                  <MaterialIcons
+                    name="image-search"
+                    size={24}
+                    color={COLORS.accentColor}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>Gallery</Text>
               </View>
 
               <View style={styles.centered}>
-                <TouchableOpacity style={styles.button} activeOpacity={0.8} onPress={onTakePhoto}>
-                  <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
+                <TouchableOpacity
+                  style={styles.button}
+                  activeOpacity={0.8}
+                  onPress={onTakePhoto}
+                >
+                  <MaterialIcons
+                    name="photo-camera"
+                    size={24}
+                    color={COLORS.accentColor}
+                  />
                 </TouchableOpacity>
                 <Text style={styles.buttonText}>Camera</Text>
               </View>
