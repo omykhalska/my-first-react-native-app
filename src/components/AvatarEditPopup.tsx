@@ -25,19 +25,19 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-type Props = {
+interface IProps {
   visible: boolean;
   onPress: () => void;
   setIsLoadingPhoto: (arg: boolean) => void;
   navigation: NavigationProp<any, any>;
-};
+}
 
 export const AvatarEditPopup = ({
   visible,
   onPress,
   setIsLoadingPhoto,
   navigation,
-}: Props) => {
+}: IProps) => {
   const userAvatar = useSelector(getUserAvatar);
   const dispatch = useDispatch();
 

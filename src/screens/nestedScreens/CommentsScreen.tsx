@@ -20,8 +20,11 @@ import { Comment } from '../../components/Comment';
 import { Loader } from '../../components/Loader';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, SHADOW } from '../../constants';
+import { IComment } from '../../interfaces';
 
-const imgHeight = Math.round(((Dimensions.get('window').width - 32) / 1.4) * 0.75);
+const imgHeight = Math.round(
+  ((Dimensions.get('window').width - 32) / 1.4) * 0.75
+);
 
 export default function CommentsScreen({ route }) {
   const { postId, postImage } = route.params;
@@ -42,9 +45,9 @@ export default function CommentsScreen({ route }) {
 
   const memoizedRenderItem = useMemo(
     () =>
-      ({ item }) =>
+      ({ item }: { item: IComment }) =>
         <Comment data={item} />,
-    [comments],
+    [comments]
   );
 
   const handleSubmit = async () => {
@@ -62,7 +65,11 @@ export default function CommentsScreen({ route }) {
 
       <View style={styles.commentsArea}>
         {!comments && <Loader />}
-        <FlatList data={comments} renderItem={memoizedRenderItem} keyExtractor={item => item.id} />
+        <FlatList
+          data={comments}
+          renderItem={memoizedRenderItem}
+          keyExtractor={(item) => item.id}
+        />
       </View>
       <View
         style={{
@@ -81,11 +88,17 @@ export default function CommentsScreen({ route }) {
         ) : (
           <>
             <TextInput
-              style={[styles.textArea, SHADOW, { height: Math.max(52, inputHeight) }]}
+              style={[
+                styles.textArea,
+                SHADOW,
+                { height: Math.max(52, inputHeight) },
+              ]}
               placeholder="Write your comment"
               placeholderTextColor={COLORS.textSecondaryColor}
               onChangeText={setCommentText}
-              onContentSizeChange={event => setInputHeight(event.nativeEvent.contentSize.height)}
+              onContentSizeChange={(event) =>
+                setInputHeight(event.nativeEvent.contentSize.height)
+              }
               onSubmitEditing={Keyboard.dismiss}
               value={commentText}
               multiline

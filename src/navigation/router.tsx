@@ -3,7 +3,7 @@ import MainNavigation from './MainNavigation';
 import { Loader } from '../components/Loader';
 import { Text } from 'react-native';
 
-const useRoute = isAuth => {
+const useRoute = (isAuth: boolean) => {
   switch (isAuth) {
     case false:
       return <AuthNavigation />;

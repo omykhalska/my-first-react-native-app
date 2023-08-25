@@ -1,7 +1,14 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { COLORS } from '../constants';
+import { ReactNode } from 'react';
 
-export const Loader = ({ size = 'large', style = {}, children }) => (
+interface IProps {
+  size?: 'small' | 'large';
+  style?: {};
+  children?: ReactNode;
+}
+
+export const Loader = ({ size = 'large', style = {}, children }: IProps) => (
   <View style={styles.loadingIndicator}>
     <ActivityIndicator size={size} color={COLORS.accentColor} style={style} />
     {children}

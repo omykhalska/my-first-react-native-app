@@ -10,15 +10,21 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 import { Ionicons } from '@expo/vector-icons';
 import { useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { authLogInUser } from '../../redux/auth/authOperations';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
+import { NavigationProp } from '@react-navigation/native';
+import { UserCredentials } from '../../interfaces';
 
-export default function LoginScreen({ navigation }) {
+interface IProps {
+  navigation: NavigationProp<any, any>;
+}
+
+export default function LoginScreen({ navigation }: IProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
@@ -26,11 +32,11 @@ export default function LoginScreen({ navigation }) {
   const { isKeyboardVisible } = useKeyboard();
   const { keyboardHeight } = useKeyboard();
 
-  const passwordRef = useRef(null);
+  const passwordRef = useRef(null) as any;
 
   const dispatch = useDispatch();
 
-  const onSubmit = ({ email, password }) => {
+  const onSubmit = ({ email, password }: UserCredentials) => {
     setIsLoading(true);
     dispatch(authLogInUser(email, password));
     setIsLoading(false);
@@ -49,10 +55,12 @@ export default function LoginScreen({ navigation }) {
                 resetForm();
               }}
             >
-              {props => (
+              {(props) => (
                 <View>
                   <Text style={styles.formTitle}>Login</Text>
-                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : ''}>
+                  <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                  >
                     <TextInput
                       value={props.values.email}
                       onChangeText={props.handleChange('email')}
@@ -63,7 +71,11 @@ export default function LoginScreen({ navigation }) {
                         props.setFieldTouched('email');
                         setFocusedItem('');
                       }}
-                      onSubmitEditing={() => passwordRef.current?.focus()}
+                      onSubmitEditing={() => {
+                        if (passwordRef.current !== null) {
+                          passwordRef.current.focus();
+                        }
+                      }}
                       blurOnSubmit={false}
                       returnKeyType="next"
                       returnKeyLabel="next"
@@ -82,7 +94,11 @@ export default function LoginScreen({ navigation }) {
                       <Text style={styles.errorText}>{props.errors.email}</Text>
                     )}
 
-                    <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
+                    <View
+                      style={{
+                        marginBottom: isKeyboardVisible ? keyboardHeight : 0,
+                      }}
+                    >
                       <TextInput
                         value={props.values.password}
                         onChangeText={props.handleChange('password')}
@@ -119,13 +135,15 @@ export default function LoginScreen({ navigation }) {
                       </TouchableOpacity>
 
                       {props.errors.password && props.touched.password && (
-                        <Text style={styles.errorText}>{props.errors.password}</Text>
+                        <Text style={styles.errorText}>
+                          {props.errors.password}
+                        </Text>
                       )}
                     </View>
                   </KeyboardAvoidingView>
 
                   <TouchableOpacity
-                    onPress={props.handleSubmit}
+                    onPress={() => props.handleSubmit()}
                     activeOpacity={0.8}
                     style={{
                       ...styles.buttonContainer,
@@ -138,7 +156,10 @@ export default function LoginScreen({ navigation }) {
                 </View>
               )}
             </Formik>
-            <TouchableOpacity onPress={() => navigation.navigate('Sign up')} activeOpacity={0.8}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Sign up')}
+              activeOpacity={0.8}
+            >
               <Text
                 style={{
                   ...styles.text,

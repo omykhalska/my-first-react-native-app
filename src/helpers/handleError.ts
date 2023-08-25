@@ -1,6 +1,12 @@
 import { Alert } from 'react-native';
 
-export const handleError = e => {
-  Alert.alert('An error has occurred', e.message);
-  console.log(e.message);
+export const handleError = (error: unknown) => {
+  let message = 'Unknown Error';
+
+  if (error instanceof Error) {
+    message = error.message;
+  }
+
+  Alert.alert('An error has occurred: ', message);
+  console.log(error);
 };

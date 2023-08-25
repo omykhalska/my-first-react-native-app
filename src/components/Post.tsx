@@ -1,15 +1,31 @@
-import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { getUserId } from '../redux/auth/authSelectors';
 import { setLike, removeLike, deletePost } from '../firebase';
 import { COLORS, IMAGES } from '../constants';
+import { NavigationProp } from '@react-navigation/native';
+import { IPost } from '../interfaces';
 
 const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
 
-export const Post = ({ item, navigation, screen = 'Post' }) => {
-  const [isLiked, setIsLiked] = useState(null);
+interface IProps {
+  item: IPost;
+  navigation: NavigationProp<any, any>;
+  screen?: 'PostsScreen' | 'ProfileScreen';
+}
+
+export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
+  const [isLiked, setIsLiked] = useState<null | boolean>(null);
 
   const userId = useSelector(getUserId);
 
@@ -43,7 +59,7 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
 
   return (
     <View style={styles.publication}>
-      {screen === 'Post' ? (
+      {screen === 'PostsScreen' ? (
         <>
           <View style={styles.userDataBox}>
             <Image
@@ -60,7 +76,11 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
           <View style={[styles.centered, styles.titleBox]}>
             <Text style={styles.title}>{item.title}</Text>
             <TouchableOpacity onPress={onDeletePost}>
-              <Feather name="delete" size={24} color={COLORS.textPrimaryColor} />
+              <Feather
+                name="delete"
+                size={24}
+                color={COLORS.textPrimaryColor}
+              />
             </TouchableOpacity>
           </View>
           <Image source={{ uri: item.photo }} style={styles.picture} />
@@ -69,14 +89,21 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
       <View style={styles.extraData}>
         <View style={styles.centered}>
           <TouchableOpacity style={styles.centered} onPress={toggleLike}>
-            <AntDesign name={isLiked ? 'like1' : 'like2'} size={24} color={COLORS.accentColor} />
+            <AntDesign
+              name={isLiked ? 'like1' : 'like2'}
+              size={24}
+              color={COLORS.accentColor}
+            />
             <Text style={styles.commentsCount}>{item.likes?.length || 0}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={{ ...styles.centered, marginLeft: 24 }}
             onPress={() => {
-              navigation.navigate('Comments', { postId: item.id, postImage: item.photo });
+              navigation.navigate('Comments', {
+                postId: item.id,
+                postImage: item.photo,
+              });
             }}
           >
             <AntDesign name="message1" size={24} color={COLORS.accentColor} />
@@ -92,7 +119,11 @@ export const Post = ({ item, navigation, screen = 'Post' }) => {
                 navigation.navigate('Map', { location: item.location });
               }}
             >
-              <AntDesign name="enviromento" size={24} color={COLORS.accentColor} />
+              <AntDesign
+                name="enviromento"
+                size={24}
+                color={COLORS.accentColor}
+              />
               <Text style={styles.location}>{item.address}</Text>
             </TouchableOpacity>
           </View>

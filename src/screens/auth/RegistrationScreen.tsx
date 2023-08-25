@@ -22,6 +22,8 @@ import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
 import { useMediaLibraryPermissions } from 'expo-image-picker';
 import { handleError } from '../../helpers/handleError';
+import { NavigationProp } from '@react-navigation/native';
+import { UserCredentials } from '../../interfaces';
 
 const imgOptions = {
   quality: 1,
@@ -29,36 +31,43 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-export default function RegistrationScreen({ navigation }) {
+interface IProps {
+  navigation: NavigationProp<any, any>;
+}
+
+export default function RegistrationScreen({ navigation }: IProps) {
   const [status, requestPermission] = useMediaLibraryPermissions();
   const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState<string | null | undefined>(null);
 
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
+  const emailRef = useRef(null) as any;
+  const passwordRef = useRef(null) as any;
 
   const dispatch = useDispatch();
 
   const pickAvatar = async () => {
     try {
-      if (!status.granted) {
+      if (!status!.granted) {
         await requestPermission();
       } else {
         const photo = await pickImage(imgOptions);
-        setImageUri(photo);
+        photo && setImageUri(photo);
       }
     } catch (e) {
       handleError(e);
     }
   };
 
-  const handleRegisterClick = async values => {
+  const handleRegisterClick = async (values: UserCredentials) => {
     setIsLoading(true);
-    const avatarUrl = await uploadPhotoToServer({ photoUrl: imageUri, photoDir: 'avatars' });
+    const avatarUrl = await uploadPhotoToServer({
+      photoUrl: imageUri,
+      photoDir: 'avatars',
+    });
     const data = { ...values, avatar: avatarUrl };
     dispatch(authRegisterUser(data));
     setIsLoading(false);
@@ -73,19 +82,36 @@ export default function RegistrationScreen({ navigation }) {
       <View style={styles.container}>
         <ImageBackground source={IMAGES.bgPattern} style={styles.image}>
           <View style={styles.avatarContainer}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
             {!imageUri ? (
-              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={pickAvatar}>
-                <AntDesign name="pluscircleo" size={25} color={COLORS.accentColor} />
-              </TouchableOpacity>
+              <>
+                <View style={styles.image} />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.buttonIcon}
+                  onPress={pickAvatar}
+                >
+                  <AntDesign
+                    name="pluscircleo"
+                    size={25}
+                    color={COLORS.accentColor}
+                  />
+                </TouchableOpacity>
+              </>
             ) : (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.buttonIcon}
-                onPress={removeAvatar}
-              >
-                <AntDesign name="delete" size={25} color={COLORS.accentColor} />
-              </TouchableOpacity>
+              <>
+                <Image source={{ uri: imageUri }} style={styles.image} />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.buttonIcon}
+                  onPress={removeAvatar}
+                >
+                  <AntDesign
+                    name="delete"
+                    size={25}
+                    color={COLORS.accentColor}
+                  />
+                </TouchableOpacity>
+              </>
             )}
           </View>
           <View style={styles.regFormContainer}>
@@ -94,11 +120,17 @@ export default function RegistrationScreen({ navigation }) {
               validationSchema={SCHEMAS.registerSchema}
               onSubmit={handleRegisterClick}
             >
-              {props => (
-                <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
+              {(props) => (
+                <View
+                  style={{
+                    marginBottom: isKeyboardVisible ? keyboardHeight : 0,
+                  }}
+                >
                   <Text style={styles.formTitle}>Create Account</Text>
 
-                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+                  <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                  >
                     <View>
                       <TextInput
                         value={props.values.login}
@@ -122,7 +154,9 @@ export default function RegistrationScreen({ navigation }) {
                         underlineColorAndroid={'transparent'}
                       />
                       {props.errors.login && props.touched.login && (
-                        <Text style={styles.errorText}>{props.errors.login}</Text>
+                        <Text style={styles.errorText}>
+                          {props.errors.login}
+                        </Text>
                       )}
                     </View>
 
@@ -152,7 +186,9 @@ export default function RegistrationScreen({ navigation }) {
                         underlineColorAndroid={'transparent'}
                       />
                       {props.errors.email && props.touched.email && (
-                        <Text style={styles.errorText}>{props.errors.email}</Text>
+                        <Text style={styles.errorText}>
+                          {props.errors.email}
+                        </Text>
                       )}
                     </View>
 
@@ -191,7 +227,9 @@ export default function RegistrationScreen({ navigation }) {
                       </TouchableOpacity>
 
                       {props.errors.password && props.touched.password && (
-                        <Text style={styles.errorText}>{props.errors.password}</Text>
+                        <Text style={styles.errorText}>
+                          {props.errors.password}
+                        </Text>
                       )}
                     </View>
                   </KeyboardAvoidingView>
@@ -202,7 +240,7 @@ export default function RegistrationScreen({ navigation }) {
                       display: isKeyboardVisible ? 'none' : 'flex',
                     }}
                     activeOpacity={0.8}
-                    onPress={props.handleSubmit}
+                    onPress={() => props.handleSubmit()}
                     disabled={isLoading}
                   >
                     <Text style={styles.buttonText}>Create Account</Text>

@@ -6,10 +6,16 @@ import { useSelector } from 'react-redux';
 import { Post } from '../../components/Post';
 import { Loader } from '../../components/Loader';
 import { COLORS } from '../../constants';
+import { NavigationProp } from '@react-navigation/native';
+import { IPost } from '../../interfaces';
 
-export default function PostsScreen({ navigation }) {
+interface IProps {
+  navigation: NavigationProp<any, any>;
+}
+
+export default function PostsScreen({ navigation }: IProps) {
   const [refreshing, setRefreshing] = useState(false);
-  const [posts, setPosts] = useState(null);
+  const [posts, setPosts] = useState<null | IPost[]>(null);
   const userAvatar = useSelector(getUserAvatar);
 
   useEffect(() => {
@@ -38,9 +44,11 @@ export default function PostsScreen({ navigation }) {
           <FlatList
             data={posts}
             renderItem={memoizedRenderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={(item) => item.id}
             ItemSeparatorComponent={({ highlighted }) => (
-              <View style={[styles.separator, highlighted && { marginLeft: 0 }]} />
+              <View
+                style={[styles.separator, highlighted && { marginLeft: 0 }]}
+              />
             )}
             ListEmptyComponent={
               <View style={styles.publications}>

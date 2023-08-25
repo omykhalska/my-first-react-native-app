@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authStateChangeUser } from '../redux/auth/authOperations';
 import { getStateChange } from '../redux/auth/authSelectors';
 
-const Main = ({ onLayoutRootView }) => {
+interface IProps {
+  onLayoutRootView: () => Promise<void>;
+}
+
+const Main = ({ onLayoutRootView }: IProps) => {
   const stateChange = useSelector(getStateChange);
 
   const dispatch = useDispatch();

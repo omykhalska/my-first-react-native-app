@@ -9,55 +9,54 @@ import { COLORS } from '../../constants';
 
 const HomeTabs = createBottomTabNavigator();
 
-const tabNavOptions = {
-  tabBarActiveTintColor: COLORS.bgColor,
-  tabBarActiveBackgroundColor: COLORS.accentColor,
-  tabBarInactiveTintColor: COLORS.textPrimaryColor,
-  tabBarInactiveBackgroundColor: COLORS.bgColor,
-  tabBarItemStyle: {
-    marginTop: 8,
-    height: 40,
-    maxWidth: 70,
-    marginHorizontal: 10,
-    borderRadius: 20,
-  },
-  tabBarStyle: {
-    height: 62,
-    alignItems: 'center',
-  },
-  tabBarShowLabel: false,
-  headerTitleAlign: 'center',
-};
-
-const tabScreenOptions = {
-  headerStyle: {
-    backgroundColor: COLORS.bgColor,
-    shadowColor: COLORS.shadowColor,
-    shadowOffset: { width: 0, height: 0.5 },
-    shadowRadius: 27.18,
-  },
-  headerTitleStyle: {
-    fontWeight: '500',
-    fontSize: 17,
-    lineHeight: 22,
-    letterSpacing: -0.408,
-    color: COLORS.textPrimaryColor,
-  },
-};
-
 export default function HomeScreen() {
   const dispatch = useDispatch();
 
   return (
-    <HomeTabs.Navigator screenOptions={tabNavOptions} initialRouteName="Home">
+    <HomeTabs.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: COLORS.bgColor,
+        tabBarActiveBackgroundColor: COLORS.accentColor,
+        tabBarInactiveTintColor: COLORS.textPrimaryColor,
+        tabBarInactiveBackgroundColor: COLORS.bgColor,
+        tabBarItemStyle: {
+          marginTop: 8,
+          height: 40,
+          maxWidth: 70,
+          marginHorizontal: 10,
+          borderRadius: 20,
+        },
+        tabBarStyle: {
+          height: 62,
+          alignItems: 'center',
+        },
+        tabBarShowLabel: false,
+        headerTitleAlign: 'center',
+      }}
+      initialRouteName="Home"
+    >
       <HomeTabs.Screen
         name="Home"
         component={mainScreen.PostsScreen}
         options={() => ({
-          ...tabScreenOptions,
+          headerStyle: {
+            backgroundColor: COLORS.bgColor,
+            shadowColor: COLORS.shadowColor,
+            shadowOffset: { width: 0, height: 0.5 },
+            shadowRadius: 27.18,
+          },
+          headerTitleStyle: {
+            fontWeight: '500',
+            fontSize: 17,
+            lineHeight: 22,
+            letterSpacing: -0.408,
+            color: COLORS.textPrimaryColor,
+          },
           tabBarActiveTintColor: COLORS.accentColor,
           tabBarActiveBackgroundColor: COLORS.bgColor,
-          tabBarIcon: ({ color }) => <Feather name="grid" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Feather name="grid" size={24} color={color} />
+          ),
 
           title: 'Feed',
           headerRightContainerStyle: {
@@ -69,7 +68,11 @@ export default function HomeScreen() {
                 dispatch(authLogOutUser());
               }}
             >
-              <Feather name="log-out" size={24} color={COLORS.textSecondaryColor} />
+              <Feather
+                name="log-out"
+                size={24}
+                color={COLORS.textSecondaryColor}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -77,8 +80,20 @@ export default function HomeScreen() {
       <HomeTabs.Screen
         name="Create"
         component={mainScreen.CreatePostsScreen}
-        options={({ navigation, route }) => ({
-          ...tabScreenOptions,
+        options={({ navigation }) => ({
+          headerStyle: {
+            backgroundColor: COLORS.bgColor,
+            shadowColor: COLORS.shadowColor,
+            shadowOffset: { width: 0, height: 0.5 },
+            shadowRadius: 27.18,
+          },
+          headerTitleStyle: {
+            fontWeight: '500',
+            fontSize: 17,
+            lineHeight: 22,
+            letterSpacing: -0.408,
+            color: COLORS.textPrimaryColor,
+          },
           tabBarStyle: {
             display: 'none',
           },
@@ -90,7 +105,9 @@ export default function HomeScreen() {
             borderRadius: 20,
             backgroundColor: COLORS.accentColor,
           },
-          tabBarIcon: () => <AntDesign name="plus" size={24} color={COLORS.bgColor} />,
+          tabBarIcon: () => (
+            <AntDesign name="plus" size={24} color={COLORS.bgColor} />
+          ),
           title: 'Create a post',
           headerLeftContainerStyle: {
             paddingLeft: 10,
@@ -99,12 +116,16 @@ export default function HomeScreen() {
             <TouchableOpacity
               onPress={() => {
                 navigation.setParams({
-                  image: route.params.image === '',
+                  image: '',
                 });
                 navigation.dispatch(CommonActions.goBack());
               }}
             >
-              <Feather name="arrow-left" size={24} color={COLORS.textPrimaryColor} />
+              <Feather
+                name="arrow-left"
+                size={24}
+                color={COLORS.textPrimaryColor}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -113,7 +134,9 @@ export default function HomeScreen() {
         name="Profile"
         component={mainScreen.ProfileScreen}
         options={{
-          tabBarIcon: ({ color }) => <Feather name="user" size={24} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Feather name="user" size={24} color={color} />
+          ),
           tabBarActiveTintColor: COLORS.accentColor,
           tabBarActiveBackgroundColor: COLORS.bgColor,
           headerShown: false,
