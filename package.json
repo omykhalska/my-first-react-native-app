@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build": "npm run lint && tsc"
   },
   "dependencies": {
     "@expo/metro-config": "^0.5.2",
@@ -52,6 +53,8 @@
     "@types/react-test-renderer": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "3.0.2",
     "typescript": "^4.9.5"
   },
   "private": true
