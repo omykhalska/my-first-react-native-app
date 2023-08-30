@@ -1,11 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit'
+import { IUser } from '../../interfaces'
 
 export interface IState {
-  userId: null | string | number,
-  userName: null | string,
-  userEmail: null | string,
-  userAvatar: null | string,
-  stateChange: null | boolean,
+  userId: null | string
+  userName: null | string
+  userEmail: null | string
+  userAvatar: null | string
+  stateChange: null | boolean
 }
 
 const initialState: IState = {
@@ -14,26 +15,29 @@ const initialState: IState = {
   userEmail: null,
   userAvatar: null,
   stateChange: null,
-};
+}
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    updateUserProfile: (state:IState, { payload }) => ({
+    updateUserProfile: (state, { payload }: PayloadAction<IUser>) => ({
       ...state,
       userId: payload.userId,
       userName: payload.userName,
       userEmail: payload.userEmail,
       userAvatar: payload.userAvatar,
     }),
-    authStateChange: (state:IState, { payload }) => ({
+    authStateChange: (
+      state,
+      { payload }: PayloadAction<{ stateChange: boolean }>
+    ) => ({
       ...state,
       stateChange: payload.stateChange,
     }),
-    signOutUser: (_, { payload }) => ({
+    signOutUser: (_, { payload }: PayloadAction<{ stateChange: boolean }>) => ({
       ...initialState,
       stateChange: payload.stateChange,
     }),
   },
-});
+})

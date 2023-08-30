@@ -13,9 +13,8 @@ import {
 import {Formik} from 'formik';
 import {Ionicons} from '@expo/vector-icons';
 import {useRef, useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {authLogInUser} from '../../redux/auth/authOperations';
-import {useKeyboard} from '../../helpers/hooks';
+import {useAppDispatch, useKeyboard} from '../../helpers/hooks';
 import {COLORS, IMAGES, SCHEMAS} from '../../constants';
 import {NavigationProp} from '@react-navigation/native';
 import {UserCredentials} from '../../interfaces';
@@ -34,7 +33,7 @@ export default function LoginScreen({navigation}: IProps) {
 
     const passwordRef = useRef(null) as any;
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const onSubmit = ({email, password}: UserCredentials) => {
         setIsLoading(true);

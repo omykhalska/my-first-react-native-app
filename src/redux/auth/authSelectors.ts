@@ -1,7 +1,9 @@
-export const getUserName = state => state.auth.userName;
+import { RootState } from '../store'
 
-export const getUserId = state => state.auth.userId;
+export const getUserName = (state: RootState) => state.auth.userName
 
-export const getUserAvatar = state => state.auth.userAvatar;
+export const getUserId = (state: RootState) => state.auth.userId
 
-export const getStateChange = state => state.auth.stateChange;
+export const getUserAvatar = (state: RootState) => state.auth.userAvatar
+
+export const getStateChange = (state: RootState) => state.auth.stateChange
