@@ -14,11 +14,10 @@ import {
 import { Formik } from 'formik';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
 import { uploadPhotoToServer } from '../../firebase';
 import { pickImage } from '../../helpers/handleImagePicker';
-import { useKeyboard } from '../../helpers/hooks';
+import { useAppDispatch, useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
 import { useMediaLibraryPermissions } from 'expo-image-picker';
 import { handleError } from '../../helpers/handleError';
@@ -40,14 +39,14 @@ export default function RegistrationScreen({ navigation }: IProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [imageUri, setImageUri] = useState<string | null | undefined>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
   const emailRef = useRef(null) as any;
   const passwordRef = useRef(null) as any;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const pickAvatar = async () => {
     try {
@@ -62,14 +61,21 @@ export default function RegistrationScreen({ navigation }: IProps) {
     }
   };
 
-  const handleRegisterClick = async (values: UserCredentials) => {
+  const handleRegisterClick = async ({ email, password, login = '' }: UserCredentials) => {
     setIsLoading(true);
-    const avatarUrl = await uploadPhotoToServer({
-      photoUrl: imageUri,
-      photoDir: 'avatars',
-    });
-    const data = { ...values, avatar: avatarUrl };
+    const data = { email, password, login, avatar: '' };
+
+    if (imageUri) {
+      const avatarUrl = await uploadPhotoToServer({
+        photoUrl: imageUri,
+        photoDir: 'avatars',
+      });
+
+      if (avatarUrl) data.avatar = avatarUrl;
+    }
+
     dispatch(authRegisterUser(data));
+
     setIsLoading(false);
   };
 
@@ -90,11 +96,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                   style={styles.buttonIcon}
                   onPress={pickAvatar}
                 >
-                  <AntDesign
-                    name="pluscircleo"
-                    size={25}
-                    color={COLORS.accentColor}
-                  />
+                  <AntDesign name='pluscircleo' size={25} color={COLORS.accentColor} />
                 </TouchableOpacity>
               </>
             ) : (
@@ -105,11 +107,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                   style={styles.buttonIcon}
                   onPress={removeAvatar}
                 >
-                  <AntDesign
-                    name="delete"
-                    size={25}
-                    color={COLORS.accentColor}
-                  />
+                  <AntDesign name='delete' size={25} color={COLORS.accentColor} />
                 </TouchableOpacity>
               </>
             )}
@@ -120,7 +118,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
               validationSchema={SCHEMAS.registerSchema}
               onSubmit={handleRegisterClick}
             >
-              {(props) => (
+              {props => (
                 <View
                   style={{
                     marginBottom: isKeyboardVisible ? keyboardHeight : 0,
@@ -128,9 +126,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                 >
                   <Text style={styles.formTitle}>Create Account</Text>
 
-                  <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                  >
+                  <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                     <View>
                       <TextInput
                         value={props.values.login}
@@ -142,9 +138,9 @@ export default function RegistrationScreen({ navigation }: IProps) {
                         }}
                         onSubmitEditing={() => emailRef.current?.focus()}
                         blurOnSubmit={false}
-                        returnKeyType="next"
-                        returnKeyLabel="next"
-                        placeholder="Your Name"
+                        returnKeyType='next'
+                        returnKeyLabel='next'
+                        placeholder='Your Name'
                         placeholderTextColor={COLORS.textSecondaryColor}
                         style={[
                           focusedItem === 'login'
@@ -154,9 +150,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                         underlineColorAndroid={'transparent'}
                       />
                       {props.errors.login && props.touched.login && (
-                        <Text style={styles.errorText}>
-                          {props.errors.login}
-                        </Text>
+                        <Text style={styles.errorText}>{props.errors.login}</Text>
                       )}
                     </View>
 
@@ -172,12 +166,12 @@ export default function RegistrationScreen({ navigation }: IProps) {
                         ref={emailRef}
                         onSubmitEditing={() => passwordRef.current?.focus()}
                         blurOnSubmit={false}
-                        returnKeyType="next"
-                        returnKeyLabel="next"
-                        placeholder="E-mail"
+                        returnKeyType='next'
+                        returnKeyLabel='next'
+                        placeholder='E-mail'
                         placeholderTextColor={COLORS.textSecondaryColor}
-                        autoComplete="email"
-                        keyboardType="email-address"
+                        autoComplete='email'
+                        keyboardType='email-address'
                         style={[
                           focusedItem === 'email'
                             ? { ...styles.input, ...styles.inputOnFocus }
@@ -186,9 +180,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                         underlineColorAndroid={'transparent'}
                       />
                       {props.errors.email && props.touched.email && (
-                        <Text style={styles.errorText}>
-                          {props.errors.email}
-                        </Text>
+                        <Text style={styles.errorText}>{props.errors.email}</Text>
                       )}
                     </View>
 
@@ -202,9 +194,9 @@ export default function RegistrationScreen({ navigation }: IProps) {
                           setFocusedItem('');
                         }}
                         ref={passwordRef}
-                        returnKeyType="go"
-                        returnKeyLabel="go"
-                        placeholder="Create Password"
+                        returnKeyType='go'
+                        returnKeyLabel='go'
+                        placeholder='Create Password'
                         placeholderTextColor={COLORS.textSecondaryColor}
                         secureTextEntry={isHiddenPassword}
                         style={[
@@ -227,9 +219,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                       </TouchableOpacity>
 
                       {props.errors.password && props.touched.password && (
-                        <Text style={styles.errorText}>
-                          {props.errors.password}
-                        </Text>
+                        <Text style={styles.errorText}>{props.errors.password}</Text>
                       )}
                     </View>
                   </KeyboardAvoidingView>
@@ -238,6 +228,7 @@ export default function RegistrationScreen({ navigation }: IProps) {
                     style={{
                       ...styles.buttonContainer,
                       display: isKeyboardVisible ? 'none' : 'flex',
+                      backgroundColor: isLoading ? COLORS.borderColor : COLORS.accentColor,
                     }}
                     activeOpacity={0.8}
                     onPress={() => props.handleSubmit()}
@@ -346,7 +337,6 @@ const styles = StyleSheet.create({
     marginTop: 44,
     alignItems: 'center',
     gap: 12,
-    backgroundColor: COLORS.accentColor,
     borderRadius: 100,
     paddingHorizontal: 32,
     paddingVertical: 16,

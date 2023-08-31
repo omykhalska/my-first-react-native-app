@@ -12,8 +12,7 @@ import {
   SafeAreaView,
   Dimensions,
 } from 'react-native';
-
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import {
   getUserAvatar,
   getUserId,
@@ -31,15 +30,20 @@ import { COLORS, IMAGES, SHADOW } from '../../constants';
 import { authUpdateUserPhoto } from '../../redux/auth/authOperations';
 import { handleError } from '../../helpers/handleError';
 import { IPost } from '../../interfaces';
+import { useAppDispatch } from '../../helpers/hooks';
+import { BottomTabNavigatorParamList } from '../nestedScreens/HomeScreen';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-export default function ProfileScreen({ navigation, route }) {
+type Props = BottomTabScreenProps<BottomTabNavigatorParamList, 'Profile'>;
+
+export default function ProfileScreen({ navigation, route }: Props) {
   const userName = useSelector(getUserName);
-  const userId = useSelector(getUserId);
+  const userId = useSelector(getUserId)!;
   const userAvatar = useSelector(getUserAvatar);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const photo = route?.params?.image || null;
+  const photo = route.params?.image || null;
 
   const [posts, setPosts] = useState<null | IPost[]>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -49,7 +53,7 @@ export default function ProfileScreen({ navigation, route }) {
     if (photo) {
       changePhoto();
     }
-  }, [route?.params?.image]);
+  }, [route.params?.image]);
 
   useEffect(() => {
     setIsLoadingPhoto(false);
@@ -65,11 +69,11 @@ export default function ProfileScreen({ navigation, route }) {
     try {
       setIsLoadingPhoto(true);
       const avatarUrl = await uploadPhotoToServer({
-        photoUrl: photo,
+        photoUrl: photo!,
         photoDir: 'avatars',
       });
       userAvatar && (await removeAvatar(userAvatar));
-      dispatch(authUpdateUserPhoto(avatarUrl));
+      avatarUrl && dispatch(authUpdateUserPhoto(avatarUrl));
       navigation.setParams({ image: '' });
     } catch (e) {
       setIsLoadingPhoto(false);
@@ -77,12 +81,12 @@ export default function ProfileScreen({ navigation, route }) {
     }
   };
 
-  const renderItem = (item) => (
+  const renderItem = (item: IPost) => (
     <Post
       key={item.id}
       item={item}
       navigation={navigation}
-      screen="ProfileScreen"
+      screen='ProfileScreen'
     />
   );
   const memoizedRenderItem = useMemo(() => renderItem, [posts]);
@@ -107,7 +111,7 @@ export default function ProfileScreen({ navigation, route }) {
                 {isLoadingPhoto ? (
                   <Loader />
                 ) : (
-                  <Image source={{ uri: userAvatar }} style={styles.image} />
+                  <Image source={{ uri: userAvatar || undefined }} style={styles.image} />
                 )}
               </View>
             </View>
@@ -120,7 +124,7 @@ export default function ProfileScreen({ navigation, route }) {
                 onPressIn={togglePopup}
               >
                 <MaterialIcons
-                  name="mode-edit"
+                  name='mode-edit'
                   size={24}
                   color={COLORS.accentColor}
                   style={styles.icon}
@@ -169,7 +173,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignSelf: 'stretch',
     width: Dimensions.get('window').width,
-    marginTop: 148 - StatusBar.currentHeight,
+    marginTop: StatusBar.currentHeight ? 148 - StatusBar.currentHeight : 148,
     paddingHorizontal: 16,
     backgroundColor: COLORS.bgColor,
     borderTopLeftRadius: 25,

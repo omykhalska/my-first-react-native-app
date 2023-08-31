@@ -6,17 +6,17 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { AntDesign, Feather } from '@expo/vector-icons';
-import { getUserId } from '../redux/auth/authSelectors';
-import { setLike, removeLike, deletePost } from '../firebase';
-import { COLORS, IMAGES } from '../constants';
-import { NavigationProp } from '@react-navigation/native';
-import { IPost } from '../interfaces';
+} from 'react-native'
+import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { AntDesign, Feather } from '@expo/vector-icons'
+import { getUserId } from '../redux/auth/authSelectors'
+import { setLike, removeLike, deletePost } from '../firebase'
+import { COLORS, IMAGES } from '../constants'
+import { NavigationProp } from '@react-navigation/native'
+import { IPost } from '../interfaces'
 
-const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
+const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4)
 
 interface IProps {
   item: IPost;
@@ -25,37 +25,38 @@ interface IProps {
 }
 
 export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
-  const [isLiked, setIsLiked] = useState<null | boolean>(null);
+  const [isLiked, setIsLiked] = useState<null | boolean>(null)
 
-  const userId = useSelector(getUserId);
+  const userId = useSelector(getUserId)!
 
   useEffect(() => {
-    setIsLiked(item.likes.includes(userId));
-  });
+    setIsLiked(item.likes.includes(userId!))
+  })
 
   const toggleLike = async () => {
     if (isLiked) {
-      await removeLike(item.id, userId);
+      await removeLike(item.id, userId)
     } else {
-      await setLike(item.id, userId);
+      await setLike(item.id, userId)
     }
-  };
+  }
 
   const onDeletePost = async () => {
     Alert.alert('Delete this post', 'Do you confirm the deletion ?', [
       {
         text: 'Cancel',
-        onPress: () => {},
+        onPress: () => {
+        },
         style: 'cancel',
       },
       {
         text: 'Delete',
         onPress: async () => {
-          await deletePost(item);
+          await deletePost(item)
         },
       },
-    ]);
-  };
+    ])
+  }
 
   return (
     <View style={styles.publication}>
@@ -77,7 +78,7 @@ export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
             <Text style={styles.title}>{item.title}</Text>
             <TouchableOpacity onPress={onDeletePost}>
               <Feather
-                name="delete"
+                name='delete'
                 size={24}
                 color={COLORS.textPrimaryColor}
               />
@@ -103,10 +104,10 @@ export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
               navigation.navigate('Comments', {
                 postId: item.id,
                 postImage: item.photo,
-              });
+              })
             }}
           >
-            <AntDesign name="message1" size={24} color={COLORS.accentColor} />
+            <AntDesign name='message1' size={24} color={COLORS.accentColor} />
             <Text style={styles.commentsCount}>{item.comments}</Text>
           </TouchableOpacity>
         </View>
@@ -116,11 +117,11 @@ export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
             <TouchableOpacity
               style={styles.centered}
               onPress={() => {
-                navigation.navigate('Map', { location: item.location });
+                navigation.navigate('Map', { location: item.location })
               }}
             >
               <AntDesign
-                name="enviromento"
+                name='enviromento'
                 size={24}
                 color={COLORS.accentColor}
               />
@@ -130,8 +131,8 @@ export const Post = ({ item, navigation, screen = 'PostsScreen' }: IProps) => {
         )}
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   publication: {
@@ -199,4 +200,4 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimaryColor,
     textDecorationLine: 'underline',
   },
-});
+})

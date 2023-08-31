@@ -1,42 +1,42 @@
-import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
-import { useEffect, useMemo, useState } from 'react';
-import { getAllPosts } from '../../firebase';
-import { getUserAvatar } from '../../redux/auth/authSelectors';
-import { useSelector } from 'react-redux';
-import { Post } from '../../components/Post';
-import { Loader } from '../../components/Loader';
-import { COLORS } from '../../constants';
-import { NavigationProp } from '@react-navigation/native';
-import { IPost } from '../../interfaces';
+import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native'
+import { useEffect, useMemo, useState } from 'react'
+import { getAllPosts } from '../../firebase'
+import { getUserAvatar } from '../../redux/auth/authSelectors'
+import { useSelector } from 'react-redux'
+import { Post } from '../../components/Post'
+import { Loader } from '../../components/Loader'
+import { COLORS } from '../../constants'
+import { NavigationProp } from '@react-navigation/native'
+import { IPost } from '../../interfaces'
 
 interface IProps {
   navigation: NavigationProp<any, any>;
 }
 
 export default function PostsScreen({ navigation }: IProps) {
-  const [refreshing, setRefreshing] = useState(false);
-  const [posts, setPosts] = useState<null | IPost[]>(null);
-  const userAvatar = useSelector(getUserAvatar);
+  const [refreshing, setRefreshing] = useState(false)
+  const [posts, setPosts] = useState<null | IPost[]>(null)
+  const userAvatar = useSelector(getUserAvatar)
 
   useEffect(() => {
-    getAllPosts(setPosts);
-  }, [userAvatar]);
+    getAllPosts(setPosts)
+  }, [userAvatar])
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await getAllPosts(setPosts);
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await getAllPosts(setPosts)
+    setRefreshing(false)
+  }
 
-  const renderItem = ({ item }) => <Post item={item} navigation={navigation} />;
-  const memoizedRenderItem = useMemo(() => renderItem, [posts]);
+  const renderItem = ({ item }: { item: IPost }) => <Post item={item} navigation={navigation} />
+  const memoizedRenderItem = useMemo(() => renderItem, [posts])
 
   if (posts === null) {
     return (
       <Loader>
         <Text>Downloading data...</Text>
       </Loader>
-    );
+    )
   } else {
     return (
       <View style={styles.container}>
@@ -75,7 +75,7 @@ export default function PostsScreen({ navigation }: IProps) {
           />
         </View>
       </View>
-    );
+    )
   }
 }
 
@@ -102,4 +102,4 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 24,
   },
-});
+})

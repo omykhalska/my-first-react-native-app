@@ -21,23 +21,27 @@ import { Loader } from '../../components/Loader';
 import { useKeyboard } from '../../helpers/hooks';
 import { COLORS, SHADOW } from '../../constants';
 import { IComment } from '../../interfaces';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigatorParamList } from '../../navigation/MainNavigation';
 
 const imgHeight = Math.round(
-  ((Dimensions.get('window').width - 32) / 1.4) * 0.75
+  ((Dimensions.get('window').width - 32) / 1.4) * 0.75,
 );
 
-export default function CommentsScreen({ route }) {
+type Props = NativeStackScreenProps<NativeStackNavigatorParamList, 'Comments'>
+
+export default function CommentsScreen({ route }: Props) {
   const { postId, postImage } = route.params;
 
   const [commentIsUploading, setCommentIsUploading] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [comments, setComments] = useState(null);
+  const [comments, setComments] = useState<null | IComment[]>(null);
   const [inputHeight, setInputHeight] = useState(0);
 
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
   const inputBottomPositionIOS = isKeyboardVisible ? keyboardHeight : 0;
 
-  const userId = useSelector(getUserId);
+  const userId = useSelector(getUserId)!;
 
   useEffect(() => {
     getAllComments(postId, setComments);
@@ -47,7 +51,7 @@ export default function CommentsScreen({ route }) {
     () =>
       ({ item }: { item: IComment }) =>
         <Comment data={item} />,
-    [comments]
+    [comments],
   );
 
   const handleSubmit = async () => {
@@ -93,7 +97,7 @@ export default function CommentsScreen({ route }) {
                 SHADOW,
                 { height: Math.max(52, inputHeight) },
               ]}
-              placeholder="Write your comment"
+              placeholder='Write your comment'
               placeholderTextColor={COLORS.textSecondaryColor}
               onChangeText={setCommentText}
               onContentSizeChange={(event) =>
@@ -102,13 +106,13 @@ export default function CommentsScreen({ route }) {
               onSubmitEditing={Keyboard.dismiss}
               value={commentText}
               multiline
-              returnKeyType="done"
-              returnKeyLabel="done"
+              returnKeyType='done'
+              returnKeyLabel='done'
             />
             {commentText && (
               <View style={[styles.submitBtn, SHADOW]}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit}>
-                  <AntDesign name="arrowup" size={24} color={COLORS.bgColor} />
+                  <AntDesign name='arrowup' size={24} color={COLORS.bgColor} />
                 </TouchableOpacity>
               </View>
             )}

@@ -6,24 +6,23 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useDispatch, useSelector } from 'react-redux';
-import { removeAvatar, uploadPhotoToServer } from '../firebase';
-import { getUserAvatar } from '../redux/auth/authSelectors';
-import { authUpdateUserPhoto } from '../redux/auth/authOperations';
-import { handleError } from '../helpers/handleError';
-import { pickImage } from '../helpers/handleImagePicker';
-import { COLORS } from '../constants';
-import { NavigationProp } from '@react-navigation/native';
+} from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
+import { useSelector } from 'react-redux'
+import { removeAvatar, uploadPhotoToServer } from '../firebase'
+import { getUserAvatar } from '../redux/auth/authSelectors'
+import { authUpdateUserPhoto } from '../redux/auth/authOperations'
+import { handleError } from '../helpers/handleError'
+import { pickImage } from '../helpers/handleImagePicker'
+import { COLORS } from '../constants'
+import { NavigationProp } from '@react-navigation/native'
+import { useAppDispatch } from '../helpers/hooks'
 
 const imgOptions = {
   quality: 1,
   aspect: [1, 1],
   allowsEditing: true,
-};
+}
 
 interface IProps {
   visible: boolean;
@@ -33,68 +32,69 @@ interface IProps {
 }
 
 export const AvatarEditPopup = ({
-  visible,
-  onPress,
-  setIsLoadingPhoto,
-  navigation,
-}: IProps) => {
-  const userAvatar = useSelector(getUserAvatar);
-  const dispatch = useDispatch();
+                                  visible,
+                                  onPress,
+                                  setIsLoadingPhoto,
+                                  navigation,
+                                }: IProps) => {
+  const userAvatar = useSelector(getUserAvatar)
+  const dispatch = useAppDispatch()
 
   const onDeletePhoto = () => {
-    onPress();
+    onPress()
     Alert.alert(
       'Delete your profile picture',
       'Do you confirm the deletion ?',
       [
         {
           text: 'Cancel',
-          onPress: () => {},
+          onPress: () => {
+          },
           style: 'cancel',
         },
         {
           text: 'Delete',
           onPress: async () => {
-            await removeAvatar(userAvatar);
-            dispatch(authUpdateUserPhoto(''));
+            userAvatar && await removeAvatar(userAvatar)
+            dispatch(authUpdateUserPhoto(''))
           },
         },
-      ]
-    );
-  };
+      ],
+    )
+  }
 
   const onTakePhoto = async () => {
-    navigation.navigate('Camera', { previous_screen: 'Profile' });
-  };
+    navigation.navigate('Camera', { previous_screen: 'Profile' })
+  }
 
   const onPickPhoto = async () => {
-    await changePhoto(pickImage);
-  };
+    await changePhoto(pickImage)
+  }
 
   const changePhoto = async (
-    imagePickerFn: (options?: {}) => Promise<string | undefined>
+    imagePickerFn: (options?: {}) => Promise<string | undefined>,
   ) => {
     try {
-      onPress();
-      const photo = await imagePickerFn(imgOptions);
+      onPress()
+      const photo = await imagePickerFn(imgOptions)
       if (photo) {
-        setIsLoadingPhoto(true);
+        setIsLoadingPhoto(true)
         const avatarUrl = await uploadPhotoToServer({
           photoUrl: photo,
           photoDir: 'avatars',
-        });
-        userAvatar && (await removeAvatar(userAvatar));
-        dispatch(authUpdateUserPhoto(avatarUrl));
+        })
+        userAvatar && (await removeAvatar(userAvatar))
+        avatarUrl && dispatch(authUpdateUserPhoto(avatarUrl))
       }
     } catch (e) {
-      setIsLoadingPhoto(false);
-      handleError(e);
+      setIsLoadingPhoto(false)
+      handleError(e)
     }
-  };
+  }
 
   return (
     <Modal
-      animationType="slide"
+      animationType='slide'
       transparent={true}
       visible={visible}
       onRequestClose={onPress}
@@ -111,9 +111,9 @@ export const AvatarEditPopup = ({
                   onPress={onDeletePhoto}
                 >
                   <MaterialIcons
-                    name="delete"
+                    name='delete'
                     size={24}
-                    color="rgba(0,0,0,0.6)"
+                    color='rgba(0,0,0,0.6)'
                   />
                 </TouchableOpacity>
               )}
@@ -127,7 +127,7 @@ export const AvatarEditPopup = ({
                   onPress={onPickPhoto}
                 >
                   <MaterialIcons
-                    name="image-search"
+                    name='image-search'
                     size={24}
                     color={COLORS.accentColor}
                   />
@@ -142,7 +142,7 @@ export const AvatarEditPopup = ({
                   onPress={onTakePhoto}
                 >
                   <MaterialIcons
-                    name="photo-camera"
+                    name='photo-camera'
                     size={24}
                     color={COLORS.accentColor}
                   />
@@ -154,8 +154,8 @@ export const AvatarEditPopup = ({
         </View>
       </TouchableWithoutFeedback>
     </Modal>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   backdrop: {
@@ -207,4 +207,4 @@ const styles = StyleSheet.create({
   centered: {
     alignItems: 'center',
   },
-});
+})
