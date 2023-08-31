@@ -1,12 +1,13 @@
 {
-  "name": "myfirstapp",
+  "name": "pictrendy",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "build": "npm run lint && tsc"
   },
   "dependencies": {
     "@expo/metro-config": "^0.5.2",
@@ -43,7 +44,18 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "@tsconfig/react-native": "^3.0.2",
+    "@types/jest": "^29.5.4",
+    "@types/react": "~18.0.27",
+    "@types/react-native": "^0.72.2",
+    "@types/react-redux": "^7.1.26",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.1",
+    "@typescript-eslint/parser": "^6.4.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "3.0.2",
+    "typescript": "^4.9.5"
   },
   "private": true
 }

@@ -3,13 +3,17 @@ import { useState } from 'react';
 import { Button, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigatorParamList } from '../../navigation/MainNavigation';
 
-export default function CameraScreen({ navigation, route }) {
+type Props = NativeStackScreenProps<NativeStackNavigatorParamList, 'Camera'>
+
+export default function CameraScreen({ navigation, route }: Props) {
   const { previous_screen } = route.params;
 
-  const [camera, setCamera] = useState(null);
-  const [permission, requestPermission] = Camera.useCameraPermissions(null);
-  const [image, setImage] = useState(null);
+  const [camera, setCamera] = useState<Camera | null>(null);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [image, setImage] = useState<string | null>(null);
   const [type, setType] = useState(CameraType.back);
 
   if (!permission) {
@@ -20,7 +24,7 @@ export default function CameraScreen({ navigation, route }) {
     return (
       <View style={styles.container}>
         <Text style={styles.permissionText}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="Grant permission" />
+        <Button onPress={requestPermission} title='Grant permission' />
       </View>
     );
   }
@@ -31,14 +35,14 @@ export default function CameraScreen({ navigation, route }) {
 
   const takePicture = async () => {
     if (camera) {
-      const data = await camera.takePictureAsync(null);
+      const data = await camera.takePictureAsync();
       setImage(data.uri);
     }
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar />
       {image ? (
         <>
           <View style={styles.cameraContainer}>
@@ -46,10 +50,11 @@ export default function CameraScreen({ navigation, route }) {
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={() => setImage(null)}>
-              <MaterialIcons name="clear" size={48} color={COLORS.bgColor} />
+              <MaterialIcons name='clear' size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate(previous_screen, { image })}>
-              <MaterialIcons name="check" size={48} color={COLORS.bgColor} />
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Posts', { screen: previous_screen, params: { image } })}>
+              <MaterialIcons name='check' size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
           </View>
         </>
@@ -60,10 +65,10 @@ export default function CameraScreen({ navigation, route }) {
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={toggleCameraType}>
-              <MaterialIcons name="flip-camera-android" size={48} color={COLORS.bgColor} />
+              <MaterialIcons name='flip-camera-android' size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
             <TouchableOpacity onPress={takePicture}>
-              <MaterialIcons name="camera" size={48} color={COLORS.bgColor} />
+              <MaterialIcons name='camera' size={48} color={COLORS.bgColor} />
             </TouchableOpacity>
           </View>
         </>

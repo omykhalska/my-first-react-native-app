@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "allowJs": false,
+    "strict": true
+  },
+  "exclude": ["node_modules"],
+  "extends": "@tsconfig/react-native/tsconfig.json"
+}

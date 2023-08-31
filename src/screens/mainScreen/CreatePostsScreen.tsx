@@ -23,6 +23,12 @@ import { Loader } from '../../components/Loader';
 import { pickImage } from '../../helpers/handleImagePicker';
 import { COLORS, SHADOW, SCHEMAS } from '../../constants';
 import { useMediaLibraryPermissions } from 'expo-image-picker';
+import { ICoords } from '../../interfaces';
+import { BottomTabNavigatorParamList } from '../nestedScreens/HomeScreen';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { NativeStackNavigatorParamList } from '../../navigation/MainNavigation';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 const imgOptions = {
   quality: 1,
@@ -32,17 +38,21 @@ const imgOptions = {
 
 const imgHeight = Math.round((Dimensions.get('window').width - 32) / 1.4);
 
-export default function CreatePostsScreen({ navigation, route }) {
-  const photo = route?.params?.image || '';
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<BottomTabNavigatorParamList, 'Create'>,
+  NativeStackScreenProps<NativeStackNavigatorParamList>
+>;
+export default function CreatePostsScreen({ navigation, route }: Props) {
+  const photo = route.params?.image || '';
 
   const [photoUrl, setPhotoUrl] = useState('');
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState<null | ICoords>(null);
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const [status, requestPermission] = useMediaLibraryPermissions();
 
-  const userId = useSelector(getUserId);
+  const userId = useSelector(getUserId)!;
 
   useEffect(() => {
     (async () => {
@@ -74,7 +84,7 @@ export default function CreatePostsScreen({ navigation, route }) {
     }
   };
 
-  const getAddress = async coords => {
+  const getAddress = async (coords: ICoords) => {
     try {
       const { latitude, longitude } = coords;
       let response = await Location.reverseGeocodeAsync({
@@ -93,20 +103,20 @@ export default function CreatePostsScreen({ navigation, route }) {
 
   const onPickImage = async () => {
     try {
-      if (!status.granted) {
+      if (!status?.granted) {
         await requestPermission();
       } else {
         const image = await pickImage(imgOptions);
         setAddress('');
         setLocation(null);
-        setPhotoUrl(image);
+        image && setPhotoUrl(image);
       }
     } catch (e) {
       handleError(e);
     }
   };
 
-  const sendPhoto = async ({ title }) => {
+  const sendPhoto = async ({ title }: { title: string }) => {
     try {
       const data = {
         title,
@@ -153,7 +163,9 @@ export default function CreatePostsScreen({ navigation, route }) {
                       style={[styles.button, SHADOW]}
                       activeOpacity={0.8}
                       onPress={() => {
-                        navigation.navigate('Camera', { previous_screen: 'Create' });
+                        navigation.navigate('Camera', {
+                          previous_screen: 'Create',
+                        });
                       }}
                     >
                       <MaterialIcons name="photo-camera" size={24} color={COLORS.accentColor} />
@@ -197,8 +209,9 @@ export default function CreatePostsScreen({ navigation, route }) {
                       {errors.title && touched.title && (
                         <Text style={styles.errorText}>{errors.title}</Text>
                       )}
+
                       <TouchableOpacity
-                        onPress={handleSubmit}
+                        onPress={() => handleSubmit()}
                         activeOpacity={0.8}
                         disabled={!(isValid && dirty && photoUrl)}
                         style={[
@@ -236,7 +249,7 @@ export default function CreatePostsScreen({ navigation, route }) {
                           setPhotoUrl('');
                           resetForm();
                         }}
-                        opacity={0.8}
+                        activeOpacity={0.8}
                         style={[styles.trashBtnBox, SHADOW]}
                       >
                         <Feather name="trash-2" size={24} color={COLORS.textSecondaryColor} />

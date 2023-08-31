@@ -14,14 +14,15 @@ import {
 import { Formik } from 'formik';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
 import { useState, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import { authRegisterUser } from '../../redux/auth/authOperations';
 import { uploadPhotoToServer } from '../../firebase';
 import { pickImage } from '../../helpers/handleImagePicker';
-import { useKeyboard } from '../../helpers/hooks';
+import { useAppDispatch, useKeyboard } from '../../helpers/hooks';
 import { COLORS, IMAGES, SCHEMAS } from '../../constants';
 import { useMediaLibraryPermissions } from 'expo-image-picker';
 import { handleError } from '../../helpers/handleError';
+import { NavigationProp } from '@react-navigation/native';
+import { UserCredentials } from '../../interfaces';
 
 const imgOptions = {
   quality: 1,
@@ -29,38 +30,52 @@ const imgOptions = {
   allowsEditing: true,
 };
 
-export default function RegistrationScreen({ navigation }) {
+interface IProps {
+  navigation: NavigationProp<any, any>;
+}
+
+export default function RegistrationScreen({ navigation }: IProps) {
   const [status, requestPermission] = useMediaLibraryPermissions();
   const [isLoading, setIsLoading] = useState(false);
   const [focusedItem, setFocusedItem] = useState('');
   const [isHiddenPassword, setIsHiddenPassword] = useState(true);
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
   const { isKeyboardVisible, keyboardHeight } = useKeyboard();
 
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
+  const emailRef = useRef(null) as any;
+  const passwordRef = useRef(null) as any;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const pickAvatar = async () => {
     try {
-      if (!status.granted) {
+      if (!status!.granted) {
         await requestPermission();
       } else {
         const photo = await pickImage(imgOptions);
-        setImageUri(photo);
+        photo && setImageUri(photo);
       }
     } catch (e) {
       handleError(e);
     }
   };
 
-  const handleRegisterClick = async values => {
+  const handleRegisterClick = async ({ email, password, login = '' }: UserCredentials) => {
     setIsLoading(true);
-    const avatarUrl = await uploadPhotoToServer({ photoUrl: imageUri, photoDir: 'avatars' });
-    const data = { ...values, avatar: avatarUrl };
+    const data = { email, password, login, avatar: '' };
+
+    if (imageUri) {
+      const avatarUrl = await uploadPhotoToServer({
+        photoUrl: imageUri,
+        photoDir: 'avatars',
+      });
+
+      if (avatarUrl) data.avatar = avatarUrl;
+    }
+
     dispatch(authRegisterUser(data));
+
     setIsLoading(false);
   };
 
@@ -73,19 +88,28 @@ export default function RegistrationScreen({ navigation }) {
       <View style={styles.container}>
         <ImageBackground source={IMAGES.bgPattern} style={styles.image}>
           <View style={styles.avatarContainer}>
-            <Image source={{ uri: imageUri }} style={styles.image} />
             {!imageUri ? (
-              <TouchableOpacity activeOpacity={0.8} style={styles.buttonIcon} onPress={pickAvatar}>
-                <AntDesign name="pluscircleo" size={25} color={COLORS.accentColor} />
-              </TouchableOpacity>
+              <>
+                <View style={styles.image} />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.buttonIcon}
+                  onPress={pickAvatar}
+                >
+                  <AntDesign name='pluscircleo' size={25} color={COLORS.accentColor} />
+                </TouchableOpacity>
+              </>
             ) : (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                style={styles.buttonIcon}
-                onPress={removeAvatar}
-              >
-                <AntDesign name="delete" size={25} color={COLORS.accentColor} />
-              </TouchableOpacity>
+              <>
+                <Image source={{ uri: imageUri }} style={styles.image} />
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.buttonIcon}
+                  onPress={removeAvatar}
+                >
+                  <AntDesign name='delete' size={25} color={COLORS.accentColor} />
+                </TouchableOpacity>
+              </>
             )}
           </View>
           <View style={styles.regFormContainer}>
@@ -95,7 +119,11 @@ export default function RegistrationScreen({ navigation }) {
               onSubmit={handleRegisterClick}
             >
               {props => (
-                <View style={{ marginBottom: isKeyboardVisible ? keyboardHeight : 0 }}>
+                <View
+                  style={{
+                    marginBottom: isKeyboardVisible ? keyboardHeight : 0,
+                  }}
+                >
                   <Text style={styles.formTitle}>Create Account</Text>
 
                   <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -110,9 +138,9 @@ export default function RegistrationScreen({ navigation }) {
                         }}
                         onSubmitEditing={() => emailRef.current?.focus()}
                         blurOnSubmit={false}
-                        returnKeyType="next"
-                        returnKeyLabel="next"
-                        placeholder="Your Name"
+                        returnKeyType='next'
+                        returnKeyLabel='next'
+                        placeholder='Your Name'
                         placeholderTextColor={COLORS.textSecondaryColor}
                         style={[
                           focusedItem === 'login'
@@ -138,12 +166,12 @@ export default function RegistrationScreen({ navigation }) {
                         ref={emailRef}
                         onSubmitEditing={() => passwordRef.current?.focus()}
                         blurOnSubmit={false}
-                        returnKeyType="next"
-                        returnKeyLabel="next"
-                        placeholder="E-mail"
+                        returnKeyType='next'
+                        returnKeyLabel='next'
+                        placeholder='E-mail'
                         placeholderTextColor={COLORS.textSecondaryColor}
-                        autoComplete="email"
-                        keyboardType="email-address"
+                        autoComplete='email'
+                        keyboardType='email-address'
                         style={[
                           focusedItem === 'email'
                             ? { ...styles.input, ...styles.inputOnFocus }
@@ -166,9 +194,9 @@ export default function RegistrationScreen({ navigation }) {
                           setFocusedItem('');
                         }}
                         ref={passwordRef}
-                        returnKeyType="go"
-                        returnKeyLabel="go"
-                        placeholder="Create Password"
+                        returnKeyType='go'
+                        returnKeyLabel='go'
+                        placeholder='Create Password'
                         placeholderTextColor={COLORS.textSecondaryColor}
                         secureTextEntry={isHiddenPassword}
                         style={[
@@ -200,9 +228,10 @@ export default function RegistrationScreen({ navigation }) {
                     style={{
                       ...styles.buttonContainer,
                       display: isKeyboardVisible ? 'none' : 'flex',
+                      backgroundColor: isLoading ? COLORS.borderColor : COLORS.accentColor,
                     }}
                     activeOpacity={0.8}
-                    onPress={props.handleSubmit}
+                    onPress={() => props.handleSubmit()}
                     disabled={isLoading}
                   >
                     <Text style={styles.buttonText}>Create Account</Text>
@@ -308,7 +337,6 @@ const styles = StyleSheet.create({
     marginTop: 44,
     alignItems: 'center',
     gap: 12,
-    backgroundColor: COLORS.accentColor,
     borderRadius: 100,
     paddingHorizontal: 32,
     paddingVertical: 16,

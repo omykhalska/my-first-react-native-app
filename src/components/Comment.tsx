@@ -2,15 +2,21 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getUserId } from '../redux/auth/authSelectors';
 import { COLORS, IMAGES } from '../constants';
+import { IComment } from '../interfaces';
 
-export const Comment = ({ data }) => {
+interface IProps {
+  data: IComment;
+}
+
+export const Comment = ({ data }: IProps) => {
   const { userId, userAvatar, commentText, createdAt } = data;
 
   const currentUserId = useSelector(getUserId);
 
   const getDate = () => createdAt?.toDate().toLocaleDateString() || 'Today';
 
-  const getTime = () => createdAt?.toDate().toLocaleTimeString().slice(0, 5) || 'Just now';
+  const getTime = () =>
+    createdAt?.toDate().toLocaleTimeString().slice(0, 5) || 'Just now';
 
   return (
     <View
@@ -25,7 +31,10 @@ export const Comment = ({ data }) => {
           marginRight: userId === currentUserId ? 0 : 16,
         }}
       >
-        <Image source={userAvatar ? { uri: userAvatar } : IMAGES.user} style={styles.avatar} />
+        <Image
+          source={userAvatar ? { uri: userAvatar } : IMAGES.user}
+          style={styles.avatar}
+        />
       </View>
       <View
         style={{
@@ -40,7 +49,7 @@ export const Comment = ({ data }) => {
             alignSelf: userId === currentUserId ? 'flex-start' : 'flex-end',
             ...styles.commentDate,
           }}
-        >{`${getDate(data)} | ${getTime(data)}`}</Text>
+        >{`${getDate()} | ${getTime()}`}</Text>
       </View>
     </View>
   );

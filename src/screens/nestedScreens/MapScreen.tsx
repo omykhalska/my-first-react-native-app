@@ -1,8 +1,12 @@
 import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigatorParamList } from '../../navigation/MainNavigation';
 
-export default function MapScreen({ route }) {
-  const { latitude, longitude } = route.params.location;
+type Props = NativeStackScreenProps<NativeStackNavigatorParamList, 'Map'>
+
+export default function MapScreen({ route }: Props) {
+  const { latitude, longitude } = route.params?.location;
   return (
     <View style={styles.container}>
       <MapView
